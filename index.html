@@ -2,145 +2,101 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School System RK | Dynamic</title>
-    
+    <title>School Cloud RK | Testing System</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-
+    
     <style>
-        :root { --primary: #4f46e5; --sidebar: #0f172a; --bg: #f8fafc; }
-        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+        :root { --main: #4f46e5; --dark: #0f172a; --text: #1e293b; --accent: #10b981; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { margin: 0; background: #f1f5f9; display: flex; height: 100vh; color: var(--text); }
         .hidden { display: none !important; }
-
-        /* Auth Screens */
-        .auth-overlay { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
-        .auth-card { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
         
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
-        textarea { height: 100px; resize: none; }
-        button { cursor: pointer; border: none; border-radius: 8px; font-weight: 600; transition: 0.3s; }
-        .btn-google { background: #ea4335; color: white; padding: 15px; width: 100%; font-size: 16px; }
-        .btn-primary { background: var(--primary); color: white; padding: 12px; width: 100%; }
+        .full-screen { position: fixed; inset: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; z-index: 1000; color: white; }
+        .window { background: white; color: black; padding: 40px; border-radius: 24px; width: 100%; max-width: 450px; }
 
-        /* Main UI */
-        aside { width: 260px; background: var(--sidebar); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
-        main { flex: 1; padding: 30px; overflow-y: auto; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        aside { width: 300px; background: var(--dark); color: white; padding: 25px; display: flex; flex-direction: column; flex-shrink: 0; }
+        .class-select { background: #334155; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; margin: 10px 0; }
+        
+        .m-btn { background: rgba(255,255,255,0.05); color: #94a3b8; border: none; padding: 12px; text-align: left; border-radius: 10px; margin: 4px 0; cursor: pointer; width: 100%; }
+        .m-btn:hover, .m-btn.active { background: var(--main); color: white; }
 
-        .nav-group { margin-bottom: 20px; }
-        .nav-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-        .nav-btn { background: rgba(255,255,255,0.05); color: #94a3b8; padding: 10px; width: 100%; text-align: left; margin: 4px 0; font-size: 14px; }
-        .nav-btn:hover, .nav-btn.active { background: var(--primary); color: white; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; }
-        th { background: #f8fafc; font-size: 12px; color: #64748b; }
-        .n-btn { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 5px 10px; border-radius: 4px; }
-        .n-active { background: #ef4444; color: white; border-color: #ef4444; }
+        main { flex: 1; padding: 40px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        th, td { padding: 15px; border-bottom: 1px solid #f1f5f9; text-align: center; }
+        th { background: #f8fafc; font-size: 12px; text-transform: uppercase; color: #64748b; }
+        
+        .btn-test { background: var(--main); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-right: 5px; }
+        .btn-pract { background: var(--accent); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .n-btn { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 10px; }
+        .btn-go { background: var(--main); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="screen-login" class="auth-overlay">
-        <div class="auth-card" style="text-align: center;">
-            <h1>🎓 SmartSchool RK</h1>
-            <p style="color: #64748b; margin-bottom: 25px;">Единая система образования</p>
-            <button class="btn-google" onclick="login()">Войти через Google</button>
+    <div id="loader" class="full-screen"><h2>Синхронизация с облаком...</h2></div>
+
+    <div id="scr-auth" class="full-screen hidden">
+        <div class="window" style="text-align: center;">
+            <h1>SmartSchool</h1>
+            <button class="btn-go" onclick="authAction()" style="background:#ea4335">Войти через Google</button>
         </div>
     </div>
 
-    <div id="screen-survey" class="auth-overlay hidden">
-        <div class="auth-card">
-            <h3>Создание профиля</h3>
-            <p style="font-size: 13px; color: #64748b;">Выберите ваш статус и класс.</p>
-            
-            <input type="text" id="reg-name" placeholder="Ваше полное ФИО">
-            
-            <label>Ваша роль:</label>
-            <select id="reg-role" onchange="toggleRegClass()">
+    <div id="scr-reg" class="full-screen hidden">
+        <div class="window">
+            <h3>Регистрация</h3>
+            <input type="text" id="in-name" placeholder="ФИО ученика/учителя">
+            <select id="in-role">
                 <option value="student">Ученик</option>
-                <option value="teacher">Учитель (Предметник)</option>
+                <option value="teacher">Учитель</option>
             </select>
-
-            <label>Ваш класс:</label>
-            <select id="reg-class">
-                <option value="1Г">1 "Г" класс</option>
-                <option value="2Г">2 "Г" класс</option>
-                <option value="10Г">10 "Г" класс</option>
-                <option value="11Г">11 "Г" класс</option>
-            </select>
-
-            <textarea id="reg-proof" maxlength="1000" placeholder="Напишите обоснование доступа..."></textarea>
-            
-            <button class="btn-primary" onclick="sendApplication()">Отправить заявку</button>
+            <select id="in-class"></select>
+            <textarea id="in-proof" placeholder="Зачем вам доступ?"></textarea>
+            <button class="btn-go" onclick="registerInDB()">Создать аккаунт</button>
         </div>
     </div>
 
-    <div id="screen-wait" class="auth-overlay hidden">
-        <div class="auth-card" style="text-align: center;">
-            <div style="font-size: 50px;">📡</div>
-            <h3>Ожидайте подтверждения</h3>
-            <p style="color: #64748b;">Администратор проверяет вашу привязку к классу.</p>
+    <div id="scr-wait" class="full-screen hidden">
+        <div class="window" style="text-align:center">
+            <h2>⏳ Ожидание</h2>
+            <p>Ваш аккаунт активируется администратором.</p>
+            <button onclick="exitApp()" style="color:red; background:none; border:none; cursor:pointer">Выйти</button>
         </div>
     </div>
 
-    <div id="screen-main" class="hidden" style="display: flex; width: 100%;">
+    <div id="scr-app" class="hidden" style="display:flex; width:100%">
         <aside>
-            <h2 id="display-role" style="font-size: 18px; color: #818cf8;">РОЛЬ</h2>
-            <p id="display-email" style="font-size: 11px; opacity: 0.5; margin-bottom: 20px;"></p>
+            <h2 id="out-role" style="color: #818cf8; margin-bottom: 0;">ROLE</h2>
+            <p id="out-email" style="font-size: 11px; opacity: 0.5; margin-bottom: 25px;"></p>
 
-            <div class="nav-group">
-                <p class="nav-label">Выбор Класса</p>
-                <select id="filter-class" onchange="loadJournal()" style="background:#334155; color:white; border:none;">
-                    <option value="1Г">1 "Г" класс</option>
-                    <option value="2Г">2 "Г" класс</option>
-                    <option value="10Г">10 "Г" класс</option>
-                    <option value="11Г">11 "Г" класс</option>
-                </select>
+            <label style="font-size:11px; color:#64748b">КЛАСС</label>
+            <select id="app-class-sel" class="class-select" onchange="initUI()"></select>
+
+            <div id="subject-box"></div>
+
+            <div id="admin-panel" class="hidden" style="margin-top:20px; border-top:1px solid #334155; padding-top:20px">
+                <button class="m-btn" onclick="openTab('req')">🔔 Модерация заявок</button>
             </div>
 
-            <div class="nav-group">
-                <p class="nav-label">Предметы</p>
-                <div id="subject-list"></div>
-            </div>
-
-            <div id="admin-tools" class="hidden">
-                <p class="nav-label">Администрирование</p>
-                <button class="nav-btn" onclick="showTab('requests')">🔔 Заявки юзеров</button>
-            </div>
-
-            <button onclick="logout()" style="margin-top:auto; background:#334155; color:white; padding:10px; border-radius:5px;">Выйти</button>
+            <button onclick="exitApp()" style="margin-top:auto; padding:10px; background:#334155; color:white; border:none; border-radius:8px; cursor:pointer">🚪 Выход</button>
         </aside>
 
         <main>
             <div id="tab-journal">
-                <div class="card">
-                    <div style="display:flex; justify-content:space-between;">
-                        <h2 id="view-title">Выберите предмет</h2>
-                        <button id="btn-excel" onclick="exportExcel()" style="background:#10b981; color:white; border-radius:8px; padding:5px 15px;">Excel</button>
-                    </div>
-                    <table id="journal-table">
-                        <thead>
-                            <tr>
-                                <th style="text-align:left;">ФИО Ученика</th>
-                                <th>Посещение</th>
-                                <th>Балл (1-10)</th>
-                                <th>Тип</th>
-                            </tr>
-                        </thead>
-                        <tbody id="journal-body"></tbody>
-                    </table>
-                </div>
+                <h2 id="journal-title">Выберите учебную дисциплину</h2>
+                <table id="main-table">
+                    <thead><tr id="table-head"><th>Ученик</th><th>Задания</th><th>Статус</th><th>Итог</th></tr></thead>
+                    <tbody id="journal-body"></tbody>
+                </table>
             </div>
 
-            <div id="tab-requests" class="hidden">
-                <div class="card">
-                    <h2>Новые заявки</h2>
-                    <div id="req-list"></div>
-                </div>
+            <div id="tab-req" class="hidden">
+                <h2>Заявки на регистрацию</h2>
+                <div id="req-list"></div>
             </div>
         </main>
     </div>
@@ -155,160 +111,161 @@
             messagingSenderId: "1061923785862",
             appId: "1:1061923785862:web:1ab66811d0eeb56b651507"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const auth = firebase.auth();
-        const provider = new firebase.auth.GoogleAuthProvider();
 
-        let currentUser = null;
-        let currentSubject = "Информатика";
-
-        const subjectsData = {
-            "1Г": ["Грамота", "Математика", "Самопознание"],
-            "2Г": ["Русский язык", "Математика", "Английский язык"],
-            "10Г": ["Информатика", "Физика", "Алгебра", "Геометрия"],
-            "11Г": ["Информатика", "Физика", "История Казахстана", "НВП"]
+        const classNames = [];
+        for(let i=1; i<=11; i++) { ['А','Б','В','Г'].forEach(l => classNames.push(i + l)); }
+        
+        const subjData = {
+            low: ["Математика", "Букварь", "ИЗО", "Самопознание"],
+            mid: ["Алгебра", "Геометрия", "История", "Физика", "Химия"],
+            high: ["Информатика", "НВП", "Астрономия", "История Казахстана"]
         };
 
-        function login() { auth.signInWithPopup(provider).then(res => checkUser(res.user)); }
-        function logout() { auth.signOut().then(() => location.reload()); }
+        const inCls = document.getElementById('in-class');
+        const appCls = document.getElementById('app-class-sel');
+        classNames.forEach(c => {
+            inCls.add(new Option(c + " класс", c));
+            appCls.add(new Option(c + " класс", c));
+        });
 
-        function checkUser(user) {
-            if (user.email === 'ko-23-151@turan-edu.kz') {
-                currentUser = { role: 'admin', email: user.email };
-                initApp();
-                return;
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                if (user.email === 'ko-23-151@turan-edu.kz') {
+                    window.user = { role: 'admin', email: user.email };
+                    renderApp();
+                    hide('loader');
+                } else {
+                    db.ref('users/' + user.uid).on('value', s => {
+                        const val = s.val();
+                        if (!val) show('scr-reg');
+                        else if (val.status === 'pending') show('scr-wait');
+                        else { window.user = val; renderApp(); }
+                        hide('loader');
+                    });
+                }
+            } else {
+                show('scr-auth');
+                hide('loader');
             }
-            db.ref('users/' + user.uid).on('value', s => {
-                const data = s.val();
-                if (!data) showScreen('screen-survey');
-                else if (data.status === 'pending') showScreen('screen-wait');
-                else { currentUser = data; initApp(); }
-            });
-        }
+        });
 
-        function sendApplication() {
+        function authAction() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+        function exitApp() { auth.signOut().then(() => location.reload()); }
+
+        function registerInDB() {
             db.ref('users/' + auth.currentUser.uid).set({
-                name: document.getElementById('reg-name').value,
-                role: document.getElementById('reg-role').value,
-                userClass: document.getElementById('reg-class').value,
-                proof: document.getElementById('reg-proof').value,
+                name: document.getElementById('in-name').value,
+                role: document.getElementById('in-role').value,
+                uClass: document.getElementById('in-class').value,
+                proof: document.getElementById('in-proof').value,
                 status: 'pending',
                 email: auth.currentUser.email
             });
         }
 
-        function initApp() {
-            showScreen('screen-main');
-            document.getElementById('display-role').innerText = currentUser.role === 'admin' ? "АДМИНИСТРАТОР" : (currentUser.role === 'teacher' ? "УЧИТЕЛЬ" : "УЧЕНИК");
-            document.getElementById('display-email').innerText = currentUser.email;
+        function renderApp() {
+            show('scr-app');
+            document.getElementById('out-role').innerText = window.user.role === 'student' ? "УЧЕНИК" : "ПРЕПОДАВАТЕЛЬ";
+            document.getElementById('out-email').innerText = window.user.email;
             
-            if (currentUser.role === 'admin') {
-                document.getElementById('admin-tools').classList.remove('hidden');
-                loadRequests();
+            if(window.user.role === 'admin') document.getElementById('admin-panel').classList.remove('hidden');
+            if(window.user.role === 'student') {
+                appCls.value = window.user.uClass;
+                appCls.disabled = true;
             }
-            
-            if(currentUser.userClass) {
-                document.getElementById('filter-class').value = currentUser.userClass;
-                if(currentUser.role === 'student') document.getElementById('filter-class').disabled = true;
-            }
-
-            updateSubjectList();
-            loadJournal();
+            initUI();
         }
 
-        function updateSubjectList() {
-            const cls = document.getElementById('filter-class').value;
-            const list = document.getElementById('subject-list');
-            if(!subjectsData[cls]) return;
-            list.innerHTML = '';
-            subjectsData[cls].forEach(sub => {
-                list.innerHTML += `<button class="nav-btn" onclick="setSubject('${sub}')">${sub}</button>`;
+        function initUI() {
+            const cls = appCls.value;
+            const lvl = parseInt(cls);
+            let currentSubjs = lvl <= 4 ? subjData.low : (lvl <= 9 ? subjData.mid : subjData.high);
+            
+            const box = document.getElementById('subject-box');
+            box.innerHTML = '';
+            currentSubjs.forEach(s => {
+                box.innerHTML += `<button class="m-btn" onclick="openSubject('${s}')">${s}</button>`;
             });
+            loadJournalData();
         }
 
-        function setSubject(sub) {
-            currentSubject = sub;
-            loadJournal();
+        function openSubject(s) {
+            document.getElementById('journal-title').innerText = s + " (" + appCls.value + ")";
+            openTab('journal');
         }
 
-        function loadJournal() {
-            updateSubjectList();
-            const cls = document.getElementById('filter-class').value;
-            document.getElementById('view-title').innerText = `${cls} | ${currentSubject}`;
+        function loadJournalData() {
+            const cls = appCls.value;
+            const isStudent = window.user.role === 'student';
             
-            // Прячем Excel для ученика
-            const btnExcel = document.getElementById('btn-excel');
-            if(currentUser.role === 'student') btnExcel.style.display = 'none';
-            else btnExcel.style.display = 'block';
+            // Меняем шапку таблицы в зависимости от роли
+            const head = document.getElementById('table-head');
+            if (isStudent) {
+                head.innerHTML = `<th>ФИО</th><th>Тестирование (5 вопр.)</th><th>Практика (5 зад.)</th><th>Ваш балл</th>`;
+            } else {
+                head.innerHTML = `<th>Ученик</th><th>Посещаемость</th><th>Оценка за урок</th><th>Тип работы</th>`;
+            }
 
             db.ref('users').once('value', s => {
                 const users = s.val();
                 const tbody = document.getElementById('journal-body');
                 tbody.innerHTML = '';
                 
-                for(let id in users) {
-                    if(users[id].userClass === cls && users[id].role === 'student' && users[id].status === 'approved') {
-                        let controls = '';
-                        
-                        if(currentUser.role === 'student') {
-                            // Если зашел ученик - только текст
-                            controls = `<td>-</td><td>-</td><td>-</td>`;
+                for (let id in users) {
+                    if (users[id].uClass === cls && users[id].role === 'student' && users[id].status === 'approved') {
+                        let rowHtml = `<td><b>${users[id].name}</b></td>`;
+
+                        if (isStudent) {
+                            // ИНТЕРФЕЙС УЧЕНИКА: Тесты и практика
+                            rowHtml += `
+                                <td><button class="btn-test" onclick="alert('Запуск теста из 5 вопросов...')">▶ Начать тест</button></td>
+                                <td><button class="btn-pract" onclick="alert('Загрузка 5 практических задач...')">📂 Открыть задачи</button></td>
+                                <td style="color:var(--main); font-weight:bold">Ожидание</td>
+                            `;
                         } else {
-                            // Если учитель или админ - кнопки и инпуты
-                            controls = `
-                                <td><button class="n-btn" onclick="this.classList.toggle('n-active'); this.innerText = this.innerText=='Б'?'Н':'Б'">Б</button></td>
-                                <td><input type="number" min="1" max="10" style="width:40px; text-align:center;"></td>
+                            // ИНТЕРФЕЙС УЧИТЕЛЯ: Стандартный журнал
+                            rowHtml += `
+                                <td><button class="n-btn" onclick="this.innerText=this.innerText=='Б'?'Н':'Б'">Б</button></td>
+                                <td><input type="number" style="width:50px; text-align:center" placeholder="1-10"></td>
                                 <td><select style="width:auto; padding:5px;"><option>Урок</option><option>СОР</option><option>СОЧ</option></select></td>
                             `;
                         }
 
-                        tbody.innerHTML += `
-                            <tr>
-                                <td style="text-align:left;"><b>${users[id].name}</b></td>
-                                ${controls}
-                            </tr>`;
+                        tbody.innerHTML += `<tr>${rowHtml}</tr>`;
                     }
                 }
-                if(tbody.innerHTML === '') tbody.innerHTML = '<tr><td colspan="4">В этом классе пока нет зарегистрированных учеников</td></tr>';
+                if(tbody.innerHTML === '') tbody.innerHTML = '<tr><td colspan="4">В этом классе пока нет учеников</td></tr>';
             });
         }
 
         function loadRequests() {
             db.ref('users').on('value', s => {
                 const users = s.val();
-                const list = document.getElementById('req-list');
-                list.innerHTML = '';
-                for(let id in users) {
-                    if(users[id].status === 'pending') {
-                        list.innerHTML += `
-                            <div style="border:1px solid #eee; padding:10px; margin-bottom:10px; border-radius:8px;">
-                                <b>${users[id].name}</b> | Класс: ${users[id].userClass} | Роль: ${users[id].role}<br>
-                                <p style="font-size:12px; color:gray;">${users[id].proof}</p>
-                                <button onclick="approve('${id}')" style="background:green; color:white; padding:5px 10px; border-radius:4px;">Одобрить</button>
-                            </div>`;
+                const container = document.getElementById('req-list');
+                container.innerHTML = '';
+                for (let id in users) {
+                    if (users[id].status === 'pending') {
+                        container.innerHTML += `<div style="background:white; padding:15px; border-radius:12px; margin-bottom:10px; border:1px solid #e2e8f0">
+                            <b>${users[id].name}</b> | Класс: ${users[id].uClass}<br>
+                            <button class="btn-go" onclick="approve('${id}')" style="width:auto; padding:8px 20px; margin-top:10px">Одобрить вход</button>
+                        </div>`;
                     }
                 }
             });
         }
 
-        function approve(id) { db.ref('users/' + id).update({ status: 'approved' }); }
+        function approve(uid) { db.ref('users/' + uid).update({ status: 'approved' }); }
+        function show(id) { document.getElementById(id).classList.remove('hidden'); }
+        function hide(id) { document.getElementById(id).classList.add('hidden'); }
 
-        function showScreen(id) {
-            document.querySelectorAll('.auth-overlay, #screen-main').forEach(el => el.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-        }
-
-        function showTab(id) {
+        function openTab(id) {
             document.getElementById('tab-journal').classList.add('hidden');
-            document.getElementById('tab-requests').classList.add('hidden');
-            document.getElementById(id).classList.remove('hidden');
-        }
-
-        function exportExcel() {
-            const wb = XLSX.utils.table_to_book(document.getElementById('journal-table'));
-            XLSX.writeFile(wb, "School_Report.xlsx");
+            document.getElementById('tab-req').classList.add('hidden');
+            document.getElementById('tab-' + id).classList.remove('hidden');
+            if(id === 'req') loadRequests();
         }
     </script>
 </body>
