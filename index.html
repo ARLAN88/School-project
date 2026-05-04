@@ -3,109 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduSystem | Система верификации</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>EduSystem Pro | Казахстан</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        :root {
-            --primary: #4f46e5; --bg: #f8fafc; --card: #ffffff;
-            --text: #0f172a; --muted: #64748b; --border: #e2e8f0;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); }
+        :root { --primary: #2563eb; --success: #10b981; --danger: #ef4444; --bg: #f1f5f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; }
         .hidden { display: none !important; }
+        
+        /* Sidebar */
+        aside { width: 280px; background: #1e293b; color: white; display: flex; flex-direction: column; padding: 20px; }
+        aside button { background: rgba(255,255,255,0.1); color: white; border: none; padding: 12px; margin: 5px 0; border-radius: 8px; text-align: left; cursor: pointer; }
+        aside button:hover { background: var(--primary); }
+        .logout-btn { margin-top: auto; background: var(--danger) !important; }
 
-        /* Центрированные блоки (Логин, Анкета, Ожидание) */
-        .flex-center { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-        .box { background: var(--card); padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
+        /* Main Content */
+        main { flex: 1; padding: 30px; overflow-y: auto; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; }
         
-        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; }
-        button { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn-google { background: #ea4335; color: white; }
-        .btn-primary { background: var(--primary); color: white; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: center; }
+        th { background: #f8fafc; }
+
+        .grade-input { width: 45px; padding: 5px; text-align: center; border: 1px solid #cbd5e1; border-radius: 4px; }
+        .n-btn { cursor: pointer; padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; background: #eee; }
+        .n-active { background: var(--danger); color: white; border-color: var(--danger); }
         
-        /* Панель Админа */
-        .admin-layout { display: flex; height: 100vh; }
-        .sidebar { width: 260px; background: white; border-right: 1px solid var(--border); padding: 20px; }
-        .content { flex: 1; padding: 40px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border); }
-        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
-        .status-pending { background: #fef3c7; color: #92400e; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, min-minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 15px; border-radius: 10px; border-left: 4px solid var(--primary); }
+        
+        #login-screen { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .login-box { background: white; padding: 40px; border-radius: 20px; text-align: center; width: 350px; }
     </style>
 </head>
 <body>
 
-    <div id="screen-login" class="flex-center">
-        <div class="box">
-            <h2 style="margin-bottom:10px;">🎓 EduSystem</h2>
-            <p style="color:var(--muted); margin-bottom:20px;">Войдите через Google для подачи заявки</p>
-            <button class="btn-google" onclick="login()">Войти через Google</button>
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 style="margin-bottom: 5px;">EduSystem RK</h2>
+            <p style="color: #64748b;">Электронный журнал (10-балл)</p>
+            <button onclick="login()" style="width:100%; padding:15px; background:#db4437; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">
+                Войти через Google
+            </button>
         </div>
     </div>
 
-    <div id="screen-survey" class="flex-center hidden">
-        <div class="box">
-            <h3>Создание профиля</h3>
-            <p style="font-size:0.9rem; color:var(--muted);">Администратор проверит ваши данные</p>
-            <input type="text" id="field-name" placeholder="Ваше ФИО">
-            <select id="field-role">
-                <option value="student">Ученик</option>
-                <option value="teacher">Учитель</option>
-            </select>
-            <textarea id="field-proof" placeholder="Докажите роль (номер школы, класс или предмет преподавания)"></textarea>
-            <button class="btn-primary" onclick="sendRequest()">Отправить заявку</button>
+    <aside id="sidebar" class="hidden">
+        <h3 id="user-role-label">Загрузка...</h3>
+        <p id="user-email-label" style="font-size: 0.8rem; opacity: 0.7;"></p>
+        <hr style="width:100%; opacity:0.2;">
+        
+        <div id="nav-admin" class="hidden">
+            <button onclick="showSection('section-requests')">🔔 Заявки (Модерация)</button>
+            <button onclick="showSection('section-journal')">📊 Общий журнал</button>
         </div>
-    </div>
 
-    <div id="screen-wait" class="flex-center hidden">
-        <div class="box">
-            <div style="font-size: 3rem;">⏳</div>
-            <h3 style="margin-top:10px;">Заявка на рассмотрении</h3>
-            <p style="color:var(--muted); margin-top:10px;">Ваш аккаунт сейчас проверяется администратором. Пожалуйста, зайдите позже.</p>
-            <button onclick="location.reload()">Проверить статус</button>
+        <div id="nav-teacher" class="hidden">
+            <button onclick="showSection('section-journal')">📓 Мой журнал</button>
+            <button onclick="showSection('section-analytics')">📈 Аналитика класса</button>
         </div>
-    </div>
 
-    <div id="screen-admin" class="admin-layout hidden">
-        <aside class="sidebar">
-            <h2>Админ-панель</h2>
-            <p id="admin-name" style="margin-bottom:20px; font-size:0.9rem; color:var(--muted);"></p>
-            <button class="btn-primary" onclick="location.reload()">Обновить список</button>
-        </aside>
-        <main class="content">
-            <h3>Заявки на верификацию</h3>
-            <table style="margin-top:20px;">
-                <thead>
-                    <tr>
-                        <th>Имя / Email</th>
-                        <th>Роль</th>
-                        <th>Доказательства</th>
-                        <th>Действие</th>
-                    </tr>
-                </thead>
-                <tbody id="requests-table"></tbody>
-            </table>
-        </main>
-    </div>
+        <button class="logout-btn" onclick="logout()">🚪 Выйти из системы</button>
+    </aside>
 
-    <div id="screen-main" class="flex-center hidden">
-        <div class="box">
-            <h1 id="welcome-user">Добро пожаловать!</h1>
-            <p id="user-role-display"></p>
-            <div style="margin-top:20px; padding:20px; border:1px dashed var(--border);">
-                Здесь будет функционал для <span id="role-name"></span>
+    <main id="main-content" class="hidden">
+        
+        <section id="section-requests" class="hidden">
+            <div class="card">
+                <h3>Заявки на доступ</h3>
+                <table id="requests-table">
+                    <thead><tr><th>ФИО / Email</th><th>Роль</th><th>Инфо</th><th>Действие</th></tr></thead>
+                    <tbody></tbody>
+                </table>
             </div>
-            <button onclick="location.reload()" style="background:#f1f5f9; color:black;">Выйти</button>
-        </div>
-    </div>
+        </section>
+
+        <section id="section-journal" class="hidden">
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3>Классный журнал: 11 "А" | Предмет: Информатика</h3>
+                    <input type="date" id="journal-date" value="2024-09-01" onchange="loadJournalData()">
+                </div>
+                
+                <div class="stats-grid" style="margin-top:20px;">
+                    <div class="stat-card">Средний балл: <b id="avg-total">0</b></div>
+                    <div class="stat-card">Посещаемость: <b id="att-total">0%</b></div>
+                </div>
+
+                <table id="journal-table">
+                    <thead>
+                        <tr>
+                            <th>Ученик</th>
+                            <th>Посещаемость</th>
+                            <th>Оценка (1-10)</th>
+                            <th>Тип работы</th>
+                            <th>Ср. балл</th>
+                        </tr>
+                    </thead>
+                    <tbody id="journal-body">
+                        </tbody>
+                </table>
+                <br>
+                <button onclick="saveJournal()" style="background:var(--success); color:white; padding:12px 25px; border:none; border-radius:8px; cursor:pointer;">💾 Сохранить в облако</button>
+                <button onclick="exportToExcel()" style="background:#1d6f42; color:white; padding:12px 25px; border:none; border-radius:8px; cursor:pointer; margin-left:10px;">Excel Отчет</button>
+            </div>
+        </section>
+
+        <section id="section-analytics" class="hidden">
+            <div class="card">
+                <h3>Визуализация успеваемости</h3>
+                <canvas id="attendanceChart" width="400" height="150"></canvas>
+            </div>
+        </section>
+    </main>
 
     <script>
-        // ТВОИ КЛЮЧИ
         const firebaseConfig = {
             apiKey: "AIzaSyAWmME75qjW5pxmOjObfVsINaRylPtpL6k",
             authDomain: "auth-project-7aec4.firebaseapp.com",
@@ -121,92 +138,161 @@
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
 
-        let currentUid = null;
+        let currentUser = null;
 
-        // ВХОД ЧЕРЕЗ GOOGLE
+        // ВХОД
         function login() {
             auth.signInWithPopup(provider).then(res => {
-                currentUid = res.user.uid;
-                checkUser(res.user);
+                checkAccess(res.user);
             });
         }
 
-        function checkUser(gUser) {
-            // Твой личный емейл как суперадмина (ЗАМЕНИ НА СВОЙ)
-            if (gUser.email === 'ko-23-151@turan-edu.kz') {
-                showScreen('screen-admin');
-                document.getElementById('admin-name').innerText = gUser.email;
-                loadRequests();
+        // ВЫХОД
+        function logout() {
+            auth.signOut().then(() => {
+                location.reload();
+            });
+        }
+
+        function checkAccess(user) {
+            const uid = user.uid;
+            // Админ по почте
+            if (user.email === 'ko-23-151@turan-edu.kz') {
+                currentUser = { role: 'admin', email: user.email };
+                initUI();
                 return;
             }
 
-            db.ref('users/' + currentUid).once('value', s => {
+            db.ref('users/' + uid).once('value', s => {
                 const data = s.val();
-                if (!data) {
-                    showScreen('screen-survey'); // Новый — на анкету
-                } else if (data.status === 'pending') {
-                    showScreen('screen-wait');   // Ждет — на экран ожидания
+                if (data && data.status === 'approved') {
+                    currentUser = { uid, ...data };
+                    initUI();
+                } else if (!data) {
+                    // Регистрация новой заявки (упростим для теста)
+                    const name = prompt("Введите ваше ФИО:");
+                    const role = prompt("Кто вы? (teacher/student):");
+                    db.ref('users/' + uid).set({
+                        name: name, role: role, status: 'pending', email: user.email
+                    });
+                    alert("Заявка отправлена админу!");
                 } else {
-                    showScreen('screen-main');   // Одобрен — в систему
-                    document.getElementById('welcome-user').innerText = "Привет, " + data.name;
-                    document.getElementById('user-role-display').innerText = "Твоя роль: " + (data.role === 'teacher' ? 'Учитель' : 'Ученик');
-                    document.getElementById('role-name').innerText = data.role;
+                    alert("Ваш аккаунт на проверке!");
                 }
             });
         }
 
-        // ОТПРАВКА ЗАЯВКИ
-        function sendRequest() {
-            const name = document.getElementById('field-name').value;
-            const role = document.getElementById('field-role').value;
-            const proof = document.getElementById('field-proof').value;
+        function initUI() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('sidebar').classList.remove('hidden');
+            document.getElementById('main-content').classList.remove('hidden');
+            document.getElementById('user-email-label').innerText = currentUser.email;
+            document.getElementById('user-role-label').innerText = currentUser.role.toUpperCase();
 
-            if(!name || !proof) return alert("Заполните все поля!");
-
-            db.ref('users/' + currentUid).set({
-                name: name,
-                role: role,
-                proof: proof,
-                status: 'pending',
-                email: auth.currentUser.email
-            }).then(() => {
-                showScreen('screen-wait');
-            });
+            if (currentUser.role === 'admin') {
+                document.getElementById('nav-admin').classList.remove('hidden');
+                showSection('section-requests');
+                loadRequests();
+            } else {
+                document.getElementById('nav-teacher').classList.remove('hidden');
+                showSection('section-journal');
+                loadJournalData();
+            }
         }
 
-        // АДМИН: ЗАГРУЗКА ЗАЯВОК
+        // МОДЕРНИЗАЦИЯ (АДМИН)
         function loadRequests() {
             db.ref('users').on('value', s => {
-                const users = s.val();
-                const table = document.getElementById('requests-table');
-                table.innerHTML = '';
-                for (let id in users) {
-                    if (users[id].status === 'pending') {
-                        table.innerHTML += `
-                            <tr>
-                                <td><b>${users[id].name}</b><br>${users[id].email}</td>
-                                <td>${users[id].role}</td>
-                                <td>${users[id].proof}</td>
-                                <td>
-                                    <button class="btn-primary" onclick="approve('${id}', '${users[id].role}')" style="padding:5px 10px; font-size:0.8rem;">Одобрить</button>
-                                    <button onclick="approve('${id}', 'teacher')" style="padding:5px 10px; font-size:0.8rem; background:gray; color:white;">Как Учителя</button>
-                                    <button onclick="approve('${id}', 'student')" style="padding:5px 10px; font-size:0.8rem; background:gray; color:white;">Как Ученика</button>
-                                </td>
-                            </tr>`;
+                const list = s.val();
+                const tbody = document.querySelector('#requests-table tbody');
+                tbody.innerHTML = '';
+                for (let id in list) {
+                    if (list[id].status === 'pending') {
+                        tbody.innerHTML += `<tr>
+                            <td>${list[id].name}<br>${list[id].email}</td>
+                            <td>${list[id].role}</td>
+                            <td>${list[id].proof || 'Нет данных'}</td>
+                            <td><button onclick="approve('${id}')">Одобрить</button></td>
+                        </tr>`;
                     }
                 }
             });
         }
 
-        function approve(uid, role) {
-            db.ref('users/' + uid).update({
-                status: 'approved',
-                role: role
-            }).then(() => alert("Роль " + role + " подтверждена!"));
+        function approve(uid) {
+            db.ref('users/' + uid).update({ status: 'approved' });
         }
 
-        function showScreen(id) {
-            document.querySelectorAll('body > div').forEach(d => d.classList.add('hidden'));
+        // ЖУРНАЛ И АНАЛИТИКА
+        const students = ["Абишев А.", "Бериков Д.", "Иванова Е.", "Касымов М.", "Нурахметов С."]; // Тестовый список
+
+        function loadJournalData() {
+            const date = document.getElementById('journal-date').value;
+            const tbody = document.getElementById('journal-body');
+            tbody.innerHTML = '';
+
+            students.forEach(name => {
+                tbody.innerHTML += `
+                    <tr data-name="${name}">
+                        <td>${name}</td>
+                        <td><button class="n-btn" onclick="toggleAttendance(this)">Б</button></td>
+                        <td><input type="number" class="grade-input" min="1" max="10" oninput="calculateStats()"></td>
+                        <td>
+                            <select>
+                                <option value="lesson">Урок</option>
+                                <option value="sor">СОР</option>
+                                <option value="soch">СОЧ</option>
+                            </select>
+                        </td>
+                        <td class="row-avg">-</td>
+                    </tr>
+                `;
+            });
+            calculateStats();
+        }
+
+        function toggleAttendance(btn) {
+            if (btn.innerText === 'Б') { btn.innerText = 'Н'; btn.classList.add('n-active'); }
+            else if (btn.innerText === 'Н') { btn.innerText = 'У'; btn.style.background = 'orange'; }
+            else { btn.innerText = 'Б'; btn.classList.remove('n-active'); btn.style.background = '#eee'; }
+            calculateStats();
+        }
+
+        function calculateStats() {
+            let totalGrade = 0;
+            let gradeCount = 0;
+            let n_count = 0;
+
+            document.querySelectorAll('#journal-body tr').forEach(row => {
+                const grade = row.querySelector('.grade-input').value;
+                const att = row.querySelector('.n-btn').innerText;
+                
+                if (grade) {
+                    totalGrade += parseInt(grade);
+                    gradeCount++;
+                    row.querySelector('.row-avg').innerText = grade;
+                }
+                if (att === 'Н') n_count++;
+            });
+
+            const avg = gradeCount > 0 ? (totalGrade / gradeCount).toFixed(1) : 0;
+            const attendance = ((students.length - n_count) / students.length * 100).toFixed(0);
+
+            document.getElementById('avg-total').innerText = avg;
+            document.getElementById('att-total').innerText = attendance + "%";
+        }
+
+        function saveJournal() {
+            alert("Данные за " + document.getElementById('journal-date').value + " сохранены в Firebase!");
+        }
+
+        function exportToExcel() {
+            var wb = XLSX.utils.table_to_book(document.getElementById('journal-table'), {sheet: "Журнал"});
+            XLSX.writeFile(wb, "Report_School_RK.xlsx");
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
     </script>
