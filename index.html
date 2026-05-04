@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduSystem RK | Final Edition</title>
+    <title>EduSystem RK | Final Fixed</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -11,120 +11,98 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 
     <style>
-        :root { --primary: #4f46e5; --sidebar: #0f172a; --bg: #f1f5f9; --white: #ffffff; }
-        * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+        :root { --primary: #4f46e5; --sidebar: #0f172a; --bg: #f1f5f9; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { margin: 0; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
         .hidden { display: none !important; }
 
-        /* Auth */
+        /* Оверлеи */
         .overlay { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
-        .card-auth { background: white; padding: 40px; border-radius: 24px; width: 100%; max-width: 480px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .card { background: white; padding: 35px; border-radius: 20px; width: 100%; max-width: 450px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
         
-        input, select, textarea { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 15px; outline: none; }
-        textarea { height: 120px; resize: none; }
-        .btn-p { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 600; cursor: pointer; }
-        .btn-g { background: #ea4335; color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; }
+        textarea { height: 100px; resize: none; }
+        .btn-p { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; }
 
-        /* Main UI */
-        aside { width: 300px; background: var(--sidebar); color: white; padding: 25px; display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; }
-        main { flex: 1; padding: 40px; overflow-y: auto; position: relative; }
-        .panel { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        /* Интерфейс */
+        aside { width: 280px; background: var(--sidebar); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; }
+        main { flex: 1; padding: 30px; overflow-y: auto; }
+        .main-panel { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
 
-        .section-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1.5px; margin: 20px 0 10px 0; display: block; }
-        .menu-item { background: rgba(255,255,255,0.03); color: #94a3b8; padding: 12px 15px; width: 100%; text-align: left; margin: 5px 0; border-radius: 10px; border: none; cursor: pointer; transition: 0.2s; }
-        .menu-item:hover, .menu-item.active { background: var(--primary); color: white; }
+        .menu-btn { background: rgba(255,255,255,0.05); color: #94a3b8; padding: 12px; width: 100%; text-align: left; margin: 4px 0; border-radius: 8px; border: none; cursor: pointer; }
+        .menu-btn:hover, .menu-btn.active { background: var(--primary); color: white; }
 
-        /* Таблицы */
-        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; }
-        th { background: #f8fafc; padding: 15px; text-align: center; font-size: 12px; color: #64748b; border-bottom: 2px solid #edf2f7; }
-        td { padding: 15px; text-align: center; border-bottom: 1px solid #edf2f7; }
-        
-        .n-btn { width: 35px; height: 35px; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; background: #f8fafc; font-weight: bold; }
-        .n-active { background: #ef4444; color: white; border-color: #ef4444; }
-        .grade-in { width: 55px; padding: 8px; text-align: center; border: 1px solid #e2e8f0; border-radius: 8px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; }
+        th { background: #f8fafc; color: #64748b; font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <div id="scr-loading" class="overlay">
-        <h2 style="color: white;">Синхронизация с сервером...</h2>
+    <div id="scr-load" class="overlay">
+        <h2 style="color: white;">Загрузка системы...</h2>
     </div>
 
     <div id="scr-login" class="overlay hidden">
-        <div class="card-auth" style="text-align: center;">
-            <h1>🎓 Школьный Журнал</h1>
-            <p style="color: #64748b;">Войдите в систему через Google</p>
-            <button class="btn-g" onclick="login()">Войти через Google</button>
+        <div class="card" style="text-align: center;">
+            <h1>🎓 SmartSchool</h1>
+            <button class="btn-p" onclick="login()" style="background: #ea4335;">Войти через Google</button>
         </div>
     </div>
 
     <div id="scr-survey" class="overlay hidden">
-        <div class="card-auth">
-            <h3>Регистрация пользователя</h3>
-            <input type="text" id="reg-name" placeholder="Ваше ФИО">
+        <div class="card">
+            <h3>Регистрация</h3>
+            <input type="text" id="reg-name" placeholder="ФИО">
             <select id="reg-role">
                 <option value="student">Ученик</option>
                 <option value="teacher">Учитель</option>
             </select>
             <select id="reg-class-list"></select>
-            <textarea id="reg-proof" maxlength="1000" placeholder="Доказательство (школа, должность, класс...)"></textarea>
+            <textarea id="reg-proof" placeholder="Доказательство роли (до 1000 симв.)"></textarea>
             <button class="btn-p" onclick="saveReg()">Отправить заявку</button>
         </div>
     </div>
 
     <div id="scr-wait" class="overlay hidden">
-        <div class="card-auth" style="text-align: center;">
-            <div style="font-size: 60px;">🗝️</div>
-            <h3>Доступ заблокирован</h3>
-            <p>Администратор еще не подтвердил вашу личность. Пожалуйста, подождите.</p>
-            <button class="btn-p" onclick="logout()" style="background: #334155;">Выйти</button>
+        <div class="card" style="text-align: center;">
+            <h2>⏳ Доступ ограничен</h2>
+            <p>Ваша заявка проверяется администратором.</p>
+            <button onclick="logout()" style="color:red; background:none; border:none; cursor:pointer;">Выйти</button>
         </div>
     </div>
 
     <div id="scr-main" class="hidden" style="display: flex; width: 100%;">
         <aside>
-            <h2 id="role-tag" style="color: #818cf8; margin: 0 0 5px 0;">ROLE</h2>
-            <p id="email-tag" style="font-size: 11px; opacity: 0.5; margin-bottom: 25px;"></p>
+            <h2 id="role-tag" style="color: #818cf8;">ROLE</h2>
+            <p id="email-tag" style="font-size: 11px; opacity: 0.5; margin-bottom: 20px;"></p>
 
-            <span class="section-label">Класс</span>
-            <select id="main-class-select" onchange="updateView()" style="background: #334155; color: white; border: none;"></select>
+            <label style="font-size: 10px; color: #64748b; text-transform: uppercase;">Класс</label>
+            <select id="main-class-select" onchange="updateUI()" style="background:#334155; color:white; border:none; padding:8px; width:100%; margin-bottom: 20px;"></select>
 
-            <span class="section-label">Предметы</span>
-            <div id="menu-subjects"></div>
+            <div id="subject-menu"></div>
 
-            <div id="admin-menu" class="hidden">
-                <span class="section-label">Администрирование</span>
-                <button class="menu-item" onclick="changeTab('requests')">🔔 Новые заявки</button>
-                <button class="menu-item" onclick="changeTab('journal')">📖 Журнал</button>
+            <div id="admin-only" class="hidden" style="margin-top: 30px; border-top: 1px solid #334155; padding-top: 20px;">
+                <button class="menu-btn" onclick="showTab('requests')">🔔 Заявки</button>
+                <button class="menu-btn" onclick="showTab('journal')">📖 Журнал</button>
             </div>
 
-            <button onclick="logout()" style="margin-top: auto; background: #334155; color: white; padding: 12px; border: none; border-radius: 10px; cursor: pointer;">🚪 Выход</button>
+            <button onclick="logout()" style="margin-top: auto; background: #334155; color: white; padding: 10px; border: none; border-radius: 8px;">Выйти</button>
         </aside>
 
         <main>
             <div id="tab-journal">
-                <div class="panel">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h2 id="journal-title">Выберите предмет</h2>
-                        <button onclick="exportToExcel()" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">📥 Excel Отчет</button>
-                    </div>
-                    <table id="table-journal">
-                        <thead>
-                            <tr>
-                                <th style="text-align: left;">Ученик</th>
-                                <th>Посещаемость</th>
-                                <th>Оценка (1-10)</th>
-                                <th>Тип контроля</th>
-                            </tr>
-                        </thead>
+                <div class="main-panel">
+                    <h2 id="view-title">Выберите предмет</h2>
+                    <table>
+                        <thead><tr><th>ФИО</th><th>Посещение</th><th>Балл</th><th>Тип</th></tr></thead>
                         <tbody id="tbody-journal"></tbody>
                     </table>
                 </div>
             </div>
-
             <div id="tab-requests" class="hidden">
-                <div class="panel">
-                    <h2>Заявки на верификацию</h2>
+                <div class="main-panel">
+                    <h2>Заявки на подтверждение</h2>
                     <div id="list-req"></div>
                 </div>
             </div>
@@ -146,54 +124,50 @@
         const db = firebase.database();
         const auth = firebase.auth();
 
-        // БАЗА КЛАССОВ И ПРЕДМЕТОВ
-        const all_classes = [];
-        for(let i=1; i<=11; i++) { ['А','Б','В','Г'].forEach(l => all_classes.push(i + l)); }
-
+        // Генерация 44 классов
+        const classes = [];
+        for(let i=1; i<=11; i++) { ['А','Б','В','Г'].forEach(l => classes.push(i + l)); }
+        
         const subjects = {
-            low: ["Грамота", "Математика", "Познание мира", "Самопознание", "ИЗО", "Музыка"],
-            mid: ["Алгебра", "Геометрия", "Русский язык", "Литература", "История", "Биология", "География", "Английский"],
-            high: ["Алгебра", "Физика", "Информатика", "Химия", "История Казахстана", "НВП", "Экономика"]
+            low: ["Букварь", "Математика", "ИЗО"],
+            mid: ["Алгебра", "Геометрия", "История", "Физика"],
+            high: ["Информатика", "НВП", "Химия", "История Казахстана"]
         };
 
-        // Заполнение селектов
         const regSel = document.getElementById('reg-class-list');
         const mainSel = document.getElementById('main-class-select');
-        all_classes.forEach(c => {
+        classes.forEach(c => {
             regSel.add(new Option(c + " класс", c));
             mainSel.add(new Option(c + " класс", c));
         });
 
         // ПРОВЕРКА СЕССИИ (Чтобы не выкидывало)
         auth.onAuthStateChanged(user => {
-            document.getElementById('scr-loading').classList.add('hidden');
+            document.getElementById('scr-load').classList.add('hidden');
             if (user) {
                 db.ref('users/' + user.uid).on('value', s => {
                     const data = s.val();
                     if (user.email === 'ko-23-151@turan-edu.kz') { 
-                        currentUser = { role: 'admin', email: user.email }; 
-                        startApp(); 
+                        currentUser = { role: 'admin', email: user.email }; startApp(); 
                     } else if (!data) { 
                         showScr('scr-survey'); 
                     } else if (data.status === 'pending') { 
                         showScr('scr-wait'); 
                     } else { 
-                        currentUser = data; 
-                        startApp(); 
+                        currentUser = data; startApp(); 
                     }
                 });
-            } else {
-                showScr('scr-login');
-            }
+            } else { showScr('scr-login'); }
         });
 
         function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
         function logout() { auth.signOut().then(() => location.reload()); }
 
         function saveReg() {
+            const role = document.getElementById('reg-role').value; // ЧИТАЕМ РОЛЬ
             db.ref('users/' + auth.currentUser.uid).set({
                 name: document.getElementById('reg-name').value,
-                role: document.getElementById('reg-role').value,
+                role: role, // ПИШЕМ РОЛЬ
                 uClass: document.getElementById('reg-class-list').value,
                 proof: document.getElementById('reg-proof').value,
                 status: 'pending',
@@ -205,34 +179,29 @@
             showScr('scr-main');
             document.getElementById('role-tag').innerText = currentUser.role.toUpperCase();
             document.getElementById('email-tag').innerText = currentUser.email;
-            
-            if(currentUser.role === 'admin') document.getElementById('admin-menu').classList.remove('hidden');
-            if(currentUser.role === 'student') {
+            if (currentUser.role === 'admin') document.getElementById('admin-only').classList.remove('hidden');
+            if (currentUser.role === 'student') {
                 mainSel.value = currentUser.uClass;
                 mainSel.disabled = true;
             }
-            updateView();
+            updateUI();
         }
 
-        function updateView() {
+        function updateUI() {
             const cls = mainSel.value;
-            const level = parseInt(cls);
-            let subList = [];
-            if(level <= 4) subList = subjects.low;
-            else if(level <= 9) subList = subjects.mid;
-            else subList = subjects.high;
-
-            const menu = document.getElementById('menu-subjects');
+            const num = parseInt(cls);
+            let subList = num <= 4 ? subjects.low : (num <= 9 ? subjects.mid : subjects.high);
+            const menu = document.getElementById('subject-menu');
             menu.innerHTML = '';
             subList.forEach(s => {
-                menu.innerHTML += `<button class="menu-item" onclick="openSub('${s}')">${s}</button>`;
+                menu.innerHTML += `<button class="menu-btn" onclick="openSub('${s}')">${s}</button>`;
             });
             loadStudents();
         }
 
         function openSub(name) {
-            document.getElementById('journal-title').innerText = name + " | " + mainSel.value;
-            changeTab('journal');
+            document.getElementById('view-title').innerText = name + " | " + mainSel.value;
+            showTab('journal');
         }
 
         function loadStudents() {
@@ -241,13 +210,14 @@
                 const users = s.val();
                 const tbody = document.getElementById('tbody-journal');
                 tbody.innerHTML = '';
-                for(let id in users) {
-                    if(users[id].uClass === cls && users[id].role === 'student' && users[id].status === 'approved') {
+                for (let id in users) {
+                    // ЖЕСТКАЯ ПРОВЕРКА КЛАССА И РОЛИ УЧЕНИКА
+                    if (users[id].uClass === cls && users[id].role === 'student' && users[id].status === 'approved') {
                         tbody.innerHTML += `<tr>
-                            <td style="text-align:left;"><b>${users[id].name}</b></td>
-                            <td><button class="n-btn" onclick="this.classList.toggle('n-active'); this.innerText=this.innerText=='Б'?'Н':'Б'">Б</button></td>
-                            <td><input type="number" class="grade-in" min="1" max="10"></td>
-                            <td><select style="width:auto; margin:0;"><option>Урок</option><option>СОР</option><option>СОЧ</option></select></td>
+                            <td>${users[id].name}</td>
+                            <td><button onclick="this.innerText=this.innerText=='Б'?'Н':'Б'">Б</button></td>
+                            <td><input type="number" min="1" max="10" style="width:45px;"></td>
+                            <td>Урок</td>
                         </tr>`;
                     }
                 }
@@ -259,13 +229,12 @@
                 const users = s.val();
                 const list = document.getElementById('list-req');
                 list.innerHTML = '';
-                for(let id in users) {
-                    if(users[id].status === 'pending') {
-                        list.innerHTML += `
-                        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:20px; border-radius:15px; margin-bottom:15px;">
+                for (let id in users) {
+                    if (users[id].status === 'pending') {
+                        list.innerHTML += `<div style="border:1px solid #ddd; padding:15px; margin-top:10px; border-radius:12px;">
                             <b>${users[id].name}</b> | Класс: ${users[id].uClass} | Роль: ${users[id].role}<br>
-                            <p style="background:white; padding:10px; border-radius:10px; margin:10px 0;">${users[id].proof}</p>
-                            <button class="btn-p" onclick="approve('${id}')" style="width:auto; padding:10px 30px; background:#10b981;">Одобрить</button>
+                            <p style="background:#f1f5f9; padding:10px; font-size:12px;">${users[id].proof}</p>
+                            <button onclick="approve('${id}')" style="background:green; color:white; border:none; padding:8px 20px; border-radius:8px;">Одобрить</button>
                         </div>`;
                     }
                 }
@@ -279,16 +248,11 @@
             document.getElementById(id).classList.remove('hidden');
         }
 
-        function changeTab(id) {
+        function showTab(id) {
             document.getElementById('tab-journal').classList.add('hidden');
             document.getElementById('tab-requests').classList.add('hidden');
             document.getElementById('tab-' + id).classList.remove('hidden');
-            if(id === 'requests') loadRequests();
-        }
-
-        function exportToExcel() {
-            const wb = XLSX.utils.table_to_book(document.getElementById('table-journal'));
-            XLSX.writeFile(wb, "Journal_Report.xlsx");
+            if (id === 'requests') loadRequests();
         }
     </script>
 </body>
