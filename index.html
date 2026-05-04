@@ -10,26 +10,22 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
 <style>
-:root { --primary:#4f46e5; --sidebar:#0f172a; --bg:#f1f5f9; }
-*{font-family:Segoe UI;margin:0;box-sizing:border-box}
-body{display:flex;height:100vh;background:var(--bg)}
+*{font-family:Arial;margin:0;box-sizing:border-box}
+body{display:flex;height:100vh}
 .hidden{display:none!important}
 
 .overlay{position:fixed;inset:0;background:#0f172a;display:flex;align-items:center;justify-content:center}
-.card{background:#fff;padding:25px;border-radius:15px;width:420px}
+.card{background:#fff;padding:20px;border-radius:10px;width:400px}
 
-input,select,textarea{width:100%;padding:10px;margin:6px 0;border:1px solid #ddd;border-radius:8px}
-.btn{background:var(--primary);color:#fff;border:none;padding:12px;width:100%;border-radius:10px}
+aside{width:250px;background:#111827;color:#fff;padding:15px}
+main{flex:1;padding:20px}
 
-aside{width:260px;background:var(--sidebar);color:#fff;padding:20px}
-main{flex:1;padding:20px;overflow:auto}
+.menu-btn{width:100%;padding:10px;margin:5px 0;background:#1f2937;color:#fff;border:none;border-radius:6px;cursor:pointer}
+.menu-btn:hover{background:#4f46e5}
 
-.menu-btn{background:#1e293b;color:#cbd5e1;padding:10px;margin:5px 0;border:none;width:100%;border-radius:8px;cursor:pointer}
-.menu-btn:hover{background:var(--primary);color:#fff}
-
-table{width:100%;margin-top:15px;border-collapse:collapse}
+table{width:100%;border-collapse:collapse}
 td,th{border:1px solid #ddd;padding:8px;text-align:center}
-th{background:#f8fafc}
+button{cursor:pointer}
 </style>
 </head>
 
@@ -38,8 +34,8 @@ th{background:#f8fafc}
 <!-- LOGIN -->
 <div id="login" class="overlay">
   <div class="card">
-    <h2>Login</h2>
-    <button class="btn" onclick="login()">Войти через Google</button>
+    <h3>Вход</h3>
+    <button onclick="login()">Google login</button>
   </div>
 </div>
 
@@ -49,8 +45,8 @@ th{background:#f8fafc}
     <h3>Регистрация</h3>
     <input id="name" placeholder="ФИО">
     <select id="class"></select>
-    <textarea id="proof" placeholder="Почему хотите участвовать"></textarea>
-    <button class="btn" onclick="save()">Отправить</button>
+    <textarea id="proof" placeholder="Комментарий"></textarea>
+    <button onclick="save()">Отправить</button>
   </div>
 </div>
 
@@ -68,18 +64,20 @@ th{background:#f8fafc}
 <h3 id="role"></h3>
 <div id="menu"></div>
 
-<div id="admin" class="hidden">
+<div id="adminBlock" class="hidden">
 <hr>
-<button class="menu-btn" onclick="loadReq()">Заявки</button>
+<button class="menu-btn" onclick="loadRequests()">Заявки</button>
 </div>
 
 </aside>
 
 <main>
-<h3>Панель</h3>
+<h3>Пользователи</h3>
 <table>
-<thead><tr><th>Имя</th><th>Статус</th><th>Роль</th></tr></thead>
-<tbody id="tbl"></tbody>
+<thead>
+<tr><th>Имя</th><th>Статус</th><th>Роль</th></tr>
+</thead>
+<tbody id="table"></tbody>
 </table>
 </main>
 
@@ -88,14 +86,19 @@ th{background:#f8fafc}
 <!-- MODAL -->
 <div id="modal" class="overlay hidden">
   <div class="card">
-    <h3>Назначить предмет</h3>
+    <h3>Одобрение пользователя</h3>
+    <p id="userInfo"></p>
+
     <select id="subject">
+      <option value="">Сделать учеником</option>
       <option>Математика</option>
       <option>Физика</option>
       <option>Информатика</option>
       <option>История</option>
     </select>
-    <button class="btn" onclick="confirm()">OK</button>
+
+    <button onclick="confirmApprove()">Подтвердить</button>
+    <button onclick="closeModal()">Отмена</button>
   </div>
 </div>
 
@@ -109,21 +112,23 @@ databaseURL:"x"
 const db=firebase.database();
 const auth=firebase.auth();
 
-let userData=null;
-let tempId=null;
+let currentUser=null;
+let pendingUser=null;
 
+// классы
 const classes=[...Array(11)].map((_,i)=>i+1+"А");
-
 classes.forEach(c=>{
-  const o=document.createElement("option");
-  o.innerText=c;
-  document.getElementById("class").appendChild(o);
+const o=document.createElement("option");
+o.textContent=c;
+document.getElementById("class").appendChild(o);
 });
 
+// LOGIN
 function login(){
 auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 }
 
+// AUTH
 auth.onAuthStateChanged(u=>{
 if(!u){show("login");return;}
 
@@ -140,11 +145,12 @@ show("wait");
 return;
 }
 
-userData=d;
+currentUser=d;
 start();
 });
 });
 
+// SAVE REG
 function save(){
 db.ref("users/"+auth.currentUser.uid).set({
 name:document.getElementById("name").value,
@@ -156,19 +162,22 @@ subjects:[]
 });
 }
 
+// START APP
 function start(){
 show("main");
-document.getElementById("role").innerText=userData.role;
 
-if(userData.role==="admin"){
-document.getElementById("admin").classList.remove("hidden");
+document.getElementById("role").innerText=currentUser.role;
+
+if(currentUser.role==="admin"){
+document.getElementById("adminBlock").classList.remove("hidden");
 }
 
 document.getElementById("menu").innerHTML=
-(userData.subjects||[]).map(s=>`<button class="menu-btn">${s}</button>`).join("");
+(currentUser.subjects||[]).map(s=>`<button class="menu-btn">${s}</button>`).join("");
 }
 
-function loadReq(){
+// LOAD REQUESTS
+function loadRequests(){
 db.ref("users").once("value",s=>{
 const d=s.val();
 let html="";
@@ -179,32 +188,49 @@ html+=`
 <tr>
 <td>${d[id].name}</td>
 <td>${d[id].status}</td>
-<td>
-<button onclick="openModal('${id}')">approve</button>
-</td>
+<td><button onclick="openModal('${id}')">approve</button></td>
 </tr>`;
 }
 }
 
-document.getElementById("tbl").innerHTML=html;
+document.getElementById("table").innerHTML=html;
 });
 }
 
+// OPEN MODAL
 function openModal(id){
-tempId=id;
+pendingUser=id;
+
+db.ref("users/"+id).once("value",s=>{
+document.getElementById("userInfo").innerText=s.val().name;
+});
+
 show("modal");
 }
 
-function confirm(){
-db.ref("users/"+tempId).update({
-status:"approved",
-role:"teacher",
-subjects:[document.getElementById("subject").value]
-});
+// CONFIRM APPROVE
+function confirmApprove(){
+const subject=document.getElementById("subject").value;
 
+let update={status:"approved"};
+
+if(subject){
+update.role="teacher";
+update.subjects=[subject];
+}
+
+db.ref("users/"+pendingUser).update(update);
+
+closeModal();
+loadRequests();
+}
+
+// CLOSE MODAL
+function closeModal(){
 show("main");
 }
 
+// SHOW
 function show(id){
 document.querySelectorAll(".overlay,#main").forEach(e=>e.classList.add("hidden"));
 document.getElementById(id).classList.remove("hidden");
