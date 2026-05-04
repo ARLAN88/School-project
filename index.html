@@ -1,241 +1,315 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduSystem RK</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School System RK | Dynamic</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <style>
+        :root { --primary: #4f46e5; --sidebar: #0f172a; --bg: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+        .hidden { display: none !important; }
 
-<style>
-*{font-family:Arial;margin:0;box-sizing:border-box}
-body{display:flex;height:100vh}
-.hidden{display:none!important}
+        /* Auth Screens */
+        .auth-overlay { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+        .auth-card { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+        textarea { height: 100px; resize: none; }
+        button { cursor: pointer; border: none; border-radius: 8px; font-weight: 600; transition: 0.3s; }
+        .btn-google { background: #ea4335; color: white; padding: 15px; width: 100%; font-size: 16px; }
+        .btn-primary { background: var(--primary); color: white; padding: 12px; width: 100%; }
 
-.overlay{position:fixed;inset:0;background:#0f172a;display:flex;align-items:center;justify-content:center}
-.card{background:#fff;padding:20px;border-radius:10px;width:400px}
+        /* Main UI */
+        aside { width: 260px; background: var(--sidebar); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
+        main { flex: 1; padding: 30px; overflow-y: auto; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
 
-aside{width:250px;background:#111827;color:#fff;padding:15px}
-main{flex:1;padding:20px}
+        .nav-group { margin-bottom: 20px; }
+        .nav-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .nav-btn { background: rgba(255,255,255,0.05); color: #94a3b8; padding: 10px; width: 100%; text-align: left; margin: 4px 0; font-size: 14px; }
+        .nav-btn:hover, .nav-btn.active { background: var(--primary); color: white; }
 
-.menu-btn{width:100%;padding:10px;margin:5px 0;background:#1f2937;color:#fff;border:none;border-radius:6px;cursor:pointer}
-.menu-btn:hover{background:#4f46e5}
-
-table{width:100%;border-collapse:collapse}
-td,th{border:1px solid #ddd;padding:8px;text-align:center}
-button{cursor:pointer}
-</style>
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; }
+        th { background: #f8fafc; font-size: 12px; color: #64748b; }
+        .n-btn { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 5px 10px; border-radius: 4px; }
+        .n-active { background: #ef4444; color: white; border-color: #ef4444; }
+    </style>
 </head>
-
 <body>
 
-<!-- LOGIN -->
-<div id="login" class="overlay">
-  <div class="card">
-    <h3>Вход</h3>
-    <button onclick="login()">Google login</button>
-  </div>
-</div>
+    <div id="screen-login" class="auth-overlay">
+        <div class="auth-card" style="text-align: center;">
+            <h1>🎓 SmartSchool RK</h1>
+            <p style="color: #64748b; margin-bottom: 25px;">Единая система образования</p>
+            <button class="btn-google" onclick="login()">Войти через Google</button>
+        </div>
+    </div>
 
-<!-- REG -->
-<div id="reg" class="overlay hidden">
-  <div class="card">
-    <h3>Регистрация</h3>
-    <input id="name" placeholder="ФИО">
-    <select id="class"></select>
-    <textarea id="proof" placeholder="Комментарий"></textarea>
-    <button onclick="save()">Отправить</button>
-  </div>
-</div>
+    <div id="screen-survey" class="auth-overlay hidden">
+        <div class="auth-card">
+            <h3>Создание профиля</h3>
+            <p style="font-size: 13px; color: #64748b;">Выберите ваш статус и класс.</p>
+            
+            <input type="text" id="reg-name" placeholder="Ваше полное ФИО">
+            
+            <label>Ваша роль:</label>
+            <select id="reg-role" onchange="toggleRegClass()">
+                <option value="student">Ученик</option>
+                <option value="teacher">Учитель (Предметник)</option>
+            </select>
 
-<!-- WAIT -->
-<div id="wait" class="overlay hidden">
-  <div class="card">
-    <h3>Заявка на проверке</h3>
-  </div>
-</div>
+            <label>Ваш класс:</label>
+            <select id="reg-class">
+                <option value="1Г">1 "Г" класс</option>
+                <option value="2Г">2 "Г" класс</option>
+                <option value="10Г">10 "Г" класс</option>
+                <option value="11Г">11 "Г" класс</option>
+            </select>
 
-<!-- MAIN -->
-<div id="main" class="hidden" style="display:flex;width:100%">
+            <textarea id="reg-proof" maxlength="1000" placeholder="Напишите обоснование доступа..."></textarea>
+            
+            <button class="btn-primary" onclick="sendApplication()">Отправить заявку</button>
+        </div>
+    </div>
 
-<aside>
-<h3 id="role"></h3>
-<div id="menu"></div>
+    <div id="screen-wait" class="auth-overlay hidden">
+        <div class="auth-card" style="text-align: center;">
+            <div style="font-size: 50px;">📡</div>
+            <h3>Ожидайте подтверждения</h3>
+            <p style="color: #64748b;">Администратор проверяет вашу привязку к классу.</p>
+        </div>
+    </div>
 
-<div id="adminBlock" class="hidden">
-<hr>
-<button class="menu-btn" onclick="loadRequests()">Заявки</button>
-</div>
+    <div id="screen-main" class="hidden" style="display: flex; width: 100%;">
+        <aside>
+            <h2 id="display-role" style="font-size: 18px; color: #818cf8;">РОЛЬ</h2>
+            <p id="display-email" style="font-size: 11px; opacity: 0.5; margin-bottom: 20px;"></p>
 
-</aside>
+            <div class="nav-group">
+                <p class="nav-label">Выбор Класса</p>
+                <select id="filter-class" onchange="loadJournal()" style="background:#334155; color:white; border:none;">
+                    <option value="1Г">1 "Г" класс</option>
+                    <option value="2Г">2 "Г" класс</option>
+                    <option value="10Г">10 "Г" класс</option>
+                    <option value="11Г">11 "Г" класс</option>
+                </select>
+            </div>
 
-<main>
-<h3>Пользователи</h3>
-<table>
-<thead>
-<tr><th>Имя</th><th>Статус</th><th>Роль</th></tr>
-</thead>
-<tbody id="table"></tbody>
-</table>
-</main>
+            <div class="nav-group">
+                <p class="nav-label">Предметы</p>
+                <div id="subject-list"></div>
+            </div>
 
-</div>
+            <div id="admin-tools" class="hidden">
+                <p class="nav-label">Администрирование</p>
+                <button class="nav-btn" onclick="showTab('requests')">🔔 Заявки юзеров</button>
+            </div>
 
-<!-- MODAL -->
-<div id="modal" class="overlay hidden">
-  <div class="card">
-    <h3>Одобрение пользователя</h3>
-    <p id="userInfo"></p>
+            <button onclick="logout()" style="margin-top:auto; background:#334155; color:white; padding:10px; border-radius:5px;">Выйти</button>
+        </aside>
 
-    <select id="subject">
-      <option value="">Сделать учеником</option>
-      <option>Математика</option>
-      <option>Физика</option>
-      <option>Информатика</option>
-      <option>История</option>
-    </select>
+        <main>
+            <div id="tab-journal">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between;">
+                        <h2 id="view-title">Выберите предмет</h2>
+                        <button id="btn-excel" onclick="exportExcel()" style="background:#10b981; color:white; border-radius:8px; padding:5px 15px;">Excel</button>
+                    </div>
+                    <table id="journal-table">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left;">ФИО Ученика</th>
+                                <th>Посещение</th>
+                                <th>Балл (1-10)</th>
+                                <th>Тип</th>
+                            </tr>
+                        </thead>
+                        <tbody id="journal-body"></tbody>
+                    </table>
+                </div>
+            </div>
 
-    <button onclick="confirmApprove()">Подтвердить</button>
-    <button onclick="closeModal()">Отмена</button>
-  </div>
-</div>
+            <div id="tab-requests" class="hidden">
+                <div class="card">
+                    <h2>Новые заявки</h2>
+                    <div id="req-list"></div>
+                </div>
+            </div>
+        </main>
+    </div>
 
-<script>
-firebase.initializeApp({
-apiKey:"x",
-authDomain:"x",
-databaseURL:"x"
-});
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAWmME75qjW5pxmOjObfVsINaRylPtpL6k",
+            authDomain: "auth-project-7aec4.firebaseapp.com",
+            databaseURL: "https://auth-project-7aec4-default-rtdb.firebaseio.com",
+            projectId: "auth-project-7aec4",
+            storageBucket: "auth-project-7aec4.firebasestorage.app",
+            messagingSenderId: "1061923785862",
+            appId: "1:1061923785862:web:1ab66811d0eeb56b651507"
+        };
 
-const db=firebase.database();
-const auth=firebase.auth();
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const auth = firebase.auth();
+        const provider = new firebase.auth.GoogleAuthProvider();
 
-let currentUser=null;
-let pendingUser=null;
+        let currentUser = null;
+        let currentSubject = "Информатика";
 
-// классы
-const classes=[...Array(11)].map((_,i)=>i+1+"А");
-classes.forEach(c=>{
-const o=document.createElement("option");
-o.textContent=c;
-document.getElementById("class").appendChild(o);
-});
+        const subjectsData = {
+            "1Г": ["Грамота", "Математика", "Самопознание"],
+            "2Г": ["Русский язык", "Математика", "Английский язык"],
+            "10Г": ["Информатика", "Физика", "Алгебра", "Геометрия"],
+            "11Г": ["Информатика", "Физика", "История Казахстана", "НВП"]
+        };
 
-// LOGIN
-function login(){
-auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-}
+        function login() { auth.signInWithPopup(provider).then(res => checkUser(res.user)); }
+        function logout() { auth.signOut().then(() => location.reload()); }
 
-// AUTH
-auth.onAuthStateChanged(u=>{
-if(!u){show("login");return;}
+        function checkUser(user) {
+            if (user.email === 'ko-23-151@turan-edu.kz') {
+                currentUser = { role: 'admin', email: user.email };
+                initApp();
+                return;
+            }
+            db.ref('users/' + user.uid).on('value', s => {
+                const data = s.val();
+                if (!data) showScreen('screen-survey');
+                else if (data.status === 'pending') showScreen('screen-wait');
+                else { currentUser = data; initApp(); }
+            });
+        }
 
-db.ref("users/"+u.uid).once("value",s=>{
-const d=s.val();
+        function sendApplication() {
+            db.ref('users/' + auth.currentUser.uid).set({
+                name: document.getElementById('reg-name').value,
+                role: document.getElementById('reg-role').value,
+                userClass: document.getElementById('reg-class').value,
+                proof: document.getElementById('reg-proof').value,
+                status: 'pending',
+                email: auth.currentUser.email
+            });
+        }
 
-if(!d){
-show("reg");
-return;
-}
+        function initApp() {
+            showScreen('screen-main');
+            document.getElementById('display-role').innerText = currentUser.role === 'admin' ? "АДМИНИСТРАТОР" : (currentUser.role === 'teacher' ? "УЧИТЕЛЬ" : "УЧЕНИК");
+            document.getElementById('display-email').innerText = currentUser.email;
+            
+            if (currentUser.role === 'admin') {
+                document.getElementById('admin-tools').classList.remove('hidden');
+                loadRequests();
+            }
+            
+            if(currentUser.userClass) {
+                document.getElementById('filter-class').value = currentUser.userClass;
+                if(currentUser.role === 'student') document.getElementById('filter-class').disabled = true;
+            }
 
-if(d.status==="pending"){
-show("wait");
-return;
-}
+            updateSubjectList();
+            loadJournal();
+        }
 
-currentUser=d;
-start();
-});
-});
+        function updateSubjectList() {
+            const cls = document.getElementById('filter-class').value;
+            const list = document.getElementById('subject-list');
+            if(!subjectsData[cls]) return;
+            list.innerHTML = '';
+            subjectsData[cls].forEach(sub => {
+                list.innerHTML += `<button class="nav-btn" onclick="setSubject('${sub}')">${sub}</button>`;
+            });
+        }
 
-// SAVE REG
-function save(){
-db.ref("users/"+auth.currentUser.uid).set({
-name:document.getElementById("name").value,
-class:document.getElementById("class").value,
-proof:document.getElementById("proof").value,
-role:"student",
-status:"pending",
-subjects:[]
-});
-}
+        function setSubject(sub) {
+            currentSubject = sub;
+            loadJournal();
+        }
 
-// START APP
-function start(){
-show("main");
+        function loadJournal() {
+            updateSubjectList();
+            const cls = document.getElementById('filter-class').value;
+            document.getElementById('view-title').innerText = `${cls} | ${currentSubject}`;
+            
+            // Прячем Excel для ученика
+            const btnExcel = document.getElementById('btn-excel');
+            if(currentUser.role === 'student') btnExcel.style.display = 'none';
+            else btnExcel.style.display = 'block';
 
-document.getElementById("role").innerText=currentUser.role;
+            db.ref('users').once('value', s => {
+                const users = s.val();
+                const tbody = document.getElementById('journal-body');
+                tbody.innerHTML = '';
+                
+                for(let id in users) {
+                    if(users[id].userClass === cls && users[id].role === 'student' && users[id].status === 'approved') {
+                        let controls = '';
+                        
+                        if(currentUser.role === 'student') {
+                            // Если зашел ученик - только текст
+                            controls = `<td>-</td><td>-</td><td>-</td>`;
+                        } else {
+                            // Если учитель или админ - кнопки и инпуты
+                            controls = `
+                                <td><button class="n-btn" onclick="this.classList.toggle('n-active'); this.innerText = this.innerText=='Б'?'Н':'Б'">Б</button></td>
+                                <td><input type="number" min="1" max="10" style="width:40px; text-align:center;"></td>
+                                <td><select style="width:auto; padding:5px;"><option>Урок</option><option>СОР</option><option>СОЧ</option></select></td>
+                            `;
+                        }
 
-if(currentUser.role==="admin"){
-document.getElementById("adminBlock").classList.remove("hidden");
-}
+                        tbody.innerHTML += `
+                            <tr>
+                                <td style="text-align:left;"><b>${users[id].name}</b></td>
+                                ${controls}
+                            </tr>`;
+                    }
+                }
+                if(tbody.innerHTML === '') tbody.innerHTML = '<tr><td colspan="4">В этом классе пока нет зарегистрированных учеников</td></tr>';
+            });
+        }
 
-document.getElementById("menu").innerHTML=
-(currentUser.subjects||[]).map(s=>`<button class="menu-btn">${s}</button>`).join("");
-}
+        function loadRequests() {
+            db.ref('users').on('value', s => {
+                const users = s.val();
+                const list = document.getElementById('req-list');
+                list.innerHTML = '';
+                for(let id in users) {
+                    if(users[id].status === 'pending') {
+                        list.innerHTML += `
+                            <div style="border:1px solid #eee; padding:10px; margin-bottom:10px; border-radius:8px;">
+                                <b>${users[id].name}</b> | Класс: ${users[id].userClass} | Роль: ${users[id].role}<br>
+                                <p style="font-size:12px; color:gray;">${users[id].proof}</p>
+                                <button onclick="approve('${id}')" style="background:green; color:white; padding:5px 10px; border-radius:4px;">Одобрить</button>
+                            </div>`;
+                    }
+                }
+            });
+        }
 
-// LOAD REQUESTS
-function loadRequests(){
-db.ref("users").once("value",s=>{
-const d=s.val();
-let html="";
+        function approve(id) { db.ref('users/' + id).update({ status: 'approved' }); }
 
-for(let id in d){
-if(d[id].status==="pending"){
-html+=`
-<tr>
-<td>${d[id].name}</td>
-<td>${d[id].status}</td>
-<td><button onclick="openModal('${id}')">approve</button></td>
-</tr>`;
-}
-}
+        function showScreen(id) {
+            document.querySelectorAll('.auth-overlay, #screen-main').forEach(el => el.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
 
-document.getElementById("table").innerHTML=html;
-});
-}
+        function showTab(id) {
+            document.getElementById('tab-journal').classList.add('hidden');
+            document.getElementById('tab-requests').classList.add('hidden');
+            document.getElementById(id).classList.remove('hidden');
+        }
 
-// OPEN MODAL
-function openModal(id){
-pendingUser=id;
-
-db.ref("users/"+id).once("value",s=>{
-document.getElementById("userInfo").innerText=s.val().name;
-});
-
-show("modal");
-}
-
-// CONFIRM APPROVE
-function confirmApprove(){
-const subject=document.getElementById("subject").value;
-
-let update={status:"approved"};
-
-if(subject){
-update.role="teacher";
-update.subjects=[subject];
-}
-
-db.ref("users/"+pendingUser).update(update);
-
-closeModal();
-loadRequests();
-}
-
-// CLOSE MODAL
-function closeModal(){
-show("main");
-}
-
-// SHOW
-function show(id){
-document.querySelectorAll(".overlay,#main").forEach(e=>e.classList.add("hidden"));
-document.getElementById(id).classList.remove("hidden");
-}
-</script>
-
+        function exportExcel() {
+            const wb = XLSX.utils.table_to_book(document.getElementById('journal-table'));
+            XLSX.writeFile(wb, "School_Report.xlsx");
+        }
+    </script>
 </body>
 </html>
