@@ -46,7 +46,7 @@
         .content-area { padding: 40px; max-width: 1400px; margin: 0 auto; width: 100%; }
         
         .controls-bar { background: var(--bg-card); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 24px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; border: 1px solid var(--border);}
-        .sys-select, .sys-input { padding: 10px; border-radius: 8px; border: 1px solid var(--border); outline: none; font-weight: 500; }
+        .sys-select, .sys-input { padding: 10px; border-radius: 8px; border: 1px solid var(--border); outline: none; font-weight: 500; width: 100%;}
         
         table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
         th { background: #f8fafc; padding: 15px; text-align: left; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; border-bottom: 1px solid var(--border);}
@@ -57,15 +57,15 @@
         .att-n { background: #fee2e2; color: #991b1b; }
         .st-grade { width: 60px; padding: 6px; text-align: center; border: 1px solid var(--border); border-radius: 6px; }
 
-        /* Чекбоксы для предметов */
         .subj-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
         .subj-grid label { font-size: 0.85rem; display: flex; align-items: center; gap: 5px; cursor: pointer; }
 
-        /* Карточки заданий */
         .task-card { background: white; border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: var(--shadow); }
         .task-card h4 { margin-bottom: 10px; color: var(--primary); font-size: 1.1rem; }
         .task-card p { color: var(--text-muted); font-size: 0.95rem; white-space: pre-wrap; }
         .task-meta { font-size: 0.8rem; color: gray; margin-top: 15px; display: flex; gap: 15px; }
+        
+        .homework-section { margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); }
 
         .hidden { display: none !important; }
     </style>
@@ -148,15 +148,15 @@
                 </div>
 
                 <div id="tab-teacher-journal" class="tab-content hidden">
-                    <div class="controls-bar">
-                        <select id="t-my-subject" class="sys-select" onchange="loadJournal()"></select>
-                        <select id="t-class" class="sys-select" onchange="loadJournal()">
+                    <div class="controls-bar" style="flex-direction:row;">
+                        <select id="t-my-subject" class="sys-select" style="width:auto;" onchange="loadJournal()"></select>
+                        <select id="t-class" class="sys-select" style="width:auto;" onchange="loadJournal()">
                             <option value="11 А">11 "А" класс</option>
                             <option value="11 Б">11 "Б" класс</option>
                             <option value="10 А">10 "А" класс</option>
                         </select>
-                        <input type="date" id="t-date" class="sys-input" onchange="loadJournal()">
-                        <select id="t-type" class="sys-select">
+                        <input type="date" id="t-date" class="sys-input" style="width:auto;" onchange="loadJournal()">
+                        <select id="t-type" class="sys-select" style="width:auto;">
                             <option value="Урок">Обычный Урок</option>
                             <option value="СОР">СОР</option>
                             <option value="СОЧ">СОЧ</option>
@@ -267,16 +267,13 @@
             document.getElementById(id).classList.remove('hidden');
         }
 
-        // ЖЕСТКАЯ БЛОКИРОВКА ИНТЕРФЕЙСОВ
         function renderAppUI() {
             showScreen('scr-app');
             document.getElementById('user-name').innerText = currentUserData.name;
             
-            // 1. Полностью прячем все меню и вкладки
             document.querySelectorAll('.nav-menu').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
 
-            // 2. Показываем только нужное
             const role = currentUserData.role;
             if (role === 'admin') {
                 document.getElementById('user-role').innerText = "Администратор";
@@ -287,7 +284,6 @@
                 document.getElementById('user-role').innerText = "Учитель";
                 document.getElementById('menu-teacher').classList.remove('hidden');
                 
-                // Заполняем список разрешенных предметов
                 const subjSelect = document.getElementById('t-my-subject');
                 const taskSubjSelect = document.getElementById('task-subject');
                 subjSelect.innerHTML = ''; taskSubjSelect.innerHTML = '';
@@ -320,7 +316,6 @@
                 document.getElementById('page-title').innerText = btnElement.innerText.replace(/[^\w\sа-яА-ЯёЁ]/gi, '').trim();
             }
 
-            // Роутинг загрузки данных
             if(tabId === 'tab-admin-req') loadAdminRequests();
             if(tabId === 'tab-teacher-journal') loadJournal();
             if(tabId === 'tab-teacher-tasks') loadTeacherTasks();
@@ -329,7 +324,7 @@
         }
 
         // ==========================================
-        // 1. АДМИН: МНОЖЕСТВЕННЫЙ ВЫБОР ПРЕДМЕТОВ
+        // 1. АДМИН
         // ==========================================
         function loadAdminRequests() {
             db.ref('users').on('value', snap => {
@@ -341,7 +336,6 @@
                     if (users[uid].status === 'pending') {
                         const isTeacher = users[uid].role === 'teacher';
                         
-                        // Генерируем чекбоксы для учителя
                         let checkboxesHTML = '';
                         if (isTeacher) {
                             checkboxesHTML = `<div class="subj-grid" id="subj-box-${uid}">`;
@@ -370,7 +364,7 @@
                 const checked = document.querySelectorAll(`#subj-box-${uid} input:checked`);
                 const assignedSubjects = Array.from(checked).map(cb => cb.value);
                 if (assignedSubjects.length === 0) return alert("Выберите хотя бы один предмет для учителя!");
-                updates.subjects = assignedSubjects; // Массив предметов
+                updates.subjects = assignedSubjects; 
             }
             db.ref('users/' + uid).update(updates);
         }
@@ -469,7 +463,6 @@
                 const tasks = snap.val();
                 if(!tasks) return list.innerHTML = '<p>Заданий пока нет.</p>';
 
-                // Сортировка по новым
                 Object.keys(tasks).reverse().forEach(key => {
                     const t = tasks[key];
                     list.innerHTML += `
@@ -485,12 +478,11 @@
             });
         }
 
-        // Обновляем список заданий при смене класса/предмета у учителя
         document.getElementById('task-subject').addEventListener('change', loadTeacherTasks);
         document.getElementById('task-class').addEventListener('change', loadTeacherTasks);
 
         // ==========================================
-        // 4. УЧЕНИК: ДНЕВНИК И ЗАДАНИЯ
+        // 4. УЧЕНИК: ДНЕВНИК И ЗАДАНИЯ С ОТВЕТАМИ
         // ==========================================
         function loadStudentGrades() {
             const uClass = currentUserData.uClass;
@@ -528,18 +520,53 @@
 
                 for(let subj in allSubjects) {
                     const tasks = allSubjects[subj];
-                    Object.keys(tasks).reverse().forEach(key => {
+                    Object.keys(tasks).reverse().forEach(taskId => {
                         hasTasks = true;
-                        const t = tasks[key];
+                        const t = tasks[taskId];
+                        
+                        // Изменили дизайн: добавили поле ввода и кнопку отправки
                         list.innerHTML += `
                             <div class="task-card">
                                 <h4>[${subj}] ${t.title}</h4>
                                 <p>${t.desc}</p>
                                 <div class="task-meta"><span>📅 Задано: ${t.date}</span></div>
+                                
+                                <div class="homework-section">
+                                    <textarea id="ans-${taskId}" class="sys-input" rows="2" placeholder="Напишите ответ или вставьте ссылку на Диск (Google/Yandex)..."></textarea>
+                                    <button class="btn btn-success" style="margin-top: 10px;" onclick="submitHomework('${taskId}', '${subj}')">Отправить ответ</button>
+                                </div>
                             </div>`;
                     });
                 }
                 if(!hasTasks) list.innerHTML = '<p>Ура, заданий нет!</p>';
+            });
+        }
+
+        // НОВАЯ ФУНКЦИЯ ДЛЯ ОТПРАВКИ ДОМАШКИ В БАЗУ ДАННЫХ
+        function submitHomework(taskId, subject) {
+            const answerText = document.getElementById(`ans-${taskId}`).value;
+
+            if (answerText.trim() === "") {
+                alert("Пожалуйста, введите ответ или ссылку на диск!");
+                return;
+            }
+
+            const myUid = auth.currentUser.uid;
+            const uClass = currentUserData.uClass;
+
+            // Сохраняем ответ напрямую в Realtime Database (в ветку homeworks)
+            db.ref(`homeworks/${uClass}/${subject}/${taskId}/${myUid}`).set({
+                studentName: currentUserData.name,
+                answer: answerText,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            })
+            .then(() => {
+                alert("Задание успешно отправлено!");
+                document.getElementById(`ans-${taskId}`).value = ""; // Очищаем поле после успешной отправки
+            })
+            .catch((error) => {
+                console.error("Ошибка при отправке: ", error);
+                alert("Произошла ошибка при отправке задания.");
             });
         }
     </script>
