@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartSchool Pro | Система РК</title>
+    <title>EduSystem RK | Final Edition</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -11,119 +11,121 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 
     <style>
-        :root { --primary: #4f46e5; --sidebar: #0f172a; --bg: #f8fafc; }
-        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); display: flex; height: 100vh; }
+        :root { --primary: #4f46e5; --sidebar: #0f172a; --bg: #f1f5f9; --white: #ffffff; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
         .hidden { display: none !important; }
 
-        /* Экраны авторизации */
-        .auth-overlay { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
-        .auth-card { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px; }
+        /* Auth */
+        .overlay { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+        .card-auth { background: white; padding: 40px; border-radius: 24px; width: 100%; max-width: 480px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
         
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; }
-        textarea { height: 100px; resize: none; }
-        button { cursor: pointer; border: none; border-radius: 8px; font-weight: 600; transition: 0.3s; }
-        .btn-google { background: #ea4335; color: white; padding: 15px; width: 100%; font-size: 16px; }
-        .btn-primary { background: var(--primary); color: white; padding: 12px; width: 100%; }
+        input, select, textarea { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 15px; outline: none; }
+        textarea { height: 120px; resize: none; }
+        .btn-p { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 600; cursor: pointer; }
+        .btn-g { background: #ea4335; color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-size: 16px; margin-top: 10px; cursor: pointer; }
 
-        /* Интерфейс */
-        aside { width: 280px; background: var(--sidebar); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; }
-        main { flex: 1; padding: 30px; overflow-y: auto; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        /* Main UI */
+        aside { width: 300px; background: var(--sidebar); color: white; padding: 25px; display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; }
+        main { flex: 1; padding: 40px; overflow-y: auto; position: relative; }
+        .panel { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
 
-        .nav-group { margin-bottom: 25px; }
-        .nav-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block;}
-        .nav-btn { background: rgba(255,255,255,0.05); color: #94a3b8; padding: 10px; width: 100%; text-align: left; margin: 4px 0; font-size: 13px; }
-        .nav-btn:hover, .nav-btn.active { background: var(--primary); color: white; }
+        .section-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1.5px; margin: 20px 0 10px 0; display: block; }
+        .menu-item { background: rgba(255,255,255,0.03); color: #94a3b8; padding: 12px 15px; width: 100%; text-align: left; margin: 5px 0; border-radius: 10px; border: none; cursor: pointer; transition: 0.2s; }
+        .menu-item:hover, .menu-item.active { background: var(--primary); color: white; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; }
-        th { background: #f8fafc; font-size: 12px; color: #64748b; }
-        .n-btn { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 5px 10px; border-radius: 4px; }
-        .n-active { background: #ef4444; color: white; }
+        /* Таблицы */
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; }
+        th { background: #f8fafc; padding: 15px; text-align: center; font-size: 12px; color: #64748b; border-bottom: 2px solid #edf2f7; }
+        td { padding: 15px; text-align: center; border-bottom: 1px solid #edf2f7; }
+        
+        .n-btn { width: 35px; height: 35px; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; background: #f8fafc; font-weight: bold; }
+        .n-active { background: #ef4444; color: white; border-color: #ef4444; }
+        .grade-in { width: 55px; padding: 8px; text-align: center; border: 1px solid #e2e8f0; border-radius: 8px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="screen-loading" class="auth-overlay">
-        <div style="color: white; text-align: center;">
-            <h2>Загрузка системы...</h2>
-            <p>Проверяем авторизацию</p>
+    <div id="scr-loading" class="overlay">
+        <h2 style="color: white;">Синхронизация с сервером...</h2>
+    </div>
+
+    <div id="scr-login" class="overlay hidden">
+        <div class="card-auth" style="text-align: center;">
+            <h1>🎓 Школьный Журнал</h1>
+            <p style="color: #64748b;">Войдите в систему через Google</p>
+            <button class="btn-g" onclick="login()">Войти через Google</button>
         </div>
     </div>
 
-    <div id="screen-login" class="auth-overlay hidden">
-        <div class="auth-card" style="text-align: center;">
-            <h1>🎓 SmartSchool</h1>
-            <button class="btn-google" onclick="login()">Войти через Google</button>
-        </div>
-    </div>
-
-    <div id="screen-survey" class="auth-overlay hidden">
-        <div class="auth-card">
-            <h3>Регистрация</h3>
-            <input type="text" id="reg-name" placeholder="ФИО">
+    <div id="scr-survey" class="overlay hidden">
+        <div class="card-auth">
+            <h3>Регистрация пользователя</h3>
+            <input type="text" id="reg-name" placeholder="Ваше ФИО">
             <select id="reg-role">
                 <option value="student">Ученик</option>
                 <option value="teacher">Учитель</option>
             </select>
-            <select id="reg-class">
-                </select>
-            <textarea id="reg-proof" placeholder="Доказательство доступа (до 1000 симв.)"></textarea>
-            <button class="btn-primary" onclick="sendApplication()">Отправить</button>
+            <select id="reg-class-list"></select>
+            <textarea id="reg-proof" maxlength="1000" placeholder="Доказательство (школа, должность, класс...)"></textarea>
+            <button class="btn-p" onclick="saveReg()">Отправить заявку</button>
         </div>
     </div>
 
-    <div id="screen-wait" class="auth-overlay hidden">
-        <div class="auth-card" style="text-align: center;">
-            <h2>⏳ На рассмотрении</h2>
-            <p>Админ должен одобрить вашу заявку.</p>
-            <button onclick="logout()" style="color: red; background: none;">Выйти</button>
+    <div id="scr-wait" class="overlay hidden">
+        <div class="card-auth" style="text-align: center;">
+            <div style="font-size: 60px;">🗝️</div>
+            <h3>Доступ заблокирован</h3>
+            <p>Администратор еще не подтвердил вашу личность. Пожалуйста, подождите.</p>
+            <button class="btn-p" onclick="logout()" style="background: #334155;">Выйти</button>
         </div>
     </div>
 
-    <div id="screen-main" class="hidden" style="display: flex; width: 100%;">
+    <div id="scr-main" class="hidden" style="display: flex; width: 100%;">
         <aside>
-            <h2 id="display-role" style="color: #818cf8; margin-bottom: 0;">РОЛЬ</h2>
-            <p id="display-email" style="font-size: 11px; opacity: 0.5; margin-bottom: 20px;"></p>
+            <h2 id="role-tag" style="color: #818cf8; margin: 0 0 5px 0;">ROLE</h2>
+            <p id="email-tag" style="font-size: 11px; opacity: 0.5; margin-bottom: 25px;"></p>
 
-            <div class="nav-group">
-                <span class="nav-label">Класс</span>
-                <select id="filter-class" onchange="updateUI()" style="background:#334155; color:white; border:none; width: 100%; padding: 8px;">
-                    </select>
+            <span class="section-label">Класс</span>
+            <select id="main-class-select" onchange="updateView()" style="background: #334155; color: white; border: none;"></select>
+
+            <span class="section-label">Предметы</span>
+            <div id="menu-subjects"></div>
+
+            <div id="admin-menu" class="hidden">
+                <span class="section-label">Администрирование</span>
+                <button class="menu-item" onclick="changeTab('requests')">🔔 Новые заявки</button>
+                <button class="menu-item" onclick="changeTab('journal')">📖 Журнал</button>
             </div>
 
-            <div class="nav-group">
-                <span class="nav-label">Предметы</span>
-                <div id="subject-list"></div>
-            </div>
-
-            <div id="admin-tools" class="hidden">
-                <span class="nav-label">Админ</span>
-                <button class="nav-btn" onclick="showTab('requests')">🔔 Заявки</button>
-                <button class="nav-btn" onclick="showTab('journal')">📖 Журнал</button>
-            </div>
-
-            <button onclick="logout()" style="margin-top:auto; background:#334155; color:white; padding:10px;">Выйти</button>
+            <button onclick="logout()" style="margin-top: auto; background: #334155; color: white; padding: 12px; border: none; border-radius: 10px; cursor: pointer;">🚪 Выход</button>
         </aside>
 
         <main>
             <div id="tab-journal">
-                <div class="card">
-                    <h2 id="view-title">Выберите предмет</h2>
-                    <table id="journal-table">
+                <div class="panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2 id="journal-title">Выберите предмет</h2>
+                        <button onclick="exportToExcel()" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">📥 Excel Отчет</button>
+                    </div>
+                    <table id="table-journal">
                         <thead>
-                            <tr><th>ФИО</th><th>Посещение</th><th>Балл (1-10)</th><th>Тип</th></tr>
+                            <tr>
+                                <th style="text-align: left;">Ученик</th>
+                                <th>Посещаемость</th>
+                                <th>Оценка (1-10)</th>
+                                <th>Тип контроля</th>
+                            </tr>
                         </thead>
-                        <tbody id="journal-body"></tbody>
+                        <tbody id="tbody-journal"></tbody>
                     </table>
-                    <button class="btn-primary" onclick="alert('Данные сохранены!')" style="margin-top: 20px; width: auto; padding: 10px 30px;">Сохранить</button>
                 </div>
             </div>
 
             <div id="tab-requests" class="hidden">
-                <div class="card">
-                    <h2>Ожидают одобрения</h2>
-                    <div id="req-list"></div>
+                <div class="panel">
+                    <h2>Заявки на верификацию</h2>
+                    <div id="list-req"></div>
                 </div>
             </div>
         </main>
@@ -144,108 +146,108 @@
         const db = firebase.database();
         const auth = firebase.auth();
 
-        // ДАННЫЕ
-        const classes = ["1А", "1Б", "1Г", "2А", "2В", "3Б", "5А", "9Б", "10А", "11Г"];
+        // БАЗА КЛАССОВ И ПРЕДМЕТОВ
+        const all_classes = [];
+        for(let i=1; i<=11; i++) { ['А','Б','В','Г'].forEach(l => all_classes.push(i + l)); }
+
         const subjects = {
-            primary: ["Букварь", "Математика", "Познание мира", "Рисование"],
-            middle: ["Алгебра", "Биология", "История", "География", "Английский"],
-            senior: ["Физика", "Информатика", "Геометрия", "НВП", "Химия"]
+            low: ["Грамота", "Математика", "Познание мира", "Самопознание", "ИЗО", "Музыка"],
+            mid: ["Алгебра", "Геометрия", "Русский язык", "Литература", "История", "Биология", "География", "Английский"],
+            high: ["Алгебра", "Физика", "Информатика", "Химия", "История Казахстана", "НВП", "Экономика"]
         };
 
-        // Заполнение списков классов
-        [document.getElementById('reg-class'), document.getElementById('filter-class')].forEach(sel => {
-            classes.forEach(c => {
-                let opt = new Option(c + " класс", c);
-                sel.add(opt);
-            });
+        // Заполнение селектов
+        const regSel = document.getElementById('reg-class-list');
+        const mainSel = document.getElementById('main-class-select');
+        all_classes.forEach(c => {
+            regSel.add(new Option(c + " класс", c));
+            mainSel.add(new Option(c + " класс", c));
         });
 
-        // ПРОВЕРКА АВТОРИЗАЦИИ (Чтобы не выкидывало)
+        // ПРОВЕРКА СЕССИИ (Чтобы не выкидывало)
         auth.onAuthStateChanged(user => {
-            document.getElementById('screen-loading').classList.add('hidden');
+            document.getElementById('scr-loading').classList.add('hidden');
             if (user) {
-                checkUserStatus(user);
+                db.ref('users/' + user.uid).on('value', s => {
+                    const data = s.val();
+                    if (user.email === 'ko-23-151@turan-edu.kz') { 
+                        currentUser = { role: 'admin', email: user.email }; 
+                        startApp(); 
+                    } else if (!data) { 
+                        showScr('scr-survey'); 
+                    } else if (data.status === 'pending') { 
+                        showScr('scr-wait'); 
+                    } else { 
+                        currentUser = data; 
+                        startApp(); 
+                    }
+                });
             } else {
-                showScreen('screen-login');
+                showScr('scr-login');
             }
         });
 
         function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
         function logout() { auth.signOut().then(() => location.reload()); }
 
-        function checkUserStatus(user) {
-            if (user.email === 'ko-23-151@turan-edu.kz') {
-                currentUser = { role: 'admin', email: user.email };
-                initApp();
-                return;
-            }
-            db.ref('users/' + user.uid).on('value', s => {
-                const data = s.val();
-                if (!data) showScreen('screen-survey');
-                else if (data.status === 'pending') showScreen('screen-wait');
-                else { currentUser = data; initApp(); }
-            });
-        }
-
-        function sendApplication() {
+        function saveReg() {
             db.ref('users/' + auth.currentUser.uid).set({
                 name: document.getElementById('reg-name').value,
                 role: document.getElementById('reg-role').value,
-                userClass: document.getElementById('reg-class').value,
+                uClass: document.getElementById('reg-class-list').value,
                 proof: document.getElementById('reg-proof').value,
                 status: 'pending',
                 email: auth.currentUser.email
             });
         }
 
-        function initApp() {
-            showScreen('screen-main');
-            document.getElementById('display-role').innerText = currentUser.role.toUpperCase();
-            document.getElementById('display-email').innerText = currentUser.email;
-            if (currentUser.role === 'admin') document.getElementById('admin-tools').classList.remove('hidden');
+        function startApp() {
+            showScr('scr-main');
+            document.getElementById('role-tag').innerText = currentUser.role.toUpperCase();
+            document.getElementById('email-tag').innerText = currentUser.email;
             
-            if (currentUser.role === 'student') {
-                document.getElementById('filter-class').value = currentUser.userClass;
-                document.getElementById('filter-class').disabled = true;
+            if(currentUser.role === 'admin') document.getElementById('admin-menu').classList.remove('hidden');
+            if(currentUser.role === 'student') {
+                mainSel.value = currentUser.uClass;
+                mainSel.disabled = true;
             }
-            updateUI();
+            updateView();
         }
 
-        function updateUI() {
-            const cls = document.getElementById('filter-class').value;
-            const num = parseInt(cls);
+        function updateView() {
+            const cls = mainSel.value;
+            const level = parseInt(cls);
             let subList = [];
-            
-            if (num <= 4) subList = subjects.primary;
-            else if (num <= 9) subList = subjects.middle;
-            else subList = subjects.senior;
+            if(level <= 4) subList = subjects.low;
+            else if(level <= 9) subList = subjects.mid;
+            else subList = subjects.high;
 
-            const box = document.getElementById('subject-list');
-            box.innerHTML = '';
+            const menu = document.getElementById('menu-subjects');
+            menu.innerHTML = '';
             subList.forEach(s => {
-                box.innerHTML += `<button class="nav-btn" onclick="openSubject('${s}')">${s}</button>`;
+                menu.innerHTML += `<button class="menu-item" onclick="openSub('${s}')">${s}</button>`;
             });
             loadStudents();
         }
 
-        function openSubject(name) {
-            document.getElementById('view-title').innerText = name + " | " + document.getElementById('filter-class').value;
-            showTab('journal');
+        function openSub(name) {
+            document.getElementById('journal-title').innerText = name + " | " + mainSel.value;
+            changeTab('journal');
         }
 
         function loadStudents() {
-            const cls = document.getElementById('filter-class').value;
+            const cls = mainSel.value;
             db.ref('users').once('value', s => {
                 const users = s.val();
-                const tbody = document.getElementById('journal-body');
+                const tbody = document.getElementById('tbody-journal');
                 tbody.innerHTML = '';
-                for (let id in users) {
-                    if (users[id].userClass === cls && users[id].role === 'student' && users[id].status === 'approved') {
+                for(let id in users) {
+                    if(users[id].uClass === cls && users[id].role === 'student' && users[id].status === 'approved') {
                         tbody.innerHTML += `<tr>
-                            <td>${users[id].name}</td>
+                            <td style="text-align:left;"><b>${users[id].name}</b></td>
                             <td><button class="n-btn" onclick="this.classList.toggle('n-active'); this.innerText=this.innerText=='Б'?'Н':'Б'">Б</button></td>
-                            <td><input type="number" min="1" max="10" value="10" style="width:50px;"></td>
-                            <td>СОР</td>
+                            <td><input type="number" class="grade-in" min="1" max="10"></td>
+                            <td><select style="width:auto; margin:0;"><option>Урок</option><option>СОР</option><option>СОЧ</option></select></td>
                         </tr>`;
                     }
                 }
@@ -255,14 +257,15 @@
         function loadRequests() {
             db.ref('users').on('value', s => {
                 const users = s.val();
-                const list = document.getElementById('req-list');
+                const list = document.getElementById('list-req');
                 list.innerHTML = '';
-                for (let id in users) {
-                    if (users[id].status === 'pending') {
-                        list.innerHTML += `<div style="border:1px solid #ddd; padding:10px; margin-top:5px; border-radius:10px;">
-                            <b>${users[id].name}</b> (${users[id].userClass})<br>
-                            <i>${users[id].proof}</i><br>
-                            <button onclick="approve('${id}')" style="background:green; color:white; padding:5px 10px; border-radius:5px; margin-top:5px;">Одобрить</button>
+                for(let id in users) {
+                    if(users[id].status === 'pending') {
+                        list.innerHTML += `
+                        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:20px; border-radius:15px; margin-bottom:15px;">
+                            <b>${users[id].name}</b> | Класс: ${users[id].uClass} | Роль: ${users[id].role}<br>
+                            <p style="background:white; padding:10px; border-radius:10px; margin:10px 0;">${users[id].proof}</p>
+                            <button class="btn-p" onclick="approve('${id}')" style="width:auto; padding:10px 30px; background:#10b981;">Одобрить</button>
                         </div>`;
                     }
                 }
@@ -271,16 +274,21 @@
 
         function approve(id) { db.ref('users/' + id).update({ status: 'approved' }); }
 
-        function showScreen(id) {
-            document.querySelectorAll('.auth-overlay, #screen-main').forEach(el => el.classList.add('hidden'));
+        function showScr(id) {
+            document.querySelectorAll('.overlay, #scr-main').forEach(el => el.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
 
-        function showTab(id) {
+        function changeTab(id) {
             document.getElementById('tab-journal').classList.add('hidden');
             document.getElementById('tab-requests').classList.add('hidden');
-            document.getElementById(id).classList.remove('hidden');
-            if (id === 'tab-requests') loadRequests();
+            document.getElementById('tab-' + id).classList.remove('hidden');
+            if(id === 'requests') loadRequests();
+        }
+
+        function exportToExcel() {
+            const wb = XLSX.utils.table_to_book(document.getElementById('table-journal'));
+            XLSX.writeFile(wb, "Journal_Report.xlsx");
         }
     </script>
 </body>
