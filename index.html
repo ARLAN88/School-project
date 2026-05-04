@@ -1,259 +1,215 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduSystem RK | Final Fixed</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduSystem RK</title>
 
-    <style>
-        :root { --primary: #4f46e5; --sidebar: #0f172a; --bg: #f1f5f9; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { margin: 0; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
-        .hidden { display: none !important; }
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
-        /* Оверлеи */
-        .overlay { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
-        .card { background: white; padding: 35px; border-radius: 20px; width: 100%; max-width: 450px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-        
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; }
-        textarea { height: 100px; resize: none; }
-        .btn-p { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; }
+<style>
+:root { --primary:#4f46e5; --sidebar:#0f172a; --bg:#f1f5f9; }
+*{font-family:Segoe UI;margin:0;box-sizing:border-box}
+body{display:flex;height:100vh;background:var(--bg)}
+.hidden{display:none!important}
 
-        /* Интерфейс */
-        aside { width: 280px; background: var(--sidebar); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; }
-        main { flex: 1; padding: 30px; overflow-y: auto; }
-        .main-panel { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.overlay{position:fixed;inset:0;background:#0f172a;display:flex;align-items:center;justify-content:center}
+.card{background:#fff;padding:25px;border-radius:15px;width:420px}
 
-        .menu-btn { background: rgba(255,255,255,0.05); color: #94a3b8; padding: 12px; width: 100%; text-align: left; margin: 4px 0; border-radius: 8px; border: none; cursor: pointer; }
-        .menu-btn:hover, .menu-btn.active { background: var(--primary); color: white; }
+input,select,textarea{width:100%;padding:10px;margin:6px 0;border:1px solid #ddd;border-radius:8px}
+.btn{background:var(--primary);color:#fff;border:none;padding:12px;width:100%;border-radius:10px}
 
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; }
-        th { background: #f8fafc; color: #64748b; font-size: 12px; }
-    </style>
+aside{width:260px;background:var(--sidebar);color:#fff;padding:20px}
+main{flex:1;padding:20px;overflow:auto}
+
+.menu-btn{background:#1e293b;color:#cbd5e1;padding:10px;margin:5px 0;border:none;width:100%;border-radius:8px;cursor:pointer}
+.menu-btn:hover{background:var(--primary);color:#fff}
+
+table{width:100%;margin-top:15px;border-collapse:collapse}
+td,th{border:1px solid #ddd;padding:8px;text-align:center}
+th{background:#f8fafc}
+</style>
 </head>
+
 <body>
 
-    <div id="scr-load" class="overlay">
-        <h2 style="color: white;">Загрузка системы...</h2>
-    </div>
+<!-- LOGIN -->
+<div id="login" class="overlay">
+  <div class="card">
+    <h2>Login</h2>
+    <button class="btn" onclick="login()">Войти через Google</button>
+  </div>
+</div>
 
-    <div id="scr-login" class="overlay hidden">
-        <div class="card" style="text-align: center;">
-            <h1>🎓 SmartSchool</h1>
-            <button class="btn-p" onclick="login()" style="background: #ea4335;">Войти через Google</button>
-        </div>
-    </div>
+<!-- REG -->
+<div id="reg" class="overlay hidden">
+  <div class="card">
+    <h3>Регистрация</h3>
+    <input id="name" placeholder="ФИО">
+    <select id="class"></select>
+    <textarea id="proof" placeholder="Почему хотите участвовать"></textarea>
+    <button class="btn" onclick="save()">Отправить</button>
+  </div>
+</div>
 
-    <div id="scr-survey" class="overlay hidden">
-        <div class="card">
-            <h3>Регистрация</h3>
-            <input type="text" id="reg-name" placeholder="ФИО">
-            <select id="reg-role">
-                <option value="student">Ученик</option>
-                <option value="teacher">Учитель</option>
-            </select>
-            <select id="reg-class-list"></select>
-            <textarea id="reg-proof" placeholder="Доказательство роли (до 1000 симв.)"></textarea>
-            <button class="btn-p" onclick="saveReg()">Отправить заявку</button>
-        </div>
-    </div>
+<!-- WAIT -->
+<div id="wait" class="overlay hidden">
+  <div class="card">
+    <h3>Заявка на проверке</h3>
+  </div>
+</div>
 
-    <div id="scr-wait" class="overlay hidden">
-        <div class="card" style="text-align: center;">
-            <h2>⏳ Доступ ограничен</h2>
-            <p>Ваша заявка проверяется администратором.</p>
-            <button onclick="logout()" style="color:red; background:none; border:none; cursor:pointer;">Выйти</button>
-        </div>
-    </div>
+<!-- MAIN -->
+<div id="main" class="hidden" style="display:flex;width:100%">
 
-    <div id="scr-main" class="hidden" style="display: flex; width: 100%;">
-        <aside>
-            <h2 id="role-tag" style="color: #818cf8;">ROLE</h2>
-            <p id="email-tag" style="font-size: 11px; opacity: 0.5; margin-bottom: 20px;"></p>
+<aside>
+<h3 id="role"></h3>
+<div id="menu"></div>
 
-            <label style="font-size: 10px; color: #64748b; text-transform: uppercase;">Класс</label>
-            <select id="main-class-select" onchange="updateUI()" style="background:#334155; color:white; border:none; padding:8px; width:100%; margin-bottom: 20px;"></select>
+<div id="admin" class="hidden">
+<hr>
+<button class="menu-btn" onclick="loadReq()">Заявки</button>
+</div>
 
-            <div id="subject-menu"></div>
+</aside>
 
-            <div id="admin-only" class="hidden" style="margin-top: 30px; border-top: 1px solid #334155; padding-top: 20px;">
-                <button class="menu-btn" onclick="showTab('requests')">🔔 Заявки</button>
-                <button class="menu-btn" onclick="showTab('journal')">📖 Журнал</button>
-            </div>
+<main>
+<h3>Панель</h3>
+<table>
+<thead><tr><th>Имя</th><th>Статус</th><th>Роль</th></tr></thead>
+<tbody id="tbl"></tbody>
+</table>
+</main>
 
-            <button onclick="logout()" style="margin-top: auto; background: #334155; color: white; padding: 10px; border: none; border-radius: 8px;">Выйти</button>
-        </aside>
+</div>
 
-        <main>
-            <div id="tab-journal">
-                <div class="main-panel">
-                    <h2 id="view-title">Выберите предмет</h2>
-                    <table>
-                        <thead><tr><th>ФИО</th><th>Посещение</th><th>Балл</th><th>Тип</th></tr></thead>
-                        <tbody id="tbody-journal"></tbody>
-                    </table>
-                </div>
-            </div>
-            <div id="tab-requests" class="hidden">
-                <div class="main-panel">
-                    <h2>Заявки на подтверждение</h2>
-                    <div id="list-req"></div>
-                </div>
-            </div>
-        </main>
-    </div>
+<!-- MODAL -->
+<div id="modal" class="overlay hidden">
+  <div class="card">
+    <h3>Назначить предмет</h3>
+    <select id="subject">
+      <option>Математика</option>
+      <option>Физика</option>
+      <option>Информатика</option>
+      <option>История</option>
+    </select>
+    <button class="btn" onclick="confirm()">OK</button>
+  </div>
+</div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAWmME75qjW5pxmOjObfVsINaRylPtpL6k",
-            authDomain: "auth-project-7aec4.firebaseapp.com",
-            databaseURL: "https://auth-project-7aec4-default-rtdb.firebaseio.com",
-            projectId: "auth-project-7aec4",
-            storageBucket: "auth-project-7aec4.firebasestorage.app",
-            messagingSenderId: "1061923785862",
-            appId: "1:1061923785862:web:1ab66811d0eeb56b651507"
-        };
+<script>
+firebase.initializeApp({
+apiKey:"x",
+authDomain:"x",
+databaseURL:"x"
+});
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const auth = firebase.auth();
+const db=firebase.database();
+const auth=firebase.auth();
 
-        // Генерация 44 классов
-        const classes = [];
-        for(let i=1; i<=11; i++) { ['А','Б','В','Г'].forEach(l => classes.push(i + l)); }
-        
-        const subjects = {
-            low: ["Букварь", "Математика", "ИЗО"],
-            mid: ["Алгебра", "Геометрия", "История", "Физика"],
-            high: ["Информатика", "НВП", "Химия", "История Казахстана"]
-        };
+let userData=null;
+let tempId=null;
 
-        const regSel = document.getElementById('reg-class-list');
-        const mainSel = document.getElementById('main-class-select');
-        classes.forEach(c => {
-            regSel.add(new Option(c + " класс", c));
-            mainSel.add(new Option(c + " класс", c));
-        });
+const classes=[...Array(11)].map((_,i)=>i+1+"А");
 
-        // ПРОВЕРКА СЕССИИ (Чтобы не выкидывало)
-        auth.onAuthStateChanged(user => {
-            document.getElementById('scr-load').classList.add('hidden');
-            if (user) {
-                db.ref('users/' + user.uid).on('value', s => {
-                    const data = s.val();
-                    if (user.email === 'ko-23-151@turan-edu.kz') { 
-                        currentUser = { role: 'admin', email: user.email }; startApp(); 
-                    } else if (!data) { 
-                        showScr('scr-survey'); 
-                    } else if (data.status === 'pending') { 
-                        showScr('scr-wait'); 
-                    } else { 
-                        currentUser = data; startApp(); 
-                    }
-                });
-            } else { showScr('scr-login'); }
-        });
+classes.forEach(c=>{
+  const o=document.createElement("option");
+  o.innerText=c;
+  document.getElementById("class").appendChild(o);
+});
 
-        function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-        function logout() { auth.signOut().then(() => location.reload()); }
+function login(){
+auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+}
 
-        function saveReg() {
-            const role = document.getElementById('reg-role').value; // ЧИТАЕМ РОЛЬ
-            db.ref('users/' + auth.currentUser.uid).set({
-                name: document.getElementById('reg-name').value,
-                role: role, // ПИШЕМ РОЛЬ
-                uClass: document.getElementById('reg-class-list').value,
-                proof: document.getElementById('reg-proof').value,
-                status: 'pending',
-                email: auth.currentUser.email
-            });
-        }
+auth.onAuthStateChanged(u=>{
+if(!u){show("login");return;}
 
-        function startApp() {
-            showScr('scr-main');
-            document.getElementById('role-tag').innerText = currentUser.role.toUpperCase();
-            document.getElementById('email-tag').innerText = currentUser.email;
-            if (currentUser.role === 'admin') document.getElementById('admin-only').classList.remove('hidden');
-            if (currentUser.role === 'student') {
-                mainSel.value = currentUser.uClass;
-                mainSel.disabled = true;
-            }
-            updateUI();
-        }
+db.ref("users/"+u.uid).once("value",s=>{
+const d=s.val();
 
-        function updateUI() {
-            const cls = mainSel.value;
-            const num = parseInt(cls);
-            let subList = num <= 4 ? subjects.low : (num <= 9 ? subjects.mid : subjects.high);
-            const menu = document.getElementById('subject-menu');
-            menu.innerHTML = '';
-            subList.forEach(s => {
-                menu.innerHTML += `<button class="menu-btn" onclick="openSub('${s}')">${s}</button>`;
-            });
-            loadStudents();
-        }
+if(!d){
+show("reg");
+return;
+}
 
-        function openSub(name) {
-            document.getElementById('view-title').innerText = name + " | " + mainSel.value;
-            showTab('journal');
-        }
+if(d.status==="pending"){
+show("wait");
+return;
+}
 
-        function loadStudents() {
-            const cls = mainSel.value;
-            db.ref('users').once('value', s => {
-                const users = s.val();
-                const tbody = document.getElementById('tbody-journal');
-                tbody.innerHTML = '';
-                for (let id in users) {
-                    // ЖЕСТКАЯ ПРОВЕРКА КЛАССА И РОЛИ УЧЕНИКА
-                    if (users[id].uClass === cls && users[id].role === 'student' && users[id].status === 'approved') {
-                        tbody.innerHTML += `<tr>
-                            <td>${users[id].name}</td>
-                            <td><button onclick="this.innerText=this.innerText=='Б'?'Н':'Б'">Б</button></td>
-                            <td><input type="number" min="1" max="10" style="width:45px;"></td>
-                            <td>Урок</td>
-                        </tr>`;
-                    }
-                }
-            });
-        }
+userData=d;
+start();
+});
+});
 
-        function loadRequests() {
-            db.ref('users').on('value', s => {
-                const users = s.val();
-                const list = document.getElementById('list-req');
-                list.innerHTML = '';
-                for (let id in users) {
-                    if (users[id].status === 'pending') {
-                        list.innerHTML += `<div style="border:1px solid #ddd; padding:15px; margin-top:10px; border-radius:12px;">
-                            <b>${users[id].name}</b> | Класс: ${users[id].uClass} | Роль: ${users[id].role}<br>
-                            <p style="background:#f1f5f9; padding:10px; font-size:12px;">${users[id].proof}</p>
-                            <button onclick="approve('${id}')" style="background:green; color:white; border:none; padding:8px 20px; border-radius:8px;">Одобрить</button>
-                        </div>`;
-                    }
-                }
-            });
-        }
+function save(){
+db.ref("users/"+auth.currentUser.uid).set({
+name:document.getElementById("name").value,
+class:document.getElementById("class").value,
+proof:document.getElementById("proof").value,
+role:"student",
+status:"pending",
+subjects:[]
+});
+}
 
-        function approve(id) { db.ref('users/' + id).update({ status: 'approved' }); }
+function start(){
+show("main");
+document.getElementById("role").innerText=userData.role;
 
-        function showScr(id) {
-            document.querySelectorAll('.overlay, #scr-main').forEach(el => el.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-        }
+if(userData.role==="admin"){
+document.getElementById("admin").classList.remove("hidden");
+}
 
-        function showTab(id) {
-            document.getElementById('tab-journal').classList.add('hidden');
-            document.getElementById('tab-requests').classList.add('hidden');
-            document.getElementById('tab-' + id).classList.remove('hidden');
-            if (id === 'requests') loadRequests();
-        }
-    </script>
+document.getElementById("menu").innerHTML=
+(userData.subjects||[]).map(s=>`<button class="menu-btn">${s}</button>`).join("");
+}
+
+function loadReq(){
+db.ref("users").once("value",s=>{
+const d=s.val();
+let html="";
+
+for(let id in d){
+if(d[id].status==="pending"){
+html+=`
+<tr>
+<td>${d[id].name}</td>
+<td>${d[id].status}</td>
+<td>
+<button onclick="openModal('${id}')">approve</button>
+</td>
+</tr>`;
+}
+}
+
+document.getElementById("tbl").innerHTML=html;
+});
+}
+
+function openModal(id){
+tempId=id;
+show("modal");
+}
+
+function confirm(){
+db.ref("users/"+tempId).update({
+status:"approved",
+role:"teacher",
+subjects:[document.getElementById("subject").value]
+});
+
+show("main");
+}
+
+function show(id){
+document.querySelectorAll(".overlay,#main").forEach(e=>e.classList.add("hidden"));
+document.getElementById(id).classList.remove("hidden");
+}
+</script>
+
 </body>
 </html>
