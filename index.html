@@ -3,127 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduSystem Cloud | Дипломный проект</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>EduSystem | Система верификации</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
     <style>
         :root {
-            --primary: #4f46e5; --primary-hover: #4338ca; 
-            --secondary: #10b981; --bg-body: #f8fafc; --bg-card: #ffffff;
-            --text-main: #0f172a; --text-muted: #64748b;
-            --border: #e2e8f0; --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --primary: #4f46e5; --bg: #f8fafc; --card: #ffffff;
+            --text: #0f172a; --muted: #64748b; --border: #e2e8f0;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Экран входа */
-        #login-section { position: fixed; inset: 0; background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 100%); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .login-box { background: white; padding: 2.5rem; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-        .login-box input { width: 100%; padding: 14px; margin-bottom: 16px; border: 1px solid var(--border); border-radius: 12px; outline: none; }
-        .login-box button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; }
-        
-        /* Главный интерфейс */
-        aside { width: 260px; background: var(--bg-card); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .nav-item { padding: 16px 24px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; gap: 12px; }
-        .nav-item.active { background: #eef2ff; color: var(--primary); border-right: 3px solid var(--primary); }
-        
-        main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-        header { background: white; padding: 20px 40px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); }
-        .content-area { padding: 30px; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; }
-        
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        body { background: var(--bg); color: var(--text); }
         .hidden { display: none !important; }
-        .btn { padding: 10px 15px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+
+        /* Центрированные блоки (Логин, Анкета, Ожидание) */
+        .flex-center { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+        .box { background: var(--card); padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
+        
+        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; }
+        button { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-google { background: #ea4335; color: white; }
         .btn-primary { background: var(--primary); color: white; }
+        
+        /* Панель Админа */
+        .admin-layout { display: flex; height: 100vh; }
+        .sidebar { width: 260px; background: white; border-right: 1px solid var(--border); padding: 20px; }
+        .content { flex: 1; padding: 40px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border); }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .status-pending { background: #fef3c7; color: #92400e; }
     </style>
 </head>
 <body>
 
-    <div id="login-section">
-        <div class="login-box">
-            <h2>🎓 EduSystem LMS</h2>
-            <p style="margin-bottom: 20px; color: var(--text-muted);">Облачная авторизация</p>
-            <input type="text" id="username" placeholder="Логин">
-            <input type="password" id="password" placeholder="Пароль">
-            <button onclick="login()">Войти</button>
-            <p id="error-msg" style="color: red; margin-top: 10px; display: none;">Ошибка: проверьте данные</p>
+    <div id="screen-login" class="flex-center">
+        <div class="box">
+            <h2 style="margin-bottom:10px;">🎓 EduSystem</h2>
+            <p style="color:var(--muted); margin-bottom:20px;">Войдите через Google для подачи заявки</p>
+            <button class="btn-google" onclick="login()">Войти через Google</button>
         </div>
     </div>
 
-    <aside id="sidebar" class="hidden">
-        <div style="padding: 24px; font-weight: 800; color: var(--primary);">EDUSYSTEM</div>
-        <div id="menu-admin" class="hidden">
-            <div class="nav-item active" onclick="showTab('tab-admin')">👥 Пользователи</div>
+    <div id="screen-survey" class="flex-center hidden">
+        <div class="box">
+            <h3>Создание профиля</h3>
+            <p style="font-size:0.9rem; color:var(--muted);">Администратор проверит ваши данные</p>
+            <input type="text" id="field-name" placeholder="Ваше ФИО">
+            <select id="field-role">
+                <option value="student">Ученик</option>
+                <option value="teacher">Учитель</option>
+            </select>
+            <textarea id="field-proof" placeholder="Докажите роль (номер школы, класс или предмет преподавания)"></textarea>
+            <button class="btn-primary" onclick="sendRequest()">Отправить заявку</button>
         </div>
-        <div id="menu-teacher" class="hidden">
-            <div class="nav-item active" onclick="showTab('tab-teacher')">📊 Журнал</div>
-        </div>
-        <div id="menu-student" class="hidden">
-            <div class="nav-item active" onclick="showTab('tab-student')">📖 Дневник</div>
-        </div>
-    </aside>
+    </div>
 
-    <main id="main-ui" class="hidden">
-        <header>
-            <span id="user-title" style="font-weight: 600;">Пользователь</span>
-            <button onclick="location.reload()" style="color: red; background: none; border: none; cursor: pointer;">Выход</button>
-        </header>
+    <div id="screen-wait" class="flex-center hidden">
+        <div class="box">
+            <div style="font-size: 3rem;">⏳</div>
+            <h3 style="margin-top:10px;">Заявка на рассмотрении</h3>
+            <p style="color:var(--muted); margin-top:10px;">Ваш аккаунт сейчас проверяется администратором. Пожалуйста, зайдите позже.</p>
+            <button onclick="location.reload()">Проверить статус</button>
+        </div>
+    </div>
 
-        <div class="content-area">
-            <div id="tab-admin" class="tab-content hidden">
-                <div class="card">
-                    <h3>Добавить пользователя в облако</h3>
-                    <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
-                        <input type="text" id="reg-name" placeholder="ФИО">
-                        <input type="text" id="reg-login" placeholder="Логин">
-                        <input type="text" id="reg-pass" placeholder="Пароль">
-                        <select id="reg-role">
-                            <option value="student">Ученик</option>
-                            <option value="teacher">Учитель</option>
-                            <option value="admin">Администратор</option>
-                        </select>
-                        <button class="btn btn-primary" onclick="addUser()">Создать</button>
-                    </div>
-                </div>
-                <div class="card">
-                    <h3>Список аккаунтов</h3>
-                    <table id="user-list">
-                        <thead><tr><th>Имя</th><th>Логин</th><th>Роль</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
+    <div id="screen-admin" class="admin-layout hidden">
+        <aside class="sidebar">
+            <h2>Админ-панель</h2>
+            <p id="admin-name" style="margin-bottom:20px; font-size:0.9rem; color:var(--muted);"></p>
+            <button class="btn-primary" onclick="location.reload()">Обновить список</button>
+        </aside>
+        <main class="content">
+            <h3>Заявки на верификацию</h3>
+            <table style="margin-top:20px;">
+                <thead>
+                    <tr>
+                        <th>Имя / Email</th>
+                        <th>Роль</th>
+                        <th>Доказательства</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody id="requests-table"></tbody>
+            </table>
+        </main>
+    </div>
+
+    <div id="screen-main" class="flex-center hidden">
+        <div class="box">
+            <h1 id="welcome-user">Добро пожаловать!</h1>
+            <p id="user-role-display"></p>
+            <div style="margin-top:20px; padding:20px; border:1px dashed var(--border);">
+                Здесь будет функционал для <span id="role-name"></span>
             </div>
-
-            <div id="tab-teacher" class="tab-content hidden">
-                <div class="card">
-                    <h3>Выставление оценок</h3>
-                    <table style="margin-top: 15px;">
-                        <thead><tr><th>Ученик</th><th>Оценка (2-5)</th></tr></thead>
-                        <tbody id="teacher-table"></tbody>
-                    </table>
-                    <button class="btn btn-primary" style="margin-top: 15px;" onclick="saveGrades()">Сохранить всё в Firebase</button>
-                </div>
-            </div>
-
-            <div id="tab-student" class="tab-content hidden">
-                <div class="card">
-                    <h3>Моя успеваемость</h3>
-                    <table id="student-table" style="margin-top: 15px;">
-                        <thead><tr><th>Предмет</th><th>Оценка</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
+            <button onclick="location.reload()" style="background:#f1f5f9; color:black;">Выйти</button>
         </div>
-    </main>
+    </div>
 
     <script>
-        // ТВОИ КЛЮЧИ ИЗ FIREBASE
+        // ТВОИ КЛЮЧИ
         const firebaseConfig = {
             apiKey: "AIzaSyAWmME75qjW5pxmOjObfVsINaRylPtpL6k",
             authDomain: "auth-project-7aec4.firebaseapp.com",
@@ -136,107 +118,95 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let user = null;
+        const auth = firebase.auth();
+        const provider = new firebase.auth.GoogleAuthProvider();
 
-        // ВХОД
+        let currentUid = null;
+
+        // ВХОД ЧЕРЕЗ GOOGLE
         function login() {
-            const l = document.getElementById('username').value.trim().toLowerCase();
-            const p = document.getElementById('password').value;
+            auth.signInWithPopup(provider).then(res => {
+                currentUid = res.user.uid;
+                checkUser(res.user);
+            });
+        }
 
-            // Лазейка для первого входа (чтобы ты мог зайти и создать себя)
-            if (l === 'admin' && p === '123') {
-                user = { name: "Администратор", role: "admin", login: "admin" };
-                initUI(); return;
+        function checkUser(gUser) {
+            // Твой личный емейл как суперадмина (ЗАМЕНИ НА СВОЙ)
+            if (gUser.email === 'ko-23-151@turan-edu.kz') {
+                showScreen('screen-admin');
+                document.getElementById('admin-name').innerText = gUser.email;
+                loadRequests();
+                return;
             }
 
-            db.ref('users/' + l).once('value').then(s => {
+            db.ref('users/' + currentUid).once('value', s => {
                 const data = s.val();
-                if (data && data.password === p) {
-                    user = { login: l, ...data };
-                    initUI();
+                if (!data) {
+                    showScreen('screen-survey'); // Новый — на анкету
+                } else if (data.status === 'pending') {
+                    showScreen('screen-wait');   // Ждет — на экран ожидания
                 } else {
-                    document.getElementById('error-msg').style.display = 'block';
+                    showScreen('screen-main');   // Одобрен — в систему
+                    document.getElementById('welcome-user').innerText = "Привет, " + data.name;
+                    document.getElementById('user-role-display').innerText = "Твоя роль: " + (data.role === 'teacher' ? 'Учитель' : 'Ученик');
+                    document.getElementById('role-name').innerText = data.role;
                 }
             });
         }
 
-        function initUI() {
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('sidebar').classList.remove('hidden');
-            document.getElementById('main-ui').classList.remove('hidden');
-            document.getElementById('user-title').innerText = user.name + " (" + user.role + ")";
+        // ОТПРАВКА ЗАЯВКИ
+        function sendRequest() {
+            const name = document.getElementById('field-name').value;
+            const role = document.getElementById('field-role').value;
+            const proof = document.getElementById('field-proof').value;
 
-            if (user.role === 'admin') {
-                document.getElementById('menu-admin').classList.remove('hidden');
-                showTab('tab-admin'); loadUsers();
-            } else if (user.role === 'teacher') {
-                document.getElementById('menu-teacher').classList.remove('hidden');
-                showTab('tab-teacher'); loadTeacherJournal();
-            } else {
-                document.getElementById('menu-student').classList.remove('hidden');
-                showTab('tab-student'); loadStudentDiary();
-            }
-        }
+            if(!name || !proof) return alert("Заполните все поля!");
 
-        // АДМИН: ДОБАВЛЕНИЕ
-        function addUser() {
-            const name = document.getElementById('reg-name').value;
-            const login = document.getElementById('reg-login').value.toLowerCase();
-            const pass = document.getElementById('reg-pass').value;
-            const role = document.getElementById('reg-role').value;
-
-            if(!name || !login || !pass) return alert("Заполните всё!");
-
-            db.ref('users/' + login).set({ name, password: pass, role }).then(() => {
-                alert("Пользователь " + login + " добавлен в облако!");
-                loadUsers();
+            db.ref('users/' + currentUid).set({
+                name: name,
+                role: role,
+                proof: proof,
+                status: 'pending',
+                email: auth.currentUser.email
+            }).then(() => {
+                showScreen('screen-wait');
             });
         }
 
-        function loadUsers() {
-            db.ref('users').once('value', s => {
-                const data = s.val();
-                const tbody = document.querySelector('#user-list tbody');
-                tbody.innerHTML = '';
-                for (let l in data) {
-                    tbody.innerHTML += `<tr><td>${data[l].name}</td><td>${l}</td><td>${data[l].role}</td></tr>`;
-                }
-            });
-        }
-
-        // УЧИТЕЛЬ: ЖУРНАЛ
-        function loadTeacherJournal() {
-            db.ref('users').once('value', s => {
-                const data = s.val();
-                const tbody = document.getElementById('teacher-table');
-                tbody.innerHTML = '';
-                for (let l in data) {
-                    if(data[l].role === 'student') {
-                        tbody.innerHTML += `<tr><td>${data[l].name}</td><td><input type="number" class="g-input" data-log="${l}" min="2" max="5"></td></tr>`;
+        // АДМИН: ЗАГРУЗКА ЗАЯВОК
+        function loadRequests() {
+            db.ref('users').on('value', s => {
+                const users = s.val();
+                const table = document.getElementById('requests-table');
+                table.innerHTML = '';
+                for (let id in users) {
+                    if (users[id].status === 'pending') {
+                        table.innerHTML += `
+                            <tr>
+                                <td><b>${users[id].name}</b><br>${users[id].email}</td>
+                                <td>${users[id].role}</td>
+                                <td>${users[id].proof}</td>
+                                <td>
+                                    <button class="btn-primary" onclick="approve('${id}', '${users[id].role}')" style="padding:5px 10px; font-size:0.8rem;">Одобрить</button>
+                                    <button onclick="approve('${id}', 'teacher')" style="padding:5px 10px; font-size:0.8rem; background:gray; color:white;">Как Учителя</button>
+                                    <button onclick="approve('${id}', 'student')" style="padding:5px 10px; font-size:0.8rem; background:gray; color:white;">Как Ученика</button>
+                                </td>
+                            </tr>`;
                     }
                 }
             });
         }
 
-        function saveGrades() {
-            const inputs = document.querySelectorAll('.g-input');
-            inputs.forEach(i => {
-                if(i.value) db.ref('grades/' + i.dataset.log).set(i.value);
-            });
-            alert("Оценки улетели в базу Google!");
+        function approve(uid, role) {
+            db.ref('users/' + uid).update({
+                status: 'approved',
+                role: role
+            }).then(() => alert("Роль " + role + " подтверждена!"));
         }
 
-        // УЧЕНИК: ДНЕВНИК
-        function loadStudentDiary() {
-            db.ref('grades/' + user.login).once('value', s => {
-                const grade = s.val() || "Нет оценки";
-                const tbody = document.querySelector('#student-table tbody');
-                tbody.innerHTML = `<tr><td>Информатика</td><td>${grade}</td></tr>`;
-            });
-        }
-
-        function showTab(id) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+        function showScreen(id) {
+            document.querySelectorAll('body > div').forEach(d => d.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
     </script>
