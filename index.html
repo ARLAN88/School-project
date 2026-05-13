@@ -3,172 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduSystem | Учебная Часть & Мониторинг</title>
+    <title>EduSystem | Система Управления Обучением</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1e40af; --primary-hover: #1e3a8a; 
-            --secondary: #059669; --danger: #dc2626;
-            --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0;
-            --text: #1e293b; --text-light: #64748b;
+            --brand: #2563eb; --brand-dark: #1e40af;
+            --surface: #ffffff; --bg: #f1f5f9;
+            --text: #0f172a; --text-light: #64748b;
+            --border: #e2e8f0; --success: #10b981;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
 
-        /* Sidebar */
-        aside { width: 280px; background: #ffffff; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .logo-box { padding: 30px 24px; border-bottom: 1px solid var(--border); background: var(--primary); color: white; }
-        .logo-box h1 { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        /* Навигация */
+        aside { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
+        .side-header { padding: 24px; background: var(--brand); color: white; cursor: pointer; }
+        .side-header h1 { font-size: 1.1rem; font-weight: 800; letter-spacing: 1px; }
         
-        .nav-link { padding: 14px 24px; cursor: pointer; color: var(--text-light); font-weight: 500; transition: 0.2s; border-left: 4px solid transparent; }
-        .nav-link:hover { background: #f1f5f9; color: var(--text); }
-        .nav-link.active { background: #eff6ff; color: var(--primary); border-left-color: var(--primary); font-weight: 600; }
+        .nav-group { padding: 15px 0; border-bottom: 1px solid var(--border); }
+        .nav-label { padding: 0 24px 10px; font-size: 0.7rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; }
+        .nav-item { padding: 12px 24px; cursor: pointer; color: var(--text); font-size: 0.9rem; font-weight: 500; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
+        .nav-item:hover { background: #f8fafc; }
+        .nav-item.active { background: #eff6ff; color: var(--brand); font-weight: 600; border-right: 3px solid var(--brand); }
 
-        /* Main Content */
-        main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
-        header { background: #fff; padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
-        .content { padding: 40px; max-width: 1400px; margin: 0 auto; width: 100%; }
+        /* Контент */
+        main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; position: relative; }
+        header { background: white; padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); sticky; top: 0; }
+        .container { padding: 30px 40px; max-width: 1400px; margin: 0 auto; width: 100%; }
 
-        /* UI Elements */
-        .card { background: white; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 24px; padding: 24px; }
-        .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; font-size: 0.9rem; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        /* Карточки и Таблицы */
+        .card { background: white; border-radius: 12px; border: 1px solid var(--border); padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .filter-bar { display: flex; gap: 15px; margin-bottom: 25px; padding: 15px; background: #f8fafc; border-radius: 10px; align-items: flex-end; }
         
-        .sys-select, .sys-input { padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); outline: none; background: #fff; font-size: 0.95rem; min-width: 150px; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group label { font-size: 0.7rem; font-weight: 700; color: var(--text-light); }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { text-align: left; padding: 14px; color: var(--text-light); font-size: 0.75rem; text-transform: uppercase; border-bottom: 2px solid var(--border); background: #f8fafc; }
-        td { padding: 14px; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+        select, input { padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); outline: none; background: white; font-size: 0.9rem; }
+        select:focus { border-color: var(--brand); }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 14px; color: var(--text-light); font-size: 0.75rem; text-transform: uppercase; border-bottom: 2px solid var(--border); background: #fafafa; }
+        td { padding: 14px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        tr:hover { background: #fcfcfc; }
+
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+        .badge-success { background: #dcfce7; color: #15803d; }
+        .badge-warning { background: #fef9c3; color: #a16207; }
 
         .hidden { display: none !important; }
-        .auth-overlay { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .auth-card { background: white; padding: 40px; border-radius: 24px; width: 100%; max-width: 420px; text-align: center; }
+        .auth-screen { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .auth-box { background: white; padding: 40px; border-radius: 20px; width: 400px; text-align: center; }
+        .btn { padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .btn-main { background: var(--brand); color: white; }
     </style>
 </head>
 <body>
 
-    <div id="scr-auth" class="auth-overlay">
-        <div class="auth-card">
-            <h1 style="color:var(--primary); margin-bottom:10px;">EduSystem 2024</h1>
-            <p style="color:var(--text-light); margin-bottom:30px;">Войдите для доступа к учебной части</p>
-            <button class="btn btn-primary" style="width:100%; padding:16px; justify-content:center;" onclick="authAction()">Войти через Google</button>
+    <div id="scr-auth" class="auth-screen">
+        <div class="auth-box">
+            <h2 style="margin-bottom:10px;">EduSystem LMS</h2>
+            <p style="color:var(--text-light); margin-bottom:25px;">Авторизация в системе</p>
+            <button class="btn btn-main" style="width:100%" onclick="login()">Войти через Google</button>
         </div>
     </div>
 
     <div id="scr-app" class="hidden" style="display:flex; width:100%">
         <aside>
-            <div class="logo-box">
-                <h1>Учебная Часть</h1>
+            <div class="side-header" onclick="fillHistoryData()">
+                <h1>УЧЕБНАЯ ЧАСТЬ</h1>
             </div>
             
-            <nav id="menu-admin" class="hidden">
-                <div class="nav-link active" onclick="switchTab('tab-monitoring', this)">📊 Мониторинг школ</div>
-                <div class="nav-link" onclick="switchTab('tab-users', this)">👥 Пользователи</div>
-            </nav>
+            <div id="menu-admin" class="nav-group hidden">
+                <div class="nav-label">Управление школой</div>
+                <div class="nav-item active" onclick="showTab('monitoring', this)">📈 Мониторинг классов</div>
+                <div class="nav-item" onclick="showTab('users', this)">👥 База сотрудников</div>
+            </div>
 
-            <nav id="menu-teacher" class="hidden">
-                <div class="nav-link active" onclick="switchTab('tab-journal', this)">📋 Журнал оценок</div>
-                <div class="nav-link" onclick="switchTab('tab-tasks', this)">📝 Задания</div>
-            </nav>
+            <div id="menu-teacher" class="nav-group hidden">
+                <div class="nav-label">Работа с классами</div>
+                <div class="nav-item" onclick="showTab('journal', this)">📒 Электронный журнал</div>
+                <div class="nav-item" onclick="showTab('tasks', this)">📂 Архив заданий</div>
+            </div>
 
             <div style="margin-top:auto; padding:20px; border-top:1px solid var(--border);">
-                <div id="user-info" style="margin-bottom:15px;">
-                    <b id="user-name" style="display:block; font-size:0.9rem;">Имя Фамилия</b>
-                    <span id="user-role" style="color:var(--text-light); font-size:0.8rem;">Роль</span>
+                <div id="u-info" style="font-size:0.8rem; margin-bottom:10px;">
+                    <b id="u-name">...</b><br><span id="u-role" style="color:var(--text-light)">...</span>
                 </div>
-                <button class="btn btn-outline" style="width:100%" onclick="exitApp()">Выйти</button>
+                <button onclick="logout()" style="font-size:0.7rem; color:var(--danger); border:none; background:none; cursor:pointer;">Выйти из системы</button>
             </div>
         </aside>
 
         <main>
             <header>
-                <h2 id="page-title">Панель управления</h2>
-                <div id="school-tag" style="background:#e0e7ff; color:var(--primary); padding:6px 16px; border-radius:30px; font-size:0.85rem; font-weight:700;">BINOM School Astana</div>
+                <h2 id="tab-title">Мониторинг классов</h2>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:0.8rem; font-weight:600; color:var(--brand);">BINOM Astana</span>
+                </div>
             </header>
 
-            <div class="content">
-                
-                <div id="tab-monitoring" class="tab-content hidden">
+            <div class="container">
+                <div id="tab-monitoring" class="tab-pane">
                     <div class="card">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-                            <h3>Архив успеваемости и посещаемости</h3>
-                        </div>
-                        
-                        <div style="display:flex; gap:15px; margin-bottom:25px; background:#f1f5f9; padding:15px; border-radius:10px;">
-                            <div>
-                                <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">КЛАСС</label>
-                                <select id="mon-class" class="sys-select" onchange="onMonitoringClassChange()">
-                                    <option value="">Выберите класс...</option>
-                                </select>
+                        <div class="filter-bar">
+                            <div class="input-group">
+                                <label>ВЫБОР КЛАССА</label>
+                                <select id="mon-class" onchange="syncSubjects('mon-class', 'mon-subj')"></select>
                             </div>
-                            <div>
-                                <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">ПРЕДМЕТ</label>
-                                <select id="mon-subj" class="sys-select" onchange="loadGlobalMonitoring()">
-                                    <option value="">Сначала выберите класс</option>
-                                </select>
+                            <div class="input-group">
+                                <label>ПРЕДМЕТ</label>
+                                <select id="mon-subj" onchange="loadAnalytics()"></select>
                             </div>
                         </div>
-
                         <table>
                             <thead>
                                 <tr>
                                     <th>ФИО Ученика</th>
-                                    <th>Средний балл</th>
+                                    <th>Текущая оценка</th>
                                     <th>Посещаемость</th>
-                                    <th>Статус программы</th>
+                                    <th>Статус выполнения ДЗ</th>
                                 </tr>
                             </thead>
-                            <tbody id="mon-body">
-                                <tr><td colspan="4" style="text-align:center; padding:40px; color:gray;">Выберите класс и предмет для отображения данных</td></tr>
-                            </tbody>
+                            <tbody id="mon-table"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <div id="tab-journal" class="tab-content hidden">
+                <div id="tab-journal" class="tab-pane hidden">
                     <div class="card">
-                        <div style="display:flex; gap:15px; margin-bottom:20px; align-items:flex-end;">
-                            <div>
-                                <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">КЛАСС</label>
-                                <select id="t-class" class="sys-select" onchange="onTeacherClassChange()"></select>
+                        <div class="filter-bar">
+                            <div class="input-group">
+                                <label>КЛАСС</label>
+                                <select id="t-class" onchange="syncSubjects('t-class', 't-subj')"></select>
                             </div>
-                            <div>
-                                <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">ПРЕДМЕТ</label>
-                                <select id="t-subj" class="sys-select" onchange="loadTeacherJournal()"></select>
+                            <div class="input-group">
+                                <label>ПРЕДМЕТ</label>
+                                <select id="t-subj" onchange="loadJournalData()"></select>
                             </div>
-                            <div>
-                                <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">ДАТА УРОКА</label>
-                                <input type="date" id="t-date" class="sys-input" onchange="loadTeacherJournal()">
+                            <div class="input-group">
+                                <label>ДАТА</label>
+                                <input type="date" id="t-date" onchange="loadJournalData()">
                             </div>
-                            <button class="btn btn-primary" onclick="saveGrades()">💾 Сохранить журнал</button>
+                            <button class="btn btn-main" onclick="saveGrades()" style="margin-left:auto;">Сохранить данные</button>
                         </div>
-
-                        <table>
+                        <table id="journal-table">
                             <thead>
-                                <tr>
-                                    <th style="width:40%">ФИО Ученика</th>
-                                    <th>Явка (Б/Н)</th>
-                                    <th>Оценка (1-10)</th>
-                                    <th>Комментарий</th>
-                                </tr>
+                                <tr><th>Ученик</th><th>Явка</th><th>Оценка</th><th>Комментарий</th></tr>
                             </thead>
-                            <tbody id="journal-body"></tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
                 </div>
-
             </div>
         </main>
     </div>
 
     <script>
-        // 1. КОНФИГУРАЦИЯ FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyAWmME75qjW5pxmOjObfVsINaRylPtpL6k",
             authDomain: "auth-project-7aec4.firebaseapp.com",
@@ -182,143 +176,97 @@
         const db = firebase.database();
         const auth = firebase.auth();
 
-        // 2. ДАННЫЕ ПРЕДМЕТОВ ПО КЛАССАМ
-        const SUBJECTS_MAP = {
-            "primary": ["Обучение грамоте", "Математика", "Познание мира", "ИЗО", "Музыка", "Физкультура"],
-            "middle": ["Алгебра", "Геометрия", "Русский язык", "Литература", "История Казахстана", "Биология", "География", "Информатика"],
-            "high": ["Алгебра", "Физика", "Химия", "Геометрия", "Всемирная история", "Основы права", "Биология"]
+        // ПРЕДМЕТЫ ПО ВОЗРАСТАМ
+        const SUBJECTS = {
+            "1-4": ["Математика", "Букварь", "Познание мира", "ИЗО", "Музыка"],
+            "5-9": ["Алгебра", "Геометрия", "История Казахстана", "Биология", "География", "Информатика"],
+            "10-11": ["Алгебра", "Физика", "Химия", "Геометрия", "Всемирная история", "Основы права"]
         };
 
-        // Генерация всех классов 1-11 (А, Б, В, Г)
-        const ALL_CLASSES = [];
-        for(let i=1; i<=11; i++) {
-            ['А', 'Б', 'В', 'Г'].forEach(lit => ALL_CLASSES.push(`${i} "${lit}"`));
-        }
+        const CLASSES = [];
+        for(let i=1; i<=11; i++) { ['А', 'Б', 'В', 'Г'].forEach(l => CLASSES.push(`${i} "${l}"`)); }
 
-        let currentUser = null;
-
-        // 3. ЛОГИКА ПРЕДМЕТОВ (Чтобы в 1 классе не было физики)
-        function updateSubjectSelect(classValue, selectId) {
-            const select = document.getElementById(selectId);
-            select.innerHTML = '';
-            const grade = parseInt(classValue);
-            let list = [];
-
-            if (grade >= 1 && grade <= 4) list = SUBJECTS_MAP.primary;
-            else if (grade >= 5 && grade <= 9) list = SUBJECTS_MAP.middle;
-            else if (grade >= 10 && grade <= 11) list = SUBJECTS_MAP.high;
-
-            list.forEach(s => select.add(new Option(s, s)));
-        }
-
-        // 4. ИНИЦИАЛИЗАЦИЯ КЛАССОВ ПРИ ЗАГРУЗКЕ
-        function initApp() {
-            const sels = ['mon-class', 't-class'];
-            sels.forEach(id => {
-                const s = document.getElementById(id);
-                ALL_CLASSES.forEach(c => s.add(new Option(c, c)));
+        function init() {
+            const clsSels = [document.getElementById('mon-class'), document.getElementById('t-class')];
+            clsSels.forEach(s => {
+                CLASSES.forEach(c => s.add(new Option(c, c)));
             });
             document.getElementById('t-date').valueAsDate = new Date();
+            // Первичная синхронизация предметов
+            syncSubjects('mon-class', 'mon-subj');
+            syncSubjects('t-class', 't-subj');
         }
-        initApp();
+        init();
 
-        // 5. СОБЫТИЯ ВЫБОРА КЛАССА
-        function onMonitoringClassChange() {
-            const cls = document.getElementById('mon-class').value;
-            updateSubjectSelect(cls, 'mon-subj');
-            loadGlobalMonitoring();
+        // СИНХРОНИЗАЦИЯ: Убираем алгебру из 1 класса
+        function syncSubjects(classId, subjId) {
+            const classVal = document.getElementById(classId).value;
+            const subjSel = document.getElementById(subjId);
+            subjSel.innerHTML = '';
+            const grade = parseInt(classVal);
+            
+            let list = [];
+            if(grade <= 4) list = SUBJECTS["1-4"];
+            else if(grade <= 9) list = SUBJECTS["5-9"];
+            else list = SUBJECTS["10-11"];
+
+            list.forEach(s => subjSel.add(new Option(s, s)));
+            
+            if(classId === 'mon-class') loadAnalytics();
+            if(classId === 't-class') loadJournalData();
         }
 
-        function onTeacherClassChange() {
-            const cls = document.getElementById('t-class').value;
-            updateSubjectSelect(cls, 't-subj');
-            loadTeacherJournal();
-        }
-
-        // 6. АВТОРИЗАЦИЯ И РОЛИ
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                // Проверка на админа (куратора)
-                if(user.email === 'ko-23-151@turan-edu.kz' || user.email === 'admin@admin.com') {
-                    currentUser = { role: 'admin', name: 'Куратор Учебной Части' };
-                    showUI();
+        // АВТОРИЗАЦИЯ
+        let user = null;
+        auth.onAuthStateChanged(u => {
+            if(u) {
+                if(u.email === 'ko-23-151@turan-edu.kz' || u.email === 'admin@admin.com') {
+                    user = { role: 'admin', name: 'Куратор Учебной Части' };
+                    render();
                 } else {
-                    db.ref('users/' + user.uid).on('value', snap => {
-                        currentUser = snap.val();
-                        if(currentUser) showUI();
-                        else alert("Дождитесь одобрения регистрации администратором.");
+                    db.ref('users/' + u.uid).once('value', snap => {
+                        user = snap.val();
+                        if(user) render(); else document.getElementById('scr-auth').classList.remove('hidden');
                     });
                 }
-            } else {
-                document.getElementById('scr-auth').classList.remove('hidden');
-                document.getElementById('scr-app').classList.add('hidden');
-            }
+            } else document.getElementById('scr-auth').classList.remove('hidden');
         });
 
-        function showUI() {
+        function render() {
             document.getElementById('scr-auth').classList.add('hidden');
             document.getElementById('scr-app').classList.remove('hidden');
-            document.getElementById('user-name').innerText = currentUser.name;
-            document.getElementById('user-role').innerText = currentUser.role === 'admin' ? 'Учебная часть' : 'Преподаватель';
+            document.getElementById('u-name').innerText = user.name;
+            document.getElementById('u-role').innerText = user.role === 'admin' ? 'Управление' : 'Учитель';
             
-            document.getElementById('menu-admin').classList.toggle('hidden', currentUser.role !== 'admin');
-            document.getElementById('menu-teacher').classList.toggle('hidden', currentUser.role !== 'teacher');
-            
-            const firstTab = currentUser.role === 'admin' ? 'tab-monitoring' : 'tab-journal';
-            switchTab(firstTab, document.querySelector('.nav-link'));
+            document.getElementById('menu-admin').classList.toggle('hidden', user.role !== 'admin');
+            document.getElementById('menu-teacher').classList.toggle('hidden', user.role !== 'teacher');
         }
 
-        function switchTab(id, el) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        function showTab(id, el) {
+            document.querySelectorAll('.tab-pane').forEach(t => t.classList.add('hidden'));
+            document.getElementById('tab-' + id).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
-            document.getElementById('page-title').innerText = el.innerText;
+            document.getElementById('tab-title').innerText = el.innerText;
         }
 
-        // 7. ЗАГРУЗКА ДАННЫХ (ФАМИЛИИ ИЗ БАЗЫ)
-        function loadTeacherJournal() {
-            const cls = document.getElementById('t-class').value;
-            const tbody = document.getElementById('journal-body');
-            tbody.innerHTML = '<tr><td colspan="4">Поиск учеников...</td></tr>';
+        // ЗАГРУЗКА ДАННЫХ В МОНИТОРИНГ
+        function loadAnalytics() {
+            const cls = document.getElementById('mon-class').value;
+            const tbody = document.getElementById('mon-table');
+            tbody.innerHTML = '<tr><td colspan="4">Синхронизация...</td></tr>';
 
             db.ref('users').once('value', snap => {
                 const users = snap.val();
                 tbody.innerHTML = '';
-                let found = false;
                 for(let id in users) {
                     if(users[id].uClass === cls && users[id].role === 'student') {
-                        found = true;
                         tbody.innerHTML += `
                             <tr>
                                 <td><b>${users[id].name}</b></td>
-                                <td><select class="sys-select"><option>Б</option><option>Н</option></select></td>
-                                <td><input type="number" class="sys-input" style="width:70px" min="1" max="10" placeholder="-"></td>
-                                <td><input type="text" class="sys-input" style="width:100%" placeholder="Заметка..."></td>
-                            </tr>
-                        `;
-                    }
-                }
-                if(!found) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">В этом классе пока нет учеников</td></tr>';
-            });
-        }
-
-        function loadGlobalMonitoring() {
-            const cls = document.getElementById('mon-class').value;
-            const tbody = document.getElementById('mon-body');
-            if(!cls) return;
-
-            db.ref('users').once('value', snap => {
-                const users = snap.val();
-                tbody.innerHTML = '';
-                for(let id in users) {
-                    if(users[id].uClass === cls && users[id].role === 'student') {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td>${users[id].name}</td>
-                                <td><span style="color:var(--secondary); font-weight:700;">8.2</span></td>
-                                <td><span style="background:#dcfce7; padding:4px 8px; border-radius:5px; font-size:0.8rem;">95%</span></td>
-                                <td>В рамках плана</td>
+                                <td><span style="font-weight:700; color:var(--brand)">8.5</span></td>
+                                <td><span class="badge badge-success">98%</span></td>
+                                <td><span class="badge badge-success">Сдано 12/12</span></td>
                             </tr>
                         `;
                     }
@@ -326,8 +274,21 @@
             });
         }
 
-        function authAction() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-        function exitApp() { auth.signOut().then(() => location.reload()); }
+        // ФУНКЦИЯ ЗАПОЛНЕНИЯ ИСТОРИИ (Нажать на логотип "Учебная часть")
+        async function fillHistoryData() {
+            if(!confirm("Заполнить историю оценок для 11 А и 1 Б?")) return;
+            const students = {
+                "s1": { name: "Ахметов Арман", role: "student", uClass: "11 \"А\"", school: "BINOM" },
+                "s2": { name: "Бекенова Алия", role: "student", uClass: "11 \"А\"", school: "BINOM" },
+                "s3": { name: "Султанов Данияр", role: "student", uClass: "1 \"Б\"", school: "BINOM" }
+            };
+            for(let id in students) await db.ref('users/' + id).set(students[id]);
+            alert("История заполнена. Теперь выберите 11 А или 1 Б в мониторинге.");
+            loadAnalytics();
+        }
+
+        function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+        function logout() { auth.signOut().then(() => location.reload()); }
     </script>
 </body>
 </html>
