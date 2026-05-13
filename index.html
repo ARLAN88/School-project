@@ -3,19 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduSystem | Учебная часть & Мониторинг</title>
-
-    <!-- Firebase -->
+    <title>EduSystem LMS | Enterprise Edition</title>
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-
-    <!-- Шрифты -->
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <style>
+        /* ===== ГОСУДАРСТВЕННЫЙ СТИЛЬ КАЗАХСТАНА ===== */
         :root {
-            /* Государственная палитра Казахстана */
             --kz-blue: #0A2E5C;
             --kz-gold: #C5A449;
             --kz-light-blue: #E6EEF5;
@@ -32,12 +29,7 @@
             --transition: 0.25s ease;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
 
         body {
             background: var(--bg);
@@ -47,6 +39,20 @@
             overflow: hidden;
         }
 
+        /* Анимации */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateY(10px); }
+        }
+        .animate-fade { animation: fadeSlideUp 0.4s ease forwards; }
+
         /* ===== SIDEBAR ===== */
         aside {
             width: 280px;
@@ -55,7 +61,6 @@
             display: flex;
             flex-direction: column;
             box-shadow: 2px 0 15px rgba(0,0,0,0.1);
-            position: relative;
             z-index: 10;
         }
 
@@ -63,9 +68,6 @@
             padding: 32px 24px 24px;
             border-bottom: 1px solid rgba(255,255,255,0.15);
             text-align: center;
-        }
-
-        .logo-box h1 {
             font-size: 1.3rem;
             font-weight: 700;
             letter-spacing: 1px;
@@ -75,13 +77,9 @@
             justify-content: center;
             gap: 10px;
         }
+        .logo-box::before { content: "🇰🇿"; font-size: 1.8rem; }
 
-        .logo-box h1::before {
-            content: "🇰🇿";
-            font-size: 1.8rem;
-        }
-
-        .nav-link {
+        .nav-item {
             padding: 16px 24px;
             cursor: pointer;
             color: rgba(255,255,255,0.8);
@@ -93,14 +91,12 @@
             gap: 12px;
             font-size: 0.95rem;
         }
-
-        .nav-link:hover {
+        .nav-item:hover {
             background: rgba(255,255,255,0.08);
             color: white;
             border-left-color: var(--kz-gold);
         }
-
-        .nav-link.active {
+        .nav-item.active {
             background: rgba(255,255,255,0.12);
             color: white;
             border-left-color: var(--kz-gold);
@@ -113,20 +109,8 @@
             border-top: 1px solid rgba(255,255,255,0.15);
             background: rgba(0,0,0,0.2);
         }
-
-        #user-name {
-            display: block;
-            font-weight: 600;
-            font-size: 0.95rem;
-            margin-bottom: 4px;
-        }
-
-        #user-role {
-            font-size: 0.8rem;
-            color: var(--kz-gold);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        #user-name { font-weight: 600; display: block; margin-bottom: 4px; }
+        #user-role { font-size: 0.8rem; color: var(--kz-gold); text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* ===== MAIN ===== */
         main {
@@ -136,7 +120,6 @@
             overflow-y: auto;
             background: var(--bg);
         }
-
         header {
             background: white;
             padding: 16px 40px;
@@ -146,7 +129,6 @@
             border-bottom: 1px solid var(--border);
             box-shadow: 0 2px 8px rgba(0,0,0,0.03);
         }
-
         .school-tag {
             background: linear-gradient(135deg, #0A2E5C, #1F4E8C);
             color: white;
@@ -154,17 +136,9 @@
             border-radius: 30px;
             font-size: 0.85rem;
             font-weight: 600;
-            letter-spacing: 0.5px;
         }
+        .content-area { padding: 40px; max-width: 1400px; margin: 0 auto; width: 100%; }
 
-        .content {
-            padding: 40px;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* ===== CARDS & COMPONENTS ===== */
         .card {
             background: white;
             border-radius: var(--radius);
@@ -174,11 +148,6 @@
             padding: 24px;
             transition: var(--transition);
             animation: fadeSlideUp 0.4s ease;
-        }
-
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .btn {
@@ -192,29 +161,21 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: transparent;
         }
-
         .btn-primary {
             background: linear-gradient(135deg, #0A2E5C, #1F4E8C);
             color: white;
             box-shadow: 0 4px 12px rgba(10,46,92,0.3);
         }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 18px rgba(10,46,92,0.4);
-        }
-
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(10,46,92,0.4); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: #fee2e2; color: var(--danger); }
         .btn-outline {
             background: transparent;
             border: 1px solid rgba(255,255,255,0.4);
             color: white;
         }
-
-        .btn-outline:hover {
-            background: rgba(255,255,255,0.1);
-        }
+        .btn-outline:hover { background: rgba(255,255,255,0.1); }
 
         .sys-select, .sys-input {
             padding: 10px 14px;
@@ -226,25 +187,13 @@
             transition: var(--transition);
             min-width: 150px;
         }
-
         .sys-select:focus, .sys-input:focus {
             border-color: var(--kz-accent);
             box-shadow: 0 0 0 3px rgba(31,78,140,0.1);
         }
 
-        /* ===== TABLES ===== */
-        .table-responsive {
-            overflow-x: auto;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-
+        .table-responsive { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; background: white; }
         th {
             text-align: left;
             padding: 16px;
@@ -256,22 +205,10 @@
             background: #F8FAFD;
             font-weight: 700;
         }
+        td { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #F4F9FF; }
 
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.95rem;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background: #F4F9FF;
-        }
-
-        /* ===== BADGES ===== */
         .badge {
             padding: 4px 12px;
             border-radius: 20px;
@@ -279,57 +216,11 @@
             font-weight: 600;
             display: inline-block;
         }
+        .badge-success { background: #DCFCE7; color: #166534; }
+        .badge-warning { background: #FFF3CD; color: #856404; }
+        .badge-info { background: #E0F2FE; color: #075985; }
 
-        .badge-success {
-            background: #DCFCE7;
-            color: #166534;
-        }
-
-        .badge-warning {
-            background: #FFF3CD;
-            color: #856404;
-        }
-
-        .badge-info {
-            background: #E0F2FE;
-            color: #075985;
-        }
-
-        /* ===== AUTH OVERLAY ===== */
-        .auth-overlay {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at 30% 30%, #1F4E8C, #0A2E5C);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .auth-card {
-            background: white;
-            padding: 48px 40px;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 440px;
-            text-align: center;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
-            animation: fadeSlideUp 0.5s ease;
-        }
-
-        .auth-card h1 {
-            color: var(--kz-blue);
-            margin-bottom: 12px;
-        }
-
-        .auth-card button {
-            width: 100%;
-            padding: 16px;
-            justify-content: center;
-            font-size: 1rem;
-        }
-
-        /* ===== TOAST ===== */
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -344,123 +235,175 @@
             animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
         }
 
-        @keyframes slideInRight {
-            from { transform: translateX(100px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        /* Модальное окно */
+        .full-screen-modal {
+            position: fixed; inset: 0;
+            background: radial-gradient(circle at 30% 30%, #1F4E8C, #0A2E5C);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
         }
-        @keyframes fadeOut {
-            to { opacity: 0; transform: translateY(10px); }
+        .login-box {
+            background: white;
+            padding: 48px 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            animation: fadeSlideUp 0.5s ease;
         }
-
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <!-- Экран авторизации -->
-    <div id="scr-auth" class="auth-overlay">
-        <div class="auth-card">
-            <h1>🇰🇿 EduSystem</h1>
-            <p style="color:var(--text-light); margin-bottom:30px;">Автоматизированная система учёта посещаемости</p>
-            <button class="btn btn-primary" onclick="authAction()">Войти через Google</button>
+    <!-- Экран входа -->
+    <div id="scr-auth" class="full-screen-modal hidden">
+        <div class="login-box">
+            <h1 style="color:var(--kz-blue);">🇰🇿 EduSystem</h1>
+            <p>Единая образовательная платформа</p>
+            <button class="btn btn-primary" style="width:100%; padding:16px;" onclick="authAction()">Войти через Google</button>
+        </div>
+    </div>
+
+    <!-- Экран регистрации (после первого входа) -->
+    <div id="scr-reg" class="full-screen-modal hidden">
+        <div class="login-box" style="max-width: 600px;">
+            <h3>Создание профиля</h3>
+            <p style="color:var(--text-light); margin-bottom:20px;">Заполните данные для модерации</p>
+            <input type="text" id="reg-name" class="sys-input" placeholder="ФИО полностью">
+            <div style="display:flex; gap:10px; margin-bottom:12px;">
+                <select id="reg-city" class="sys-select" onchange="updateSchools()">
+                    <option value="">🌍 Город...</option>
+                </select>
+                <select id="reg-school" class="sys-select">
+                    <option value="">🏫 Сначала выберите город</option>
+                </select>
+            </div>
+            <select id="reg-role" class="sys-select" onchange="toggleRegFields()">
+                <option value="student">👨‍🎓 Ученик</option>
+                <option value="teacher">👨‍🏫 Учитель</option>
+            </select>
+            <select id="reg-class" class="sys-select" style="margin-top:12px;">
+                <option value="">📚 Выберите класс...</option>
+            </select>
+            <button class="btn btn-primary" style="width:100%; margin-top:15px;" onclick="submitReg()">🚀 Отправить заявку</button>
+        </div>
+    </div>
+
+    <!-- Экран ожидания -->
+    <div id="scr-wait" class="full-screen-modal hidden">
+        <div class="login-box">
+            <div style="font-size:3rem;">⏳</div>
+            <h2>Ожидание доступа</h2>
+            <p>Ваша заявка отправлена администратору.</p>
+            <button class="btn btn-outline" style="width:100%; margin-top:20px; background:#0A2E5C; color:white;" onclick="exitApp()">Выйти</button>
         </div>
     </div>
 
     <!-- Основной интерфейс -->
     <div id="scr-app" class="hidden" style="display:flex; width:100%">
         <aside>
-            <div class="logo-box">
-                <h1>Учебная часть</h1>
-            </div>
-            
+            <div class="logo-box">Учебная часть</div>
             <nav id="menu-admin" class="hidden">
-                <div class="nav-link active" data-tab="tab-monitoring">📊 Мониторинг школ</div>
-                <div class="nav-link" data-tab="tab-users">👥 Пользователи</div>
+                <div class="nav-item active" data-tab="tab-admin-req">🔔 Заявки</div>
+                <div class="nav-item" data-tab="tab-users">👥 Пользователи</div>
+                <div class="nav-item" data-tab="tab-admin-logs">📝 Журнал действий</div>
             </nav>
-
             <nav id="menu-teacher" class="hidden">
-                <div class="nav-link active" data-tab="tab-journal">📋 Журнал оценок</div>
-                <div class="nav-link" data-tab="tab-tasks">📝 Задания</div>
+                <div class="nav-item active" data-tab="tab-teacher-journal">📋 Журнал</div>
+                <div class="nav-item" data-tab="tab-teacher-tasks">📝 Задания</div>
             </nav>
-
+            <nav id="menu-student" class="hidden">
+                <div class="nav-item active" data-tab="tab-student-grades">📖 Дневник</div>
+                <div class="nav-item" data-tab="tab-student-tasks">📝 Мои задания</div>
+            </nav>
             <div class="user-footer">
-                <b id="user-name">Имя Фамилия</b>
+                <b id="user-name">Имя</b>
                 <span id="user-role">Роль</span>
                 <button class="btn btn-outline" style="width:100%; margin-top:12px;" onclick="exitApp()">Выйти</button>
+                <button id="impersonate-exit" class="btn btn-outline hidden" style="width:100%; margin-top:8px;" onclick="exitImpersonate()">🔙 Выйти из режима</button>
             </div>
         </aside>
 
         <main>
             <header>
-                <h2 id="page-title">Панель управления</h2>
-                <div class="school-tag">BINOM School Astana</div>
+                <h2 id="page-title">Панель</h2>
+                <div class="school-tag" id="school-tag">EduSystem</div>
             </header>
-
-            <div class="content">
-                <!-- Вкладка Мониторинга (админ) -->
-                <div id="tab-monitoring" class="tab-content hidden">
+            <div class="content-area">
+                <!-- Админ: Заявки -->
+                <div id="tab-admin-req" class="tab-content hidden animate-fade">
                     <div class="card">
-                        <h3 style="margin-bottom: 20px;">Архив успеваемости и посещаемости</h3>
-                        <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:25px; background:var(--kz-light-blue); padding:15px; border-radius:10px;">
-                            <div>
-                                <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">КЛАСС</label>
-                                <select id="mon-class" class="sys-select" onchange="onMonitoringClassChange()">
-                                    <option value="">Выберите класс...</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">ПРЕДМЕТ</label>
-                                <select id="mon-subj" class="sys-select" onchange="loadGlobalMonitoring()">
-                                    <option value="">Сначала выберите класс</option>
-                                </select>
-                            </div>
-                        </div>
+                        <h3>Ожидают подтверждения</h3>
+                        <button class="btn btn-primary" style="margin:10px 0;" onclick="generateDemoData()">⚡ Сгенерировать демо-данные</button>
                         <div class="table-responsive">
-                            <table>
-                                <thead><tr><th>ФИО ученика</th><th>Средний балл</th><th>Посещаемость</th><th>Статус</th></tr></thead>
-                                <tbody id="mon-body">
-                                    <tr><td colspan="4" style="text-align:center; padding:40px; color:gray;">Выберите класс и предмет</td></tr>
-                                </tbody>
-                            </table>
+                            <table><thead><tr><th>Пользователь</th><th>Город / Школа</th><th>Роль / Класс</th><th>Действие</th></tr></thead>
+                            <tbody id="admin-req-body"></tbody></table>
                         </div>
                     </div>
                 </div>
-
-                <!-- Вкладка Журнала (учитель) -->
-                <div id="tab-journal" class="tab-content hidden">
+                <!-- Админ: Пользователи -->
+                <div id="tab-users" class="tab-content hidden animate-fade">
                     <div class="card">
-                        <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:20px; align-items:flex-end;">
-                            <div>
-                                <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">КЛАСС</label>
-                                <select id="t-class" class="sys-select" onchange="onTeacherClassChange()"></select>
-                            </div>
-                            <div>
-                                <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">ПРЕДМЕТ</label>
-                                <select id="t-subj" class="sys-select" onchange="loadTeacherJournal()"></select>
-                            </div>
-                            <div>
-                                <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">ДАТА</label>
-                                <input type="date" id="t-date" class="sys-input" onchange="loadTeacherJournal()">
-                            </div>
-                            <button class="btn btn-primary" onclick="saveGrades()">💾 Сохранить журнал</button>
-                        </div>
+                        <h3>Все пользователи</h3>
                         <div class="table-responsive">
-                            <table>
-                                <thead><tr><th>ФИО ученика</th><th>Явка</th><th>Оценка (1–10)</th><th>Комментарий</th></tr></thead>
-                                <tbody id="journal-body"></tbody>
-                            </table>
+                            <table><thead><tr><th>ФИО</th><th>Роль</th><th>Класс / Предметы</th><th>Школа</th><th>Действия</th></tr></thead>
+                            <tbody id="users-body"></tbody></table>
                         </div>
                     </div>
                 </div>
-
+                <!-- Админ: Логи -->
+                <div id="tab-admin-logs" class="tab-content hidden animate-fade">
+                    <div class="card"><h3>Системный журнал</h3><div id="logs-container"></div></div>
+                </div>
+                <!-- Учитель: Журнал -->
+                <div id="tab-teacher-journal" class="tab-content hidden animate-fade">
+                    <div class="card">
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
+                            <select id="t-my-subject" class="sys-select" onchange="loadJournal()"></select>
+                            <select id="t-class" class="sys-select" onchange="loadJournal()"></select>
+                            <input type="date" id="t-date" class="sys-input" onchange="loadJournal()">
+                            <select id="t-type" class="sys-select"><option value="Урок">Урок</option><option value="СОР">СОР</option><option value="СОЧ">СОЧ</option></select>
+                            <button class="btn btn-primary" onclick="saveJournal()">💾 Сохранить</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table><thead><tr><th>ФИО</th><th>Явка</th><th>Оценка</th></tr></thead>
+                            <tbody id="t-journal-body"></tbody></table>
+                        </div>
+                    </div>
+                </div>
+                <!-- Учитель: Задания -->
+                <div id="tab-teacher-tasks" class="tab-content hidden animate-fade">
+                    <div class="card">
+                        <div style="display:flex; gap:10px; margin-bottom:15px;">
+                            <select id="task-subject" class="sys-select"></select>
+                            <select id="task-class" class="sys-select"></select>
+                            <input type="text" id="task-title" class="sys-input" placeholder="Тема задания">
+                            <textarea id="task-desc" class="sys-input" rows="2" placeholder="Описание"></textarea>
+                            <button class="btn btn-primary" onclick="createTask()">+ Выдать</button>
+                        </div>
+                        <div id="teacher-tasks-list"></div>
+                    </div>
+                </div>
+                <!-- Ученик: Дневник -->
+                <div id="tab-student-grades" class="tab-content hidden animate-fade">
+                    <div class="card">
+                        <h3>Моя успеваемость</h3>
+                        <div class="table-responsive"><table><thead><tr><th>Предмет</th><th>Дата</th><th>Тип</th><th>Явка</th><th>Оценка</th></tr></thead>
+                        <tbody id="s-journal-body"></tbody></table></div>
+                    </div>
+                </div>
+                <!-- Ученик: Задания -->
+                <div id="tab-student-tasks" class="tab-content hidden animate-fade">
+                    <div class="card"><h3>Задания от учителей</h3><div id="student-tasks-list"></div></div>
+                </div>
             </div>
         </main>
     </div>
 
     <script>
-        // ====================== КОНФИГУРАЦИЯ FIREBASE ======================
+        // ====================== FIREBASE ======================
         const firebaseConfig = {
             apiKey: "AIzaSyAWmME75qjW5pxmOjObfVsINaRylPtpL6k",
             authDomain: "auth-project-7aec4.firebaseapp.com",
@@ -474,323 +417,466 @@
         const db = firebase.database();
         const auth = firebase.auth();
 
-        // ====================== ДАННЫЕ ПРЕДМЕТОВ ======================
-        const SUBJECTS_MAP = {
-            primary: ["Обучение грамоте", "Математика", "Познание мира", "ИЗО", "Музыка", "Физкультура"],
-            middle: ["Алгебра", "Геометрия", "Русский язык", "Литература", "История Казахстана", "Биология", "География", "Информатика"],
-            high: ["Алгебра", "Физика", "Химия", "Геометрия", "Всемирная история", "Основы права", "Биология"]
+        // Данные
+        const ALL_CLASSES = [];
+        for(let i=1; i<=11; i++) ['А','Б','В','Г','Д'].forEach(l => ALL_CLASSES.push(`${i} "${l}"`));
+
+        const KZ_DATA = {
+            "Астана": ["Школа-лицей №1","Гимназия №2","НИШ ФМН","BINOM School"],
+            "Алматы": ["РФМШ","Гимназия №159","Лицей №134"],
+            "Шымкент": ["Гимназия №8","НИШ ФМН","Школа №1"]
         };
 
-        // Генерация классов
-        const ALL_CLASSES = [];
-        for (let i = 1; i <= 11; i++) {
-            ['А', 'Б', 'В', 'Г'].forEach(lit => ALL_CLASSES.push(`${i} "${lit}"`));
+        const ALL_SUBJECTS = [
+            "Математика","Алгебра","Геометрия","Физика","Химия","Биология",
+            "Информатика","География","История Казахстана","Русский язык",
+            "Английский язык","Физкультура"
+        ];
+
+        let currentUserData = null;
+        let originalAdmin = null; // для выхода из режима impersonate
+        document.getElementById('t-date').valueAsDate = new Date();
+
+        // ====================== УТИЛИТЫ ======================
+        function toast(msg) {
+            const t = document.createElement('div');
+            t.className = 'toast'; t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
         }
-
-        let currentUser = null;
-
-        // ====================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ======================
-        function updateSubjectSelect(classValue, selectId) {
-            const select = document.getElementById(selectId);
-            select.innerHTML = '<option value="">Выберите предмет</option>';
-            if (!classValue) return;
-            const grade = parseInt(classValue);
-            let list = [];
-            if (grade >= 1 && grade <= 4) list = SUBJECTS_MAP.primary;
-            else if (grade >= 5 && grade <= 9) list = SUBJECTS_MAP.middle;
-            else if (grade >= 10 && grade <= 11) list = SUBJECTS_MAP.high;
-            list.forEach(s => select.add(new Option(s, s)));
-        }
-
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        // Переключение вкладок
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            const tab = document.getElementById(tabId);
-            if (tab) tab.classList.remove('hidden');
-
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.toggle('active', link.dataset.tab === tabId);
+        function logAction(action, details) {
+            db.ref('logs').push({
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                user: currentUserData?.name || 'System',
+                action, details
             });
-
-            document.getElementById('page-title').textContent = 
-                tabId === 'tab-monitoring' ? 'Мониторинг успеваемости' : 'Электронный журнал';
         }
 
-        // Инициализация всех <select> классов
-        function initSelects() {
-            ['mon-class', 't-class'].forEach(id => {
-                const sel = document.getElementById(id);
-                if (!sel) return;
-                sel.innerHTML = '<option value="">Выберите класс</option>';
-                ALL_CLASSES.forEach(c => sel.add(new Option(c, c)));
+        // ====================== ИНИЦИАЛИЗАЦИЯ СЕЛЕКТОРОВ ======================
+        function initSelectors() {
+            // Города
+            const citySel = document.getElementById('reg-city');
+            Object.keys(KZ_DATA).sort().forEach(c => citySel.add(new Option(c, c)));
+            // Классы
+            document.querySelectorAll('#reg-class, #t-class, #task-class').forEach(el => {
+                el.innerHTML = '<option value="">-- Класс --</option>';
+                ALL_CLASSES.forEach(c => el.add(new Option(c, c)));
             });
-            document.getElementById('t-date').valueAsDate = new Date();
         }
+        initSelectors();
 
-        // Навигация (клик по ссылкам)
-        document.addEventListener('click', e => {
-            const link = e.target.closest('.nav-link');
-            if (link && link.dataset.tab) {
-                switchTab(link.dataset.tab);
-            }
-        });
-
-        // Обработчики выбора класса
-        function onMonitoringClassChange() {
-            const cls = document.getElementById('mon-class').value;
-            updateSubjectSelect(cls, 'mon-subj');
-            loadGlobalMonitoring();
+        function updateSchools() {
+            const city = document.getElementById('reg-city').value;
+            const schoolSel = document.getElementById('reg-school');
+            schoolSel.innerHTML = '<option value="">🏫 Школа...</option>';
+            if(city && KZ_DATA[city]) KZ_DATA[city].forEach(s => schoolSel.add(new Option(s, s)));
         }
-
-        function onTeacherClassChange() {
-            const cls = document.getElementById('t-class').value;
-            updateSubjectSelect(cls, 't-subj');
-            loadTeacherJournal();
+        function toggleRegFields() {
+            document.getElementById('reg-class').style.display = 
+                document.getElementById('reg-role').value === 'student' ? 'block' : 'none';
         }
 
         // ====================== АВТОРИЗАЦИЯ ======================
         auth.onAuthStateChanged(user => {
             if (user) {
                 if (user.email === 'ko-23-151@turan-edu.kz' || user.email === 'admin@admin.com') {
-                    currentUser = { role: 'admin', name: 'Куратор учебной части' };
-                    showUI();
+                    currentUserData = { role:'admin', name:'Администратор', email:user.email, school:'Министерство' };
+                    renderAppUI();
                 } else {
                     db.ref('users/' + user.uid).once('value').then(snap => {
-                        currentUser = snap.val();
-                        if (currentUser) {
-                            showUI();
-                        } else {
-                            alert('Ваша учётная запись ожидает подтверждения администратором.');
-                            auth.signOut();
-                        }
-                    }).catch(err => {
-                        console.error(err);
-                        alert('Ошибка загрузки профиля');
-                        auth.signOut();
+                        const val = snap.val();
+                        if (!val) showScreen('scr-reg');
+                        else if (val.status === 'pending') showScreen('scr-wait');
+                        else { currentUserData = val; renderAppUI(); }
                     });
                 }
             } else {
-                document.getElementById('scr-auth').classList.remove('hidden');
-                document.getElementById('scr-app').classList.add('hidden');
+                showScreen('scr-auth');
             }
         });
 
-        function showUI() {
-            document.getElementById('scr-auth').classList.add('hidden');
-            document.getElementById('scr-app').classList.remove('hidden');
-            document.getElementById('user-name').textContent = currentUser.name;
-            document.getElementById('user-role').textContent = currentUser.role === 'admin' ? 'Учебная часть' : 'Преподаватель';
+        function authAction() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+        function exitApp() { auth.signOut().then(() => location.reload()); }
 
-            const isAdmin = currentUser.role === 'admin';
-            document.getElementById('menu-admin').classList.toggle('hidden', !isAdmin);
-            document.getElementById('menu-teacher').classList.toggle('hidden', isAdmin);
-
-            const startTab = isAdmin ? 'tab-monitoring' : 'tab-journal';
-            switchTab(startTab);
-            initSelects(); // повторно заполняем, если еще не
+        function submitReg() {
+            const name = document.getElementById('reg-name').value.trim();
+            const role = document.getElementById('reg-role').value;
+            const uClass = document.getElementById('reg-class').value;
+            const city = document.getElementById('reg-city').value;
+            const school = document.getElementById('reg-school').value;
+            if(!name||!city||!school||(role==='student'&&!uClass)) return alert('Заполните все поля');
+            db.ref('users/' + auth.currentUser.uid).set({
+                name, role, uClass: role==='student'?uClass:'', city, school,
+                status:'pending', email:auth.currentUser.email
+            }).then(() => { logAction('РЕГИСТРАЦИЯ', `Заявка от ${name}`); showScreen('scr-wait'); });
         }
 
-        function authAction() {
-            auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(err => {
-                alert('Ошибка входа: ' + err.message);
-            });
+        function showScreen(id) {
+            ['scr-auth','scr-reg','scr-wait','scr-app'].forEach(el => document.getElementById(el).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
         }
 
-        function exitApp() {
-            auth.signOut().then(() => location.reload());
-        }
-
-        // ====================== ЖУРНАЛ УЧИТЕЛЯ ======================
-        function loadTeacherJournal() {
-            const cls = document.getElementById('t-class').value;
-            const subj = document.getElementById('t-subj').value;
-            const date = document.getElementById('t-date').value;
-            const tbody = document.getElementById('journal-body');
-            if (!cls || !subj || !date) {
-                tbody.innerHTML = '<tr><td colspan="4">Заполните все поля</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = '<tr><td colspan="4">Загрузка...</td></tr>';
-
-            // Загружаем учеников класса и существующие записи журнала
-            Promise.all([
-                db.ref('users').once('value'),
-                db.ref(`journal/${cls}/${subj}/${date}`).once('value')
-            ]).then(([usersSnap, journalSnap]) => {
-                const users = usersSnap.val() || {};
-                const journal = journalSnap.val() || {};
-                tbody.innerHTML = '';
-
-                let found = false;
-                for (let uid in users) {
-                    if (users[uid].uClass === cls && users[uid].role === 'student') {
-                        found = true;
-                        const record = journal[uid] || {};
-                        const attendance = record.attendance || 'Б';
-                        const grade = record.grade || '';
-                        const comment = record.comment || '';
-                        tbody.innerHTML += `
-                            <tr data-student-id="${uid}">
-                                <td><b>${users[uid].name}</b></td>
-                                <td>
-                                    <select class="sys-select attendance-select">
-                                        <option ${attendance === 'Б' ? 'selected' : ''}>Б</option>
-                                        <option ${attendance === 'Н' ? 'selected' : ''}>Н</option>
-                                    </select>
-                                </td>
-                                <td><input type="number" class="sys-input grade-input" style="width:80px" min="1" max="10" value="${grade}" placeholder="-"></td>
-                                <td><input type="text" class="sys-input comment-input" style="width:100%" value="${escapeHtml(comment)}" placeholder="Заметка..."></td>
-                            </tr>
-                        `;
-                    }
-                }
-                if (!found) tbody.innerHTML = '<tr><td colspan="4">В этом классе нет учеников</td></tr>';
-            }).catch(err => {
-                console.error(err);
-                tbody.innerHTML = '<tr><td colspan="4">Ошибка загрузки</td></tr>';
-            });
-        }
-
-        function escapeHtml(text) {
-            return String(text).replace(/[&<>"]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                if (m === '"') return '&quot;';
-                return m;
-            });
-        }
-
-        function saveGrades() {
-            const cls = document.getElementById('t-class').value;
-            const subj = document.getElementById('t-subj').value;
-            const date = document.getElementById('t-date').value;
-            if (!cls || !subj || !date) {
-                showToast('Выберите класс, предмет и дату', 'warning');
-                return;
-            }
-
-            const rows = document.querySelectorAll('#journal-body tr[data-student-id]');
-            if (rows.length === 0) {
-                showToast('Нет учеников для сохранения', 'warning');
-                return;
-            }
-
-            const updates = {};
-            rows.forEach(row => {
-                const studentId = row.dataset.studentId;
-                const attendance = row.querySelector('.attendance-select').value;
-                const gradeVal = row.querySelector('.grade-input').value;
-                const comment = row.querySelector('.comment-input').value;
-
-                updates[`journal/${cls}/${subj}/${date}/${studentId}`] = {
-                    attendance: attendance,
-                    grade: gradeVal === '' ? null : Number(gradeVal),
-                    comment: comment,
-                    teacherId: auth.currentUser.uid,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                };
-            });
-
-            db.ref().update(updates)
-                .then(() => showToast('Журнал сохранён', 'success'))
-                .catch(err => {
-                    console.error(err);
-                    showToast('Ошибка сохранения', 'error');
+        // ====================== РЕНДЕР ИНТЕРФЕЙСА ======================
+        function renderAppUI() {
+            showScreen('scr-app');
+            document.getElementById('user-name').textContent = currentUserData.name;
+            document.getElementById('user-role').textContent = currentUserData.role === 'admin' ? 'Администратор' : currentUserData.role;
+            document.getElementById('school-tag').textContent = currentUserData.school || 'EduSystem';
+            
+            document.querySelectorAll('.nav-menu').forEach(m => m.classList.add('hidden'));
+            const role = currentUserData.role;
+            if (role === 'admin') {
+                document.getElementById('menu-admin').classList.remove('hidden');
+                switchTab('tab-admin-req');
+            } else if (role === 'teacher') {
+                document.getElementById('menu-teacher').classList.remove('hidden');
+                const subjSel = document.getElementById('t-my-subject');
+                const taskSubjSel = document.getElementById('task-subject');
+                subjSel.innerHTML = ''; taskSubjSel.innerHTML = '';
+                if (currentUserData.subjects) currentUserData.subjects.forEach(s => {
+                    subjSel.add(new Option(s,s)); taskSubjSel.add(new Option(s,s));
                 });
+                switchTab('tab-teacher-journal');
+            } else if (role === 'student') {
+                document.getElementById('menu-student').classList.remove('hidden');
+                switchTab('tab-student-grades');
+            }
+            document.getElementById('impersonate-exit').classList.toggle('hidden', !originalAdmin);
         }
 
-        // ====================== МОНИТОРИНГ ДЛЯ АДМИНА ======================
-        function loadGlobalMonitoring() {
-            const cls = document.getElementById('mon-class').value;
-            const subj = document.getElementById('mon-subj').value;
-            const tbody = document.getElementById('mon-body');
-            if (!cls || !subj) {
-                tbody.innerHTML = '<tr><td colspan="4">Выберите класс и предмет</td></tr>';
-                return;
-            }
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            const activeLink = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
+            if (activeLink) activeLink.classList.add('active');
+            document.getElementById('page-title').textContent = activeLink?.textContent || 'Панель';
+            // Загрузка данных
+            if (tabId === 'tab-admin-req') loadAdminRequests();
+            if (tabId === 'tab-users') loadUsers();
+            if (tabId === 'tab-admin-logs') loadAdminLogs();
+            if (tabId === 'tab-teacher-journal') loadJournal();
+            if (tabId === 'tab-teacher-tasks') loadTeacherTasks();
+            if (tabId === 'tab-student-grades') loadStudentGrades();
+            if (tabId === 'tab-student-tasks') loadStudentTasks();
+        }
 
-            tbody.innerHTML = '<tr><td colspan="4">Анализ данных...</td></tr>';
-
-            Promise.all([
-                db.ref('users').once('value'),
-                db.ref(`journal/${cls}/${subj}`).once('value')
-            ]).then(([usersSnap, journalSnap]) => {
-                const users = usersSnap.val() || {};
-                const allLessons = journalSnap.val() || {};
+        // ====================== АДМИН: ЗАЯВКИ ======================
+        function loadAdminRequests() {
+            db.ref('users').on('value', snap => {
+                const tbody = document.getElementById('admin-req-body');
                 tbody.innerHTML = '';
-
-                // Собираем статистику по каждому ученику
-                const stats = {};
-                // Инициализируем для всех учеников класса
+                const users = snap.val() || {};
                 for (let uid in users) {
-                    if (users[uid].uClass === cls && users[uid].role === 'student') {
-                        stats[uid] = { totalGrades: 0, gradeSum: 0, lessonsCount: 0, attended: 0 };
+                    if (users[uid].status === 'pending') {
+                        tbody.innerHTML += `<tr>
+                            <td>${users[uid].name}<br><small>${users[uid].email}</small></td>
+                            <td>${users[uid].city} / ${users[uid].school}</td>
+                            <td>${users[uid].role} ${users[uid].uClass||''}</td>
+                            <td><button class="btn btn-success" onclick="approveUser('${uid}')">Одобрить</button></td>
+                        </tr>`;
                     }
                 }
+                if (!tbody.innerHTML) tbody.innerHTML = '<tr><td colspan="4">Нет заявок</td></tr>';
+            });
+        }
 
-                // Проходим по всем датам и записям
-                for (let date in allLessons) {
-                    const dayEntries = allLessons[date];
-                    for (let studentId in dayEntries) {
-                        if (!stats[studentId]) continue;
-                        const rec = dayEntries[studentId];
-                        stats[studentId].lessonsCount++;
-                        if (rec.attendance === 'Б') {
-                            stats[studentId].attended++;
-                            if (typeof rec.grade === 'number') {
-                                stats[studentId].gradeSum += rec.grade;
-                                stats[studentId].totalGrades++;
-                            }
+        function approveUser(uid) {
+            db.ref('users/' + uid).once('value').then(snap => {
+                const user = snap.val();
+                if (user.role === 'teacher') {
+                    const subjects = prompt('Введите предметы через запятую:', 'Математика, Физика');
+                    if (!subjects) return;
+                    db.ref('users/' + uid).update({
+                        status: 'approved',
+                        subjects: subjects.split(',').map(s => s.trim())
+                    }).then(() => logAction('ОДОБРЕНИЕ', `Учитель ${user.name}`));
+                } else {
+                    db.ref('users/' + uid).update({ status: 'approved' })
+                      .then(() => logAction('ОДОБРЕНИЕ', `Ученик ${user.name}`));
+                }
+            });
+        }
+
+        // ====================== АДМИН: ПОЛЬЗОВАТЕЛИ (редактирование) ======================
+        function loadUsers() {
+            db.ref('users').on('value', snap => {
+                const tbody = document.getElementById('users-body');
+                tbody.innerHTML = '';
+                const users = snap.val() || {};
+                for (let uid in users) {
+                    if (users[uid].status === 'approved') {
+                        const u = users[uid];
+                        tbody.innerHTML += `<tr>
+                            <td>${u.name}</td>
+                            <td>${u.role}</td>
+                            <td>${u.role==='student' ? u.uClass : (u.subjects||[]).join(', ')}</td>
+                            <td>${u.school}</td>
+                            <td>
+                                <button class="btn" onclick="editUser('${uid}')">✏️</button>
+                                <button class="btn btn-primary" onclick="impersonate('${uid}')">👁️ Войти как</button>
+                            </td>
+                        </tr>`;
+                    }
+                }
+                if (!tbody.innerHTML) tbody.innerHTML = '<tr><td colspan="5">Нет одобренных пользователей</td></tr>';
+            });
+        }
+
+        function editUser(uid) {
+            db.ref('users/' + uid).once('value').then(snap => {
+                const user = snap.val();
+                if (user.role === 'student') {
+                    const newClass = prompt('Новый класс (например, 7 "А"):', user.uClass);
+                    if (newClass) db.ref('users/' + uid).update({ uClass: newClass });
+                } else if (user.role === 'teacher') {
+                    const newSubj = prompt('Предметы через запятую:', (user.subjects||[]).join(', '));
+                    if (newSubj) db.ref('users/' + uid).update({ subjects: newSubj.split(',').map(s=>s.trim()) });
+                }
+            });
+        }
+
+        // ====================== IMPERSONATE (войти как пользователь) ======================
+        function impersonate(uid) {
+            if (!originalAdmin) originalAdmin = { ...currentUserData, uid: auth.currentUser.uid };
+            db.ref('users/' + uid).once('value').then(snap => {
+                currentUserData = snap.val();
+                currentUserData.uid = uid;
+                renderAppUI();
+                toast(`Режим просмотра: ${currentUserData.name}`);
+            });
+        }
+        function exitImpersonate() {
+            if (originalAdmin) {
+                currentUserData = originalAdmin;
+                originalAdmin = null;
+                renderAppUI();
+                toast('Вы вернулись в режим администратора');
+            }
+        }
+
+        // ====================== ГЕНЕРАЦИЯ ДЕМО-ДАННЫХ ======================
+        function generateDemoData() {
+            const school = "BINOM School";
+            const city = "Астана";
+            const classDemo = '7 "А"';
+            const teacher1Id = 'demo-teacher-1';
+            const teacher2Id = 'demo-teacher-2';
+            const students = [
+                { id: 'demo-student-1', name: 'Ахметов Данияр' },
+                { id: 'demo-student-2', name: 'Серикова Айжан' },
+                { id: 'demo-student-3', name: 'Маратов Ерлан' },
+                { id: 'demo-student-4', name: 'Касымова Дана' },
+                { id: 'demo-student-5', name: 'Турсынбек Алия' }
+            ];
+            const subjects = ['Математика', 'Русский язык'];
+            
+            const updates = {};
+            // Учителя
+            updates[`users/${teacher1Id}`] = { name:'Учитель Математики', role:'teacher', school, city, status:'approved', subjects:['Математика'] };
+            updates[`users/${teacher2Id}`] = { name:'Учитель Русского', role:'teacher', school, city, status:'approved', subjects:['Русский язык'] };
+            // Ученики
+            students.forEach(s => {
+                updates[`users/${s.id}`] = { name:s.name, role:'student', school, city, uClass:classDemo, status:'approved' };
+            });
+            // Журнал: несколько дней
+            const dates = ['2026-05-10', '2026-05-11', '2026-05-12'];
+            dates.forEach(date => {
+                subjects.forEach(subj => {
+                    students.forEach((s, idx) => {
+                        const att = idx % 2 === 0 ? 'Б' : 'Н';
+                        const grade = att === 'Б' ? Math.floor(Math.random()*5)+5 : '';
+                        updates[`journal/${school}/${classDemo}/${subj}/${date}/${s.id}`] = { att, grade, _type:'Урок' };
+                    });
+                    // тип урока
+                    updates[`journal/${school}/${classDemo}/${subj}/${date}/_type`] = 'Урок';
+                });
+            });
+            // Задания с ответами
+            const taskId1 = 'demo-task-1';
+            const taskId2 = 'demo-task-2';
+            updates[`tasks/${school}/${classDemo}/Математика/${taskId1}`] = { title:'ДЗ: Сложение дробей', desc:'Решить №123, 124', date:'10.05.2026', timestamp: firebase.database.ServerValue.TIMESTAMP };
+            updates[`tasks/${school}/${classDemo}/Русский язык/${taskId2}`] = { title:'Сочинение "Моя Родина"', desc:'Объём 1 стр.', date:'11.05.2026', timestamp: firebase.database.ServerValue.TIMESTAMP };
+            // Ответы учеников
+            students.slice(0,2).forEach(s => {
+                updates[`homeworks/${school}/${classDemo}/Математика/${taskId1}/${s.id}`] = { studentName:s.name, answer:'Ответ на задание по математике', timestamp: firebase.database.ServerValue.TIMESTAMP };
+            });
+            students.slice(2,4).forEach(s => {
+                updates[`homeworks/${school}/${classDemo}/Русский язык/${taskId2}/${s.id}`] = { studentName:s.name, answer:'Сочинение о Родине', timestamp: firebase.database.ServerValue.TIMESTAMP };
+            });
+            
+            db.ref().update(updates).then(() => {
+                logAction('ГЕНЕРАЦИЯ', 'Созданы демо-данные');
+                toast('Демо-данные созданы!');
+                // перезагрузить заявки
+                loadAdminRequests();
+            });
+        }
+
+        // ====================== УЧИТЕЛЬ: ЖУРНАЛ ======================
+        function loadJournal() {
+            const subj = document.getElementById('t-my-subject').value;
+            const cls = document.getElementById('t-class').value;
+            const date = document.getElementById('t-date').value;
+            const tbody = document.getElementById('t-journal-body');
+            if (!subj || !cls || !date) return;
+            const school = currentUserData.school;
+            db.ref('users').once('value').then(usersSnap => {
+                const users = usersSnap.val() || {};
+                db.ref(`journal/${school}/${cls}/${subj}/${date}`).once('value').then(jSnap => {
+                    const jData = jSnap.val() || {};
+                    tbody.innerHTML = '';
+                    for (let uid in users) {
+                        if (users[uid].school === school && users[uid].uClass === cls && users[uid].role === 'student' && users[uid].status === 'approved') {
+                            const rec = jData[uid] || { att:'Б', grade:'' };
+                            tbody.innerHTML += `<tr data-uid="${uid}">
+                                <td>${users[uid].name}</td>
+                                <td><button class="btn ${rec.att==='Б'?'btn-success':'btn-danger'}" onclick="this.textContent=this.textContent==='Б'?'Н':'Б'; this.className='btn '+(this.textContent==='Б'?'btn-success':'btn-danger')">${rec.att}</button></td>
+                                <td><input type="number" class="sys-input" style="width:80px" value="${rec.grade}" min="1" max="10"></td>
+                            </tr>`;
+                        }
+                    }
+                    if (!tbody.innerHTML) tbody.innerHTML = '<tr><td colspan="3">Нет учеников</td></tr>';
+                });
+            });
+        }
+        function saveJournal() {
+            const subj = document.getElementById('t-my-subject').value;
+            const cls = document.getElementById('t-class').value;
+            const date = document.getElementById('t-date').value;
+            const type = document.getElementById('t-type').value;
+            const school = currentUserData.school;
+            if (!subj || !cls || !date) return toast('Выберите все поля');
+            const updates = { _type: type };
+            document.querySelectorAll('#t-journal-body tr[data-uid]').forEach(row => {
+                const uid = row.dataset.uid;
+                const att = row.querySelector('button').textContent;
+                const grade = row.querySelector('input').value;
+                updates[uid] = { att, grade };
+            });
+            db.ref(`journal/${school}/${cls}/${subj}/${date}`).set(updates)
+                .then(() => { logAction('СОХРАНЕНИЕ ЖУРНАЛА', `${cls} ${subj}`); toast('Сохранено'); });
+        }
+
+        // ====================== УЧИТЕЛЬ: ЗАДАНИЯ ======================
+        function createTask() {
+            const subj = document.getElementById('task-subject').value;
+            const cls = document.getElementById('task-class').value;
+            const title = document.getElementById('task-title').value.trim();
+            const desc = document.getElementById('task-desc').value.trim();
+            if (!subj||!cls||!title) return toast('Заполните данные');
+            db.ref(`tasks/${currentUserData.school}/${cls}/${subj}`).push({
+                title, desc, date: new Date().toLocaleDateString('ru-RU'),
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            }).then(() => {
+                toast('Задание выдано');
+                document.getElementById('task-title').value = '';
+                document.getElementById('task-desc').value = '';
+                loadTeacherTasks();
+            });
+        }
+        function loadTeacherTasks() {
+            const subj = document.getElementById('task-subject').value;
+            const cls = document.getElementById('task-class').value;
+            const school = currentUserData.school;
+            if (!subj||!cls) return;
+            db.ref(`tasks/${school}/${cls}/${subj}`).once('value').then(tSnap => {
+                const tasks = tSnap.val() || {};
+                const list = document.getElementById('teacher-tasks-list');
+                list.innerHTML = '';
+                for (let tid in tasks) {
+                    const t = tasks[tid];
+                    list.innerHTML += `<div class="card"><b>${t.title}</b><br><small>${t.date}</small><p>${t.desc}</p>
+                        <div id="hw-${tid}">Загрузка ответов...</div></div>`;
+                    db.ref(`homeworks/${school}/${cls}/${subj}/${tid}`).once('value').then(hwSnap => {
+                        const hw = hwSnap.val() || {};
+                        const hwDiv = document.getElementById(`hw-${tid}`);
+                        if (!hwDiv) return;
+                        hwDiv.innerHTML = Object.values(hw).map(a => 
+                            `<div style="background:#f8fafc;padding:10px;margin:5px 0;border-radius:8px">
+                                <b>${a.studentName}</b><br>${a.answer}</div>`).join('') || 'Нет ответов';
+                    });
+                }
+                if (!Object.keys(tasks).length) list.innerHTML = '<p>Нет заданий</p>';
+            });
+        }
+
+        // ====================== УЧЕНИК: ДНЕВНИК ======================
+        function loadStudentGrades() {
+            const school = currentUserData.school;
+            const cls = currentUserData.uClass;
+            const uid = currentUserData.uid;
+            db.ref(`journal/${school}/${cls}`).once('value').then(snap => {
+                const data = snap.val() || {};
+                const tbody = document.getElementById('s-journal-body');
+                tbody.innerHTML = '';
+                for (let subj in data) {
+                    for (let date in data[subj]) {
+                        if (data[subj][date][uid]) {
+                            const r = data[subj][date][uid];
+                            tbody.innerHTML += `<tr>
+                                <td>${subj}</td><td>${date}</td>
+                                <td>${data[subj][date]._type||'Урок'}</td>
+                                <td><span class="badge ${r.att==='Б'?'badge-success':'badge-warning'}">${r.att}</span></td>
+                                <td>${r.grade||'-'}</td></tr>`;
                         }
                     }
                 }
-
-                let rowsHtml = '';
-                for (let uid in stats) {
-                    const s = stats[uid];
-                    const avg = s.totalGrades > 0 ? (s.gradeSum / s.totalGrades).toFixed(2) : '—';
-                    const attendancePercent = s.lessonsCount > 0 ? Math.round((s.attended / s.lessonsCount) * 100) : 100;
-                    
-                    let statusBadge = '';
-                    if (attendancePercent >= 90 && (avg === '—' || parseFloat(avg) >= 7)) {
-                        statusBadge = '<span class="badge badge-success">Отлично</span>';
-                    } else if (attendancePercent >= 75) {
-                        statusBadge = '<span class="badge badge-info">Удовлетворительно</span>';
-                    } else {
-                        statusBadge = '<span class="badge badge-warning">Требует внимания</span>';
-                    }
-
-                    rowsHtml += `
-                        <tr>
-                            <td><b>${users[uid].name}</b></td>
-                            <td><span style="color:var(--kz-blue); font-weight:700;">${avg}</span></td>
-                            <td><span class="badge ${attendancePercent >= 90 ? 'badge-success' : (attendancePercent >= 75 ? 'badge-info' : 'badge-warning')}">${attendancePercent}%</span></td>
-                            <td>${statusBadge}</td>
-                        </tr>
-                    `;
-                }
-
-                tbody.innerHTML = rowsHtml || '<tr><td colspan="4">Нет данных</td></tr>';
-            }).catch(err => {
-                console.error(err);
-                tbody.innerHTML = '<tr><td colspan="4">Ошибка загрузки</td></tr>';
+                if (!tbody.innerHTML) tbody.innerHTML = '<tr><td colspan="5">Нет оценок</td></tr>';
             });
         }
 
-        // Первичная инициализация (если пользователь уже вошёл до загрузки скрипта)
-        document.addEventListener('DOMContentLoaded', () => {
-            initSelects();
-            // если пользователь уже есть, auth.onAuthStateChanged сработает
+        // ====================== УЧЕНИК: ЗАДАНИЯ ======================
+        function loadStudentTasks() {
+            const school = currentUserData.school;
+            const cls = currentUserData.uClass;
+            const uid = currentUserData.uid;
+            db.ref(`tasks/${school}/${cls}`).once('value').then(snap => {
+                const data = snap.val() || {};
+                const list = document.getElementById('student-tasks-list');
+                list.innerHTML = '';
+                for (let subj in data) {
+                    for (let tid in data[subj]) {
+                        const t = data[subj][tid];
+                        list.innerHTML += `<div class="card">
+                            <h4>${subj}: ${t.title}</h4><p>${t.desc}</p>
+                            <textarea id="ans-${tid}" class="sys-input" rows="2" placeholder="Ваш ответ"></textarea>
+                            <button class="btn btn-primary" onclick="submitHomework('${tid}','${subj}')">Отправить</button>
+                        </div>`;
+                    }
+                }
+                if (!list.innerHTML) list.innerHTML = '<p>Нет заданий</p>';
+            });
+        }
+        function submitHomework(taskId, subject) {
+            const ans = document.getElementById(`ans-${taskId}`).value.trim();
+            if (!ans) return toast('Введите ответ');
+            const school = currentUserData.school;
+            const cls = currentUserData.uClass;
+            const uid = currentUserData.uid;
+            db.ref(`homeworks/${school}/${cls}/${subject}/${taskId}/${uid}`).set({
+                studentName: currentUserData.name,
+                answer: ans,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            }).then(() => toast('Ответ отправлен!'));
+        }
+
+        // ====================== ЛОГИ ======================
+        function loadAdminLogs() {
+            db.ref('logs').limitToLast(50).on('value', snap => {
+                const logs = snap.val() || {};
+                const container = document.getElementById('logs-container');
+                container.innerHTML = Object.entries(logs).reverse().map(([k,l])=> 
+                    `<div class="card" style="padding:10px;margin:5px 0">
+                        <b>${new Date(l.timestamp).toLocaleString('ru-RU')}</b> — ${l.action}<br>
+                        <small>${l.user}: ${l.details}</small></div>`).join('');
+            });
+        }
+
+        // Обработчики навигации
+        document.addEventListener('click', e => {
+            const nav = e.target.closest('.nav-item');
+            if (nav && nav.dataset.tab) switchTab(nav.dataset.tab);
         });
     </script>
 </body>
