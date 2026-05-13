@@ -3,91 +3,464 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduSystem | Real-time Management</title>
-    
+    <title>EduSystem | Учебная часть & Мониторинг</title>
+
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary: #2563eb; --bg: #f8fafc; --border: #e2e8f0; --text: #1e293b; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
-        
-        aside { width: 280px; background: white; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .logo { padding: 25px; background: var(--primary); color: white; font-weight: 800; font-size: 1.2rem; }
-        .nav-item { padding: 15px 25px; cursor: pointer; border-bottom: 1px solid #f1f5f9; transition: 0.2s; font-weight: 500; }
-        .nav-item:hover { background: #f8fafc; }
-        .nav-item.active { border-left: 4px solid var(--primary); color: var(--primary); background: #eff6ff; }
 
-        main { flex: 1; overflow-y: auto; padding: 40px; }
-        .card { background: white; border-radius: 12px; border: 1px solid var(--border); padding: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        
-        .controls { display: flex; gap: 15px; margin-bottom: 25px; background: #f1f5f9; padding: 15px; border-radius: 10px; }
-        select, input { padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem; }
-        
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px; background: #f8fafc; font-size: 0.8rem; text-transform: uppercase; color: #64748b; border-bottom: 2px solid var(--border); }
-        td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
-        
-        .empty-state { text-align: center; padding: 40px; color: #94a3b8; }
-        .hidden { display: none !important; }
-        .btn { background: var(--primary); color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    <!-- Шрифты -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Государственная палитра Казахстана */
+            --kz-blue: #0A2E5C;
+            --kz-gold: #C5A449;
+            --kz-light-blue: #E6EEF5;
+            --kz-accent: #1F4E8C;
+            --bg: #F4F7FB;
+            --card: #FFFFFF;
+            --border: #DCE3EB;
+            --text: #1E293B;
+            --text-light: #64748B;
+            --success: #059669;
+            --danger: #DC2626;
+            --radius: 12px;
+            --shadow: 0 4px 20px rgba(10, 46, 92, 0.06);
+            --transition: 0.25s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ===== SIDEBAR ===== */
+        aside {
+            width: 280px;
+            background: linear-gradient(180deg, #0A2E5C 0%, #123E6B 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo-box {
+            padding: 32px 24px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            text-align: center;
+        }
+
+        .logo-box h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .logo-box h1::before {
+            content: "🇰🇿";
+            font-size: 1.8rem;
+        }
+
+        .nav-link {
+            padding: 16px 24px;
+            cursor: pointer;
+            color: rgba(255,255,255,0.8);
+            font-weight: 500;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.08);
+            color: white;
+            border-left-color: var(--kz-gold);
+        }
+
+        .nav-link.active {
+            background: rgba(255,255,255,0.12);
+            color: white;
+            border-left-color: var(--kz-gold);
+            font-weight: 600;
+        }
+
+        .user-footer {
+            margin-top: auto;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            background: rgba(0,0,0,0.2);
+        }
+
+        #user-name {
+            display: block;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        #user-role {
+            font-size: 0.8rem;
+            color: var(--kz-gold);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== MAIN ===== */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background: var(--bg);
+        }
+
+        header {
+            background: white;
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+
+        .school-tag {
+            background: linear-gradient(135deg, #0A2E5C, #1F4E8C);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .content {
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* ===== CARDS & COMPONENTS ===== */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            padding: 24px;
+            transition: var(--transition);
+            animation: fadeSlideUp 0.4s ease;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0A2E5C, #1F4E8C);
+            color: white;
+            box-shadow: 0 4px 12px rgba(10,46,92,0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(10,46,92,0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .sys-select, .sys-input {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            outline: none;
+            background: #fff;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            min-width: 150px;
+        }
+
+        .sys-select:focus, .sys-input:focus {
+            border-color: var(--kz-accent);
+            box-shadow: 0 0 0 3px rgba(31,78,140,0.1);
+        }
+
+        /* ===== TABLES ===== */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            text-align: left;
+            padding: 16px;
+            color: var(--kz-blue);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 2px solid var(--kz-light-blue);
+            background: #F8FAFD;
+            font-weight: 700;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #F4F9FF;
+        }
+
+        /* ===== BADGES ===== */
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-success {
+            background: #DCFCE7;
+            color: #166534;
+        }
+
+        .badge-warning {
+            background: #FFF3CD;
+            color: #856404;
+        }
+
+        .badge-info {
+            background: #E0F2FE;
+            color: #075985;
+        }
+
+        /* ===== AUTH OVERLAY ===== */
+        .auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 30% 30%, #1F4E8C, #0A2E5C);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 48px 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 440px;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            animation: fadeSlideUp 0.5s ease;
+        }
+
+        .auth-card h1 {
+            color: var(--kz-blue);
+            margin-bottom: 12px;
+        }
+
+        .auth-card button {
+            width: 100%;
+            padding: 16px;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--kz-blue);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            font-weight: 500;
+            z-index: 9999;
+            animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateY(10px); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
 
-    <aside>
-        <div class="logo">EDU MANAGEMENT</div>
-        <div id="nav-admin" class="hidden">
-            <div class="nav-item active" onclick="switchTab('monitoring')">📊 Учебная часть</div>
+    <!-- Экран авторизации -->
+    <div id="scr-auth" class="auth-overlay">
+        <div class="auth-card">
+            <h1>🇰🇿 EduSystem</h1>
+            <p style="color:var(--text-light); margin-bottom:30px;">Автоматизированная система учёта посещаемости</p>
+            <button class="btn btn-primary" onclick="authAction()">Войти через Google</button>
         </div>
-        <div id="nav-teacher" class="hidden">
-            <div class="nav-item active" onclick="switchTab('journal')">📋 Журнал учителя</div>
-        </div>
-        <div style="margin-top: auto; padding: 20px; border-top: 1px solid var(--border);">
-            <div id="u-display" style="font-size: 0.8rem; margin-bottom: 10px; font-weight: 600;">Загрузка...</div>
-            <button onclick="auth.signOut().then(()=>location.reload())" style="color:red; background:none; border:none; cursor:pointer;">Выйти</button>
-        </div>
-    </aside>
+    </div>
 
-    <main>
-        <div id="tab-monitoring" class="tab-content">
-            <div class="card">
-                <h2>Мониторинг успеваемости</h2>
-                <div class="controls">
-                    <select id="mon-class" onchange="updateSubjects('mon-class', 'mon-subj')"></select>
-                    <select id="mon-subj" onchange="refreshData()"></select>
-                </div>
-                <table>
-                    <thead>
-                        <tr><th>ФИО Ученика</th><th>Средний балл</th><th>Посещаемость</th></tr>
-                    </thead>
-                    <tbody id="mon-list"></tbody>
-                </table>
+    <!-- Основной интерфейс -->
+    <div id="scr-app" class="hidden" style="display:flex; width:100%">
+        <aside>
+            <div class="logo-box">
+                <h1>Учебная часть</h1>
             </div>
-        </div>
+            
+            <nav id="menu-admin" class="hidden">
+                <div class="nav-link active" data-tab="tab-monitoring">📊 Мониторинг школ</div>
+                <div class="nav-link" data-tab="tab-users">👥 Пользователи</div>
+            </nav>
 
-        <div id="tab-journal" class="tab-content hidden">
-            <div class="card">
-                <h2>Электронный журнал</h2>
-                <div class="controls">
-                    <select id="t-class" onchange="updateSubjects('t-class', 't-subj')"></select>
-                    <select id="t-subj" onchange="refreshData()"></select>
-                    <input type="date" id="t-date" onchange="refreshData()">
-                </div>
-                <table id="journal-table">
-                    <thead>
-                        <tr><th>Ученик</th><th>Явка</th><th>Оценка</th></tr>
-                    </thead>
-                    <tbody id="t-list"></tbody>
-                </table>
+            <nav id="menu-teacher" class="hidden">
+                <div class="nav-link active" data-tab="tab-journal">📋 Журнал оценок</div>
+                <div class="nav-link" data-tab="tab-tasks">📝 Задания</div>
+            </nav>
+
+            <div class="user-footer">
+                <b id="user-name">Имя Фамилия</b>
+                <span id="user-role">Роль</span>
+                <button class="btn btn-outline" style="width:100%; margin-top:12px;" onclick="exitApp()">Выйти</button>
             </div>
-        </div>
-    </main>
+        </aside>
+
+        <main>
+            <header>
+                <h2 id="page-title">Панель управления</h2>
+                <div class="school-tag">BINOM School Astana</div>
+            </header>
+
+            <div class="content">
+                <!-- Вкладка Мониторинга (админ) -->
+                <div id="tab-monitoring" class="tab-content hidden">
+                    <div class="card">
+                        <h3 style="margin-bottom: 20px;">Архив успеваемости и посещаемости</h3>
+                        <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:25px; background:var(--kz-light-blue); padding:15px; border-radius:10px;">
+                            <div>
+                                <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">КЛАСС</label>
+                                <select id="mon-class" class="sys-select" onchange="onMonitoringClassChange()">
+                                    <option value="">Выберите класс...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">ПРЕДМЕТ</label>
+                                <select id="mon-subj" class="sys-select" onchange="loadGlobalMonitoring()">
+                                    <option value="">Сначала выберите класс</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead><tr><th>ФИО ученика</th><th>Средний балл</th><th>Посещаемость</th><th>Статус</th></tr></thead>
+                                <tbody id="mon-body">
+                                    <tr><td colspan="4" style="text-align:center; padding:40px; color:gray;">Выберите класс и предмет</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Вкладка Журнала (учитель) -->
+                <div id="tab-journal" class="tab-content hidden">
+                    <div class="card">
+                        <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:20px; align-items:flex-end;">
+                            <div>
+                                <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">КЛАСС</label>
+                                <select id="t-class" class="sys-select" onchange="onTeacherClassChange()"></select>
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">ПРЕДМЕТ</label>
+                                <select id="t-subj" class="sys-select" onchange="loadTeacherJournal()"></select>
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:0.75rem; font-weight:700; margin-bottom:5px;">ДАТА</label>
+                                <input type="date" id="t-date" class="sys-input" onchange="loadTeacherJournal()">
+                            </div>
+                            <button class="btn btn-primary" onclick="saveGrades()">💾 Сохранить журнал</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead><tr><th>ФИО ученика</th><th>Явка</th><th>Оценка (1–10)</th><th>Комментарий</th></tr></thead>
+                                <tbody id="journal-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
 
     <script>
+        // ====================== КОНФИГУРАЦИЯ FIREBASE ======================
         const firebaseConfig = {
             apiKey: "AIzaSyAWmME75qjW5pxmOjObfVsINaRylPtpL6k",
             authDomain: "auth-project-7aec4.firebaseapp.com",
@@ -101,94 +474,324 @@
         const db = firebase.database();
         const auth = firebase.auth();
 
-        // 1. Предметы
-        function getSubjectsByGrade(grade) {
-            if (grade <= 4) return ["Математика", "Букварь", "Познание мира", "Музыка"];
-            if (grade <= 9) return ["Алгебра", "Геометрия", "Биология", "История Казахстана"];
-            return ["Физика", "Химия", "Алгебра", "Основы права", "Геометрия"];
+        // ====================== ДАННЫЕ ПРЕДМЕТОВ ======================
+        const SUBJECTS_MAP = {
+            primary: ["Обучение грамоте", "Математика", "Познание мира", "ИЗО", "Музыка", "Физкультура"],
+            middle: ["Алгебра", "Геометрия", "Русский язык", "Литература", "История Казахстана", "Биология", "География", "Информатика"],
+            high: ["Алгебра", "Физика", "Химия", "Геометрия", "Всемирная история", "Основы права", "Биология"]
+        };
+
+        // Генерация классов
+        const ALL_CLASSES = [];
+        for (let i = 1; i <= 11; i++) {
+            ['А', 'Б', 'В', 'Г'].forEach(lit => ALL_CLASSES.push(`${i} "${lit}"`));
         }
 
-        // 2. Генерация классов
-        const classes = [];
-        for(let i=1; i<=11; i++) { ['А','Б','В','Г'].forEach(l => classes.push(`${i} "${l}"`)); }
-        
-        function initSelectors() {
-            const sels = [document.getElementById('mon-class'), document.getElementById('t-class')];
-            sels.forEach(s => {
-                classes.forEach(c => s.add(new Option(c, c)));
+        let currentUser = null;
+
+        // ====================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ======================
+        function updateSubjectSelect(classValue, selectId) {
+            const select = document.getElementById(selectId);
+            select.innerHTML = '<option value="">Выберите предмет</option>';
+            if (!classValue) return;
+            const grade = parseInt(classValue);
+            let list = [];
+            if (grade >= 1 && grade <= 4) list = SUBJECTS_MAP.primary;
+            else if (grade >= 5 && grade <= 9) list = SUBJECTS_MAP.middle;
+            else if (grade >= 10 && grade <= 11) list = SUBJECTS_MAP.high;
+            list.forEach(s => select.add(new Option(s, s)));
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Переключение вкладок
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            const tab = document.getElementById(tabId);
+            if (tab) tab.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.toggle('active', link.dataset.tab === tabId);
+            });
+
+            document.getElementById('page-title').textContent = 
+                tabId === 'tab-monitoring' ? 'Мониторинг успеваемости' : 'Электронный журнал';
+        }
+
+        // Инициализация всех <select> классов
+        function initSelects() {
+            ['mon-class', 't-class'].forEach(id => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                sel.innerHTML = '<option value="">Выберите класс</option>';
+                ALL_CLASSES.forEach(c => sel.add(new Option(c, c)));
             });
             document.getElementById('t-date').valueAsDate = new Date();
         }
-        initSelectors();
 
-        // 3. Динамическая смена предметов (ЖИВАЯ ЛОГИКА)
-        function updateSubjects(classId, subjId) {
-            const classVal = document.getElementById(classId).value;
-            const subjSel = document.getElementById(subjId);
-            const grade = parseInt(classVal);
-            
-            subjSel.innerHTML = '';
-            getSubjectsByGrade(grade).forEach(s => subjSel.add(new Option(s, s)));
-            refreshData();
+        // Навигация (клик по ссылкам)
+        document.addEventListener('click', e => {
+            const link = e.target.closest('.nav-link');
+            if (link && link.dataset.tab) {
+                switchTab(link.dataset.tab);
+            }
+        });
+
+        // Обработчики выбора класса
+        function onMonitoringClassChange() {
+            const cls = document.getElementById('mon-class').value;
+            updateSubjectSelect(cls, 'mon-subj');
+            loadGlobalMonitoring();
         }
 
-        // 4. Загрузка данных из Firebase
-        function refreshData() {
-            const isAdmin = !document.getElementById('nav-admin').classList.contains('hidden');
-            const targetClass = isAdmin ? document.getElementById('mon-class').value : document.getElementById('t-class').value;
-            const list = isAdmin ? document.getElementById('mon-list') : document.getElementById('t-list');
-            
-            list.innerHTML = '<tr><td colspan="3" class="empty-state">Поиск данных в базе...</td></tr>';
+        function onTeacherClassChange() {
+            const cls = document.getElementById('t-class').value;
+            updateSubjectSelect(cls, 't-subj');
+            loadTeacherJournal();
+        }
 
-            // Реальный запрос в Firebase Users
-            db.ref('users').once('value', snap => {
-                const users = snap.val();
-                list.innerHTML = '';
-                let count = 0;
-
-                for(let id in users) {
-                    if(users[id].uClass === targetClass && users[id].role === 'student') {
-                        count++;
-                        if(isAdmin) {
-                            list.innerHTML += `<tr><td><b>${users[id].name}</b></td><td>8.5</td><td>100%</td></tr>`;
+        // ====================== АВТОРИЗАЦИЯ ======================
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                if (user.email === 'ko-23-151@turan-edu.kz' || user.email === 'admin@admin.com') {
+                    currentUser = { role: 'admin', name: 'Куратор учебной части' };
+                    showUI();
+                } else {
+                    db.ref('users/' + user.uid).once('value').then(snap => {
+                        currentUser = snap.val();
+                        if (currentUser) {
+                            showUI();
                         } else {
-                            list.innerHTML += `<tr><td>${users[id].name}</td><td><select><option>Б</option><option>Н</option></select></td><td><input type="number" style="width:50px"></td></tr>`;
+                            alert('Ваша учётная запись ожидает подтверждения администратором.');
+                            auth.signOut();
+                        }
+                    }).catch(err => {
+                        console.error(err);
+                        alert('Ошибка загрузки профиля');
+                        auth.signOut();
+                    });
+                }
+            } else {
+                document.getElementById('scr-auth').classList.remove('hidden');
+                document.getElementById('scr-app').classList.add('hidden');
+            }
+        });
+
+        function showUI() {
+            document.getElementById('scr-auth').classList.add('hidden');
+            document.getElementById('scr-app').classList.remove('hidden');
+            document.getElementById('user-name').textContent = currentUser.name;
+            document.getElementById('user-role').textContent = currentUser.role === 'admin' ? 'Учебная часть' : 'Преподаватель';
+
+            const isAdmin = currentUser.role === 'admin';
+            document.getElementById('menu-admin').classList.toggle('hidden', !isAdmin);
+            document.getElementById('menu-teacher').classList.toggle('hidden', isAdmin);
+
+            const startTab = isAdmin ? 'tab-monitoring' : 'tab-journal';
+            switchTab(startTab);
+            initSelects(); // повторно заполняем, если еще не
+        }
+
+        function authAction() {
+            auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(err => {
+                alert('Ошибка входа: ' + err.message);
+            });
+        }
+
+        function exitApp() {
+            auth.signOut().then(() => location.reload());
+        }
+
+        // ====================== ЖУРНАЛ УЧИТЕЛЯ ======================
+        function loadTeacherJournal() {
+            const cls = document.getElementById('t-class').value;
+            const subj = document.getElementById('t-subj').value;
+            const date = document.getElementById('t-date').value;
+            const tbody = document.getElementById('journal-body');
+            if (!cls || !subj || !date) {
+                tbody.innerHTML = '<tr><td colspan="4">Заполните все поля</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '<tr><td colspan="4">Загрузка...</td></tr>';
+
+            // Загружаем учеников класса и существующие записи журнала
+            Promise.all([
+                db.ref('users').once('value'),
+                db.ref(`journal/${cls}/${subj}/${date}`).once('value')
+            ]).then(([usersSnap, journalSnap]) => {
+                const users = usersSnap.val() || {};
+                const journal = journalSnap.val() || {};
+                tbody.innerHTML = '';
+
+                let found = false;
+                for (let uid in users) {
+                    if (users[uid].uClass === cls && users[uid].role === 'student') {
+                        found = true;
+                        const record = journal[uid] || {};
+                        const attendance = record.attendance || 'Б';
+                        const grade = record.grade || '';
+                        const comment = record.comment || '';
+                        tbody.innerHTML += `
+                            <tr data-student-id="${uid}">
+                                <td><b>${users[uid].name}</b></td>
+                                <td>
+                                    <select class="sys-select attendance-select">
+                                        <option ${attendance === 'Б' ? 'selected' : ''}>Б</option>
+                                        <option ${attendance === 'Н' ? 'selected' : ''}>Н</option>
+                                    </select>
+                                </td>
+                                <td><input type="number" class="sys-input grade-input" style="width:80px" min="1" max="10" value="${grade}" placeholder="-"></td>
+                                <td><input type="text" class="sys-input comment-input" style="width:100%" value="${escapeHtml(comment)}" placeholder="Заметка..."></td>
+                            </tr>
+                        `;
+                    }
+                }
+                if (!found) tbody.innerHTML = '<tr><td colspan="4">В этом классе нет учеников</td></tr>';
+            }).catch(err => {
+                console.error(err);
+                tbody.innerHTML = '<tr><td colspan="4">Ошибка загрузки</td></tr>';
+            });
+        }
+
+        function escapeHtml(text) {
+            return String(text).replace(/[&<>"]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                if (m === '"') return '&quot;';
+                return m;
+            });
+        }
+
+        function saveGrades() {
+            const cls = document.getElementById('t-class').value;
+            const subj = document.getElementById('t-subj').value;
+            const date = document.getElementById('t-date').value;
+            if (!cls || !subj || !date) {
+                showToast('Выберите класс, предмет и дату', 'warning');
+                return;
+            }
+
+            const rows = document.querySelectorAll('#journal-body tr[data-student-id]');
+            if (rows.length === 0) {
+                showToast('Нет учеников для сохранения', 'warning');
+                return;
+            }
+
+            const updates = {};
+            rows.forEach(row => {
+                const studentId = row.dataset.studentId;
+                const attendance = row.querySelector('.attendance-select').value;
+                const gradeVal = row.querySelector('.grade-input').value;
+                const comment = row.querySelector('.comment-input').value;
+
+                updates[`journal/${cls}/${subj}/${date}/${studentId}`] = {
+                    attendance: attendance,
+                    grade: gradeVal === '' ? null : Number(gradeVal),
+                    comment: comment,
+                    teacherId: auth.currentUser.uid,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+            });
+
+            db.ref().update(updates)
+                .then(() => showToast('Журнал сохранён', 'success'))
+                .catch(err => {
+                    console.error(err);
+                    showToast('Ошибка сохранения', 'error');
+                });
+        }
+
+        // ====================== МОНИТОРИНГ ДЛЯ АДМИНА ======================
+        function loadGlobalMonitoring() {
+            const cls = document.getElementById('mon-class').value;
+            const subj = document.getElementById('mon-subj').value;
+            const tbody = document.getElementById('mon-body');
+            if (!cls || !subj) {
+                tbody.innerHTML = '<tr><td colspan="4">Выберите класс и предмет</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '<tr><td colspan="4">Анализ данных...</td></tr>';
+
+            Promise.all([
+                db.ref('users').once('value'),
+                db.ref(`journal/${cls}/${subj}`).once('value')
+            ]).then(([usersSnap, journalSnap]) => {
+                const users = usersSnap.val() || {};
+                const allLessons = journalSnap.val() || {};
+                tbody.innerHTML = '';
+
+                // Собираем статистику по каждому ученику
+                const stats = {};
+                // Инициализируем для всех учеников класса
+                for (let uid in users) {
+                    if (users[uid].uClass === cls && users[uid].role === 'student') {
+                        stats[uid] = { totalGrades: 0, gradeSum: 0, lessonsCount: 0, attended: 0 };
+                    }
+                }
+
+                // Проходим по всем датам и записям
+                for (let date in allLessons) {
+                    const dayEntries = allLessons[date];
+                    for (let studentId in dayEntries) {
+                        if (!stats[studentId]) continue;
+                        const rec = dayEntries[studentId];
+                        stats[studentId].lessonsCount++;
+                        if (rec.attendance === 'Б') {
+                            stats[studentId].attended++;
+                            if (typeof rec.grade === 'number') {
+                                stats[studentId].gradeSum += rec.grade;
+                                stats[studentId].totalGrades++;
+                            }
                         }
                     }
                 }
 
-                if(count === 0) {
-                    list.innerHTML = `<tr><td colspan="3" class="empty-state">В классе ${targetClass} учеников не найдено.</td></tr>`;
+                let rowsHtml = '';
+                for (let uid in stats) {
+                    const s = stats[uid];
+                    const avg = s.totalGrades > 0 ? (s.gradeSum / s.totalGrades).toFixed(2) : '—';
+                    const attendancePercent = s.lessonsCount > 0 ? Math.round((s.attended / s.lessonsCount) * 100) : 100;
+                    
+                    let statusBadge = '';
+                    if (attendancePercent >= 90 && (avg === '—' || parseFloat(avg) >= 7)) {
+                        statusBadge = '<span class="badge badge-success">Отлично</span>';
+                    } else if (attendancePercent >= 75) {
+                        statusBadge = '<span class="badge badge-info">Удовлетворительно</span>';
+                    } else {
+                        statusBadge = '<span class="badge badge-warning">Требует внимания</span>';
+                    }
+
+                    rowsHtml += `
+                        <tr>
+                            <td><b>${users[uid].name}</b></td>
+                            <td><span style="color:var(--kz-blue); font-weight:700;">${avg}</span></td>
+                            <td><span class="badge ${attendancePercent >= 90 ? 'badge-success' : (attendancePercent >= 75 ? 'badge-info' : 'badge-warning')}">${attendancePercent}%</span></td>
+                            <td>${statusBadge}</td>
+                        </tr>
+                    `;
                 }
+
+                tbody.innerHTML = rowsHtml || '<tr><td colspan="4">Нет данных</td></tr>';
+            }).catch(err => {
+                console.error(err);
+                tbody.innerHTML = '<tr><td colspan="4">Ошибка загрузки</td></tr>';
             });
         }
 
-        // 5. Авторизация
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById('u-display').innerText = user.email;
-                if(user.email === 'ko-23-151@turan-edu.kz' || user.email === 'admin@admin.com') {
-                    document.getElementById('nav-admin').classList.remove('hidden');
-                    switchTab('monitoring');
-                } else {
-                    db.ref('users/' + user.uid).once('value', snap => {
-                        const d = snap.val();
-                        if(d && d.role === 'teacher') {
-                            document.getElementById('nav-teacher').classList.remove('hidden');
-                            switchTab('journal');
-                        }
-                    });
-                }
-            } else {
-                auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-            }
+        // Первичная инициализация (если пользователь уже вошёл до загрузки скрипта)
+        document.addEventListener('DOMContentLoaded', () => {
+            initSelects();
+            // если пользователь уже есть, auth.onAuthStateChanged сработает
         });
-
-        function switchTab(id) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            document.getElementById('tab-' + id).classList.remove('hidden');
-            refreshData();
-        }
     </script>
 </body>
 </html>
