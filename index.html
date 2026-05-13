@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduSystem LMS | Enterprise Edition</title>
-    
+    <title>EduSystem LMS | Государственный стандарт</title>
+
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    
+
+    <!-- Chart.js для аналитики -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Шрифты -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* ===== ГОСУДАРСТВЕННЫЙ СТИЛЬ КАЗАХСТАНА ===== */
         :root {
             --kz-blue: #0A2E5C;
             --kz-gold: #C5A449;
@@ -31,25 +36,11 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
 
-        body {
-            background: var(--bg);
-            color: var(--text);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+        body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
 
-        /* Анимации */
         @keyframes fadeSlideUp {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideInRight {
-            from { transform: translateX(100px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes fadeOut {
-            to { opacity: 0; transform: translateY(10px); }
         }
         .animate-fade { animation: fadeSlideUp 0.4s ease forwards; }
 
@@ -63,7 +54,6 @@
             box-shadow: 2px 0 15px rgba(0,0,0,0.1);
             z-index: 10;
         }
-
         .logo-box {
             padding: 32px 24px 24px;
             border-bottom: 1px solid rgba(255,255,255,0.15);
@@ -91,17 +81,8 @@
             gap: 12px;
             font-size: 0.95rem;
         }
-        .nav-item:hover {
-            background: rgba(255,255,255,0.08);
-            color: white;
-            border-left-color: var(--kz-gold);
-        }
-        .nav-item.active {
-            background: rgba(255,255,255,0.12);
-            color: white;
-            border-left-color: var(--kz-gold);
-            font-weight: 600;
-        }
+        .nav-item:hover { background: rgba(255,255,255,0.08); color: white; border-left-color: var(--kz-gold); }
+        .nav-item.active { background: rgba(255,255,255,0.12); color: white; border-left-color: var(--kz-gold); font-weight: 600; }
 
         .user-footer {
             margin-top: auto;
@@ -162,19 +143,11 @@
             align-items: center;
             gap: 8px;
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #0A2E5C, #1F4E8C);
-            color: white;
-            box-shadow: 0 4px 12px rgba(10,46,92,0.3);
-        }
+        .btn-primary { background: linear-gradient(135deg, #0A2E5C, #1F4E8C); color: white; box-shadow: 0 4px 12px rgba(10,46,92,0.3); }
         .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(10,46,92,0.4); }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: #fee2e2; color: var(--danger); }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.4);
-            color: white;
-        }
+        .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.4); color: white; }
         .btn-outline:hover { background: rgba(255,255,255,0.1); }
 
         .sys-select, .sys-input {
@@ -187,55 +160,22 @@
             transition: var(--transition);
             min-width: 150px;
         }
-        .sys-select:focus, .sys-input:focus {
-            border-color: var(--kz-accent);
-            box-shadow: 0 0 0 3px rgba(31,78,140,0.1);
-        }
+        .sys-select:focus, .sys-input:focus { border-color: var(--kz-accent); box-shadow: 0 0 0 3px rgba(31,78,140,0.1); }
 
         .table-responsive { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; background: white; }
-        th {
-            text-align: left;
-            padding: 16px;
-            color: var(--kz-blue);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            border-bottom: 2px solid var(--kz-light-blue);
-            background: #F8FAFD;
-            font-weight: 700;
-        }
+        th { text-align: left; padding: 16px; color: var(--kz-blue); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 2px solid var(--kz-light-blue); background: #F8FAFD; font-weight: 700; }
         td { padding: 14px 16px; border-bottom: 1px solid var(--border); }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: #F4F9FF; }
 
-        .badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: inline-block;
-        }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-block; }
         .badge-success { background: #DCFCE7; color: #166534; }
         .badge-warning { background: #FFF3CD; color: #856404; }
         .badge-info { background: #E0F2FE; color: #075985; }
 
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--kz-blue);
-            color: white;
-            padding: 14px 24px;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            font-weight: 500;
-            z-index: 9999;
-            animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
-        }
+        .chart-container { position: relative; height: 300px; width: 100%; margin-top: 20px; }
 
-        /* Модальное окно */
         .full-screen-modal {
             position: fixed; inset: 0;
             background: radial-gradient(circle at 30% 30%, #1F4E8C, #0A2E5C);
@@ -266,7 +206,7 @@
         </div>
     </div>
 
-    <!-- Экран регистрации (после первого входа) -->
+    <!-- Экран регистрации -->
     <div id="scr-reg" class="full-screen-modal hidden">
         <div class="login-box" style="max-width: 600px;">
             <h3>Создание профиля</h3>
@@ -291,7 +231,7 @@
         </div>
     </div>
 
-    <!-- Экран ожидания -->
+    <!-- Ожидание -->
     <div id="scr-wait" class="full-screen-modal hidden">
         <div class="login-box">
             <div style="font-size:3rem;">⏳</div>
@@ -313,6 +253,7 @@
             <nav id="menu-teacher" class="hidden">
                 <div class="nav-item active" data-tab="tab-teacher-journal">📋 Журнал</div>
                 <div class="nav-item" data-tab="tab-teacher-tasks">📝 Задания</div>
+                <div class="nav-item" data-tab="tab-teacher-analytics">📊 Аналитика</div>
             </nav>
             <nav id="menu-student" class="hidden">
                 <div class="nav-item active" data-tab="tab-student-grades">📖 Дневник</div>
@@ -336,27 +277,23 @@
                 <div id="tab-admin-req" class="tab-content hidden animate-fade">
                     <div class="card">
                         <h3>Ожидают подтверждения</h3>
-                        <button class="btn btn-primary" style="margin:10px 0;" onclick="generateDemoData()">⚡ Сгенерировать демо-данные</button>
-                        <div class="table-responsive">
-                            <table><thead><tr><th>Пользователь</th><th>Город / Школа</th><th>Роль / Класс</th><th>Действие</th></tr></thead>
-                            <tbody id="admin-req-body"></tbody></table>
-                        </div>
+                        <div class="table-responsive"><table><thead><tr><th>Пользователь</th><th>Город / Школа</th><th>Роль / Класс</th><th>Действие</th></tr></thead>
+                        <tbody id="admin-req-body"></tbody></table></div>
                     </div>
                 </div>
                 <!-- Админ: Пользователи -->
                 <div id="tab-users" class="tab-content hidden animate-fade">
                     <div class="card">
                         <h3>Все пользователи</h3>
-                        <div class="table-responsive">
-                            <table><thead><tr><th>ФИО</th><th>Роль</th><th>Класс / Предметы</th><th>Школа</th><th>Действия</th></tr></thead>
-                            <tbody id="users-body"></tbody></table>
-                        </div>
+                        <div class="table-responsive"><table><thead><tr><th>ФИО</th><th>Роль</th><th>Класс / Предметы</th><th>Школа</th><th>Действия</th></tr></thead>
+                        <tbody id="users-body"></tbody></table></div>
                     </div>
                 </div>
                 <!-- Админ: Логи -->
                 <div id="tab-admin-logs" class="tab-content hidden animate-fade">
                     <div class="card"><h3>Системный журнал</h3><div id="logs-container"></div></div>
                 </div>
+
                 <!-- Учитель: Журнал -->
                 <div id="tab-teacher-journal" class="tab-content hidden animate-fade">
                     <div class="card">
@@ -365,14 +302,14 @@
                             <select id="t-class" class="sys-select" onchange="loadJournal()"></select>
                             <input type="date" id="t-date" class="sys-input" onchange="loadJournal()">
                             <select id="t-type" class="sys-select"><option value="Урок">Урок</option><option value="СОР">СОР</option><option value="СОЧ">СОЧ</option></select>
+                            <input type="text" id="journal-search" class="sys-input" placeholder="🔍 Поиск ученика..." oninput="filterJournal()">
                             <button class="btn btn-primary" onclick="saveJournal()">💾 Сохранить</button>
                         </div>
-                        <div class="table-responsive">
-                            <table><thead><tr><th>ФИО</th><th>Явка</th><th>Оценка</th></tr></thead>
-                            <tbody id="t-journal-body"></tbody></table>
-                        </div>
+                        <div class="table-responsive"><table><thead><tr><th>ФИО</th><th>Явка</th><th>Оценка</th></tr></thead>
+                        <tbody id="t-journal-body"></tbody></table></div>
                     </div>
                 </div>
+
                 <!-- Учитель: Задания -->
                 <div id="tab-teacher-tasks" class="tab-content hidden animate-fade">
                     <div class="card">
@@ -386,6 +323,20 @@
                         <div id="teacher-tasks-list"></div>
                     </div>
                 </div>
+
+                <!-- Учитель: Аналитика -->
+                <div id="tab-teacher-analytics" class="tab-content hidden animate-fade">
+                    <div class="card">
+                        <h3>Анализ посещаемости и успеваемости</h3>
+                        <div style="display:flex; gap:10px; margin-bottom:20px;">
+                            <select id="anal-class" class="sys-select" onchange="loadAnalytics()"></select>
+                            <select id="anal-subject" class="sys-select" onchange="loadAnalytics()"></select>
+                        </div>
+                        <div id="analytics-table"></div>
+                        <div class="chart-container"><canvas id="attendanceChart"></canvas></div>
+                    </div>
+                </div>
+
                 <!-- Ученик: Дневник -->
                 <div id="tab-student-grades" class="tab-content hidden animate-fade">
                     <div class="card">
@@ -394,6 +345,7 @@
                         <tbody id="s-journal-body"></tbody></table></div>
                     </div>
                 </div>
+
                 <!-- Ученик: Задания -->
                 <div id="tab-student-tasks" class="tab-content hidden animate-fade">
                     <div class="card"><h3>Задания от учителей</h3><div id="student-tasks-list"></div></div>
@@ -403,7 +355,7 @@
     </div>
 
     <script>
-        // ====================== FIREBASE ======================
+        // ========== FIREBASE ==========
         const firebaseConfig = {
             apiKey: "AIzaSyAWmME75qjW5pxmOjObfVsINaRylPtpL6k",
             authDomain: "auth-project-7aec4.firebaseapp.com",
@@ -417,48 +369,61 @@
         const db = firebase.database();
         const auth = firebase.auth();
 
-        // Данные
+        // ========== ДАННЫЕ ==========
         const ALL_CLASSES = [];
-        for(let i=1; i<=11; i++) ['А','Б','В','Г','Д'].forEach(l => ALL_CLASSES.push(`${i} "${l}"`));
+        for (let i = 1; i <= 11; i++) {
+            ['А', 'Б', 'В', 'Г', 'Д'].forEach(l => ALL_CLASSES.push(`${i} "${l}"`));
+        }
 
         const KZ_DATA = {
-            "Астана": ["Школа-лицей №1","Гимназия №2","НИШ ФМН","BINOM School"],
-            "Алматы": ["РФМШ","Гимназия №159","Лицей №134"],
-            "Шымкент": ["Гимназия №8","НИШ ФМН","Школа №1"]
+            "Астана": [
+                "Школа-лицей №1", "Гимназия №2", "НИШ ФМН", "НИШ ХБН",
+                "БИЛ для одаренных юношей", "Школа-лицей №54", "BINOM School",
+                "Школа-гимназия №3", "Лицей №8"
+            ],
+            "Алматы": [
+                "РФМШ", "Гимназия №159", "Лицей №134", "Школа №105",
+                "КТЛ", "Гимназия №39", "Школа №12", "Лицей №165", "Школа-гимназия №144"
+            ]
         };
 
         const ALL_SUBJECTS = [
-            "Математика","Алгебра","Геометрия","Физика","Химия","Биология",
-            "Информатика","География","История Казахстана","Русский язык",
-            "Английский язык","Физкультура"
+            "Математика", "Алгебра", "Геометрия", "Физика", "Химия", "Биология",
+            "Информатика", "География", "История Казахстана", "Русский язык",
+            "Английский язык", "Физкультура"
         ];
 
         let currentUserData = null;
-        let originalAdmin = null; // для выхода из режима impersonate
+        let originalAdmin = null;
+        let attendanceChart = null;
+
         document.getElementById('t-date').valueAsDate = new Date();
 
-        // ====================== УТИЛИТЫ ======================
+        // ========== УТИЛИТЫ ==========
         function toast(msg) {
             const t = document.createElement('div');
-            t.className = 'toast'; t.textContent = msg;
+            t.style.cssText = 'position:fixed;bottom:30px;right:30px;background:#0A2E5C;color:white;padding:14px 24px;border-radius:8px;z-index:9999;animation:slideInRight 0.3s ease';
+            t.textContent = msg;
             document.body.appendChild(t);
             setTimeout(() => t.remove(), 3000);
         }
+
         function logAction(action, details) {
             db.ref('logs').push({
                 timestamp: firebase.database.ServerValue.TIMESTAMP,
                 user: currentUserData?.name || 'System',
-                action, details
+                action,
+                details
             });
         }
 
-        // ====================== ИНИЦИАЛИЗАЦИЯ СЕЛЕКТОРОВ ======================
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
         function initSelectors() {
-            // Города
             const citySel = document.getElementById('reg-city');
-            Object.keys(KZ_DATA).sort().forEach(c => citySel.add(new Option(c, c)));
-            // Классы
-            document.querySelectorAll('#reg-class, #t-class, #task-class').forEach(el => {
+            citySel.innerHTML = '<option value="">🌍 Город...</option>';
+            Object.keys(KZ_DATA).forEach(city => citySel.add(new Option(city, city)));
+
+            document.querySelectorAll('#reg-class, #t-class, #task-class, #anal-class').forEach(el => {
                 el.innerHTML = '<option value="">-- Класс --</option>';
                 ALL_CLASSES.forEach(c => el.add(new Option(c, c)));
             });
@@ -469,25 +434,32 @@
             const city = document.getElementById('reg-city').value;
             const schoolSel = document.getElementById('reg-school');
             schoolSel.innerHTML = '<option value="">🏫 Школа...</option>';
-            if(city && KZ_DATA[city]) KZ_DATA[city].forEach(s => schoolSel.add(new Option(s, s)));
+            if (city && KZ_DATA[city]) {
+                KZ_DATA[city].forEach(s => schoolSel.add(new Option(s, s)));
+            }
         }
+
         function toggleRegFields() {
-            document.getElementById('reg-class').style.display = 
+            document.getElementById('reg-class').style.display =
                 document.getElementById('reg-role').value === 'student' ? 'block' : 'none';
         }
 
-        // ====================== АВТОРИЗАЦИЯ ======================
+        // ========== АВТОРИЗАЦИЯ ==========
         auth.onAuthStateChanged(user => {
             if (user) {
                 if (user.email === 'ko-23-151@turan-edu.kz' || user.email === 'admin@admin.com') {
-                    currentUserData = { role:'admin', name:'Администратор', email:user.email, school:'Министерство' };
+                    currentUserData = { role: 'admin', name: 'Администратор', email: user.email, school: 'Министерство' };
                     renderAppUI();
                 } else {
                     db.ref('users/' + user.uid).once('value').then(snap => {
                         const val = snap.val();
                         if (!val) showScreen('scr-reg');
                         else if (val.status === 'pending') showScreen('scr-wait');
-                        else { currentUserData = val; renderAppUI(); }
+                        else {
+                            currentUserData = val;
+                            currentUserData.uid = user.uid;
+                            renderAppUI();
+                        }
                     });
                 }
             } else {
@@ -495,7 +467,7 @@
             }
         });
 
-        function authAction() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+        function authAction() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(() => {}); }
         function exitApp() { auth.signOut().then(() => location.reload()); }
 
         function submitReg() {
@@ -504,25 +476,30 @@
             const uClass = document.getElementById('reg-class').value;
             const city = document.getElementById('reg-city').value;
             const school = document.getElementById('reg-school').value;
-            if(!name||!city||!school||(role==='student'&&!uClass)) return alert('Заполните все поля');
+            if (!name || !city || !school || (role === 'student' && !uClass)) return alert('Заполните все поля');
             db.ref('users/' + auth.currentUser.uid).set({
-                name, role, uClass: role==='student'?uClass:'', city, school,
-                status:'pending', email:auth.currentUser.email
-            }).then(() => { logAction('РЕГИСТРАЦИЯ', `Заявка от ${name}`); showScreen('scr-wait'); });
+                name, role, uClass: role === 'student' ? uClass : '', city, school,
+                status: 'pending', email: auth.currentUser.email
+            }).then(() => {
+                logAction('РЕГИСТРАЦИЯ', `Заявка от ${name}`);
+                showScreen('scr-wait');
+            });
         }
 
         function showScreen(id) {
-            ['scr-auth','scr-reg','scr-wait','scr-app'].forEach(el => document.getElementById(el).classList.add('hidden'));
+            ['scr-auth', 'scr-reg', 'scr-wait', 'scr-app'].forEach(el => document.getElementById(el).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
 
-        // ====================== РЕНДЕР ИНТЕРФЕЙСА ======================
+        // ========== РЕНДЕР ИНТЕРФЕЙСА ==========
         function renderAppUI() {
             showScreen('scr-app');
             document.getElementById('user-name').textContent = currentUserData.name;
-            document.getElementById('user-role').textContent = currentUserData.role === 'admin' ? 'Администратор' : currentUserData.role;
+            document.getElementById('user-role').textContent =
+                currentUserData.role === 'admin' ? 'Администратор' : currentUserData.role;
             document.getElementById('school-tag').textContent = currentUserData.school || 'EduSystem';
-            
+            document.getElementById('impersonate-exit').classList.toggle('hidden', !originalAdmin);
+
             document.querySelectorAll('.nav-menu').forEach(m => m.classList.add('hidden'));
             const role = currentUserData.role;
             if (role === 'admin') {
@@ -532,36 +509,45 @@
                 document.getElementById('menu-teacher').classList.remove('hidden');
                 const subjSel = document.getElementById('t-my-subject');
                 const taskSubjSel = document.getElementById('task-subject');
-                subjSel.innerHTML = ''; taskSubjSel.innerHTML = '';
-                if (currentUserData.subjects) currentUserData.subjects.forEach(s => {
-                    subjSel.add(new Option(s,s)); taskSubjSel.add(new Option(s,s));
-                });
+                const analSubjSel = document.getElementById('anal-subject');
+                subjSel.innerHTML = ''; taskSubjSel.innerHTML = ''; analSubjSel.innerHTML = '';
+                if (currentUserData.subjects) {
+                    currentUserData.subjects.forEach(s => {
+                        subjSel.add(new Option(s, s));
+                        taskSubjSel.add(new Option(s, s));
+                        analSubjSel.add(new Option(s, s));
+                    });
+                } else {
+                    subjSel.add(new Option("Нет предметов", ""));
+                    taskSubjSel.add(new Option("Нет предметов", ""));
+                    analSubjSel.add(new Option("Нет предметов", ""));
+                }
                 switchTab('tab-teacher-journal');
             } else if (role === 'student') {
                 document.getElementById('menu-student').classList.remove('hidden');
                 switchTab('tab-student-grades');
             }
-            document.getElementById('impersonate-exit').classList.toggle('hidden', !originalAdmin);
         }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            const activeLink = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
-            if (activeLink) activeLink.classList.add('active');
-            document.getElementById('page-title').textContent = activeLink?.textContent || 'Панель';
-            // Загрузка данных
+            const link = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
+            if (link) link.classList.add('active');
+            document.getElementById('page-title').textContent = link?.textContent || 'Панель';
+
             if (tabId === 'tab-admin-req') loadAdminRequests();
             if (tabId === 'tab-users') loadUsers();
             if (tabId === 'tab-admin-logs') loadAdminLogs();
             if (tabId === 'tab-teacher-journal') loadJournal();
             if (tabId === 'tab-teacher-tasks') loadTeacherTasks();
+            if (tabId === 'tab-teacher-analytics') loadAnalytics();
             if (tabId === 'tab-student-grades') loadStudentGrades();
             if (tabId === 'tab-student-tasks') loadStudentTasks();
         }
 
-        // ====================== АДМИН: ЗАЯВКИ ======================
+        // ========== АДМИН: ЗАЯВКИ ==========
         function loadAdminRequests() {
             db.ref('users').on('value', snap => {
                 const tbody = document.getElementById('admin-req-body');
@@ -572,7 +558,7 @@
                         tbody.innerHTML += `<tr>
                             <td>${users[uid].name}<br><small>${users[uid].email}</small></td>
                             <td>${users[uid].city} / ${users[uid].school}</td>
-                            <td>${users[uid].role} ${users[uid].uClass||''}</td>
+                            <td>${users[uid].role} ${users[uid].uClass || ''}</td>
                             <td><button class="btn btn-success" onclick="approveUser('${uid}')">Одобрить</button></td>
                         </tr>`;
                     }
@@ -598,7 +584,7 @@
             });
         }
 
-        // ====================== АДМИН: ПОЛЬЗОВАТЕЛИ (редактирование) ======================
+        // ========== АДМИН: ПОЛЬЗОВАТЕЛИ ==========
         function loadUsers() {
             db.ref('users').on('value', snap => {
                 const tbody = document.getElementById('users-body');
@@ -610,7 +596,7 @@
                         tbody.innerHTML += `<tr>
                             <td>${u.name}</td>
                             <td>${u.role}</td>
-                            <td>${u.role==='student' ? u.uClass : (u.subjects||[]).join(', ')}</td>
+                            <td>${u.role === 'student' ? u.uClass : (u.subjects || []).join(', ')}</td>
                             <td>${u.school}</td>
                             <td>
                                 <button class="btn" onclick="editUser('${uid}')">✏️</button>
@@ -630,13 +616,13 @@
                     const newClass = prompt('Новый класс (например, 7 "А"):', user.uClass);
                     if (newClass) db.ref('users/' + uid).update({ uClass: newClass });
                 } else if (user.role === 'teacher') {
-                    const newSubj = prompt('Предметы через запятую:', (user.subjects||[]).join(', '));
-                    if (newSubj) db.ref('users/' + uid).update({ subjects: newSubj.split(',').map(s=>s.trim()) });
+                    const newSubj = prompt('Предметы через запятую:', (user.subjects || []).join(', '));
+                    if (newSubj) db.ref('users/' + uid).update({ subjects: newSubj.split(',').map(s => s.trim()) });
                 }
             });
         }
 
-        // ====================== IMPERSONATE (войти как пользователь) ======================
+        // ========== IMPERSONATE ==========
         function impersonate(uid) {
             if (!originalAdmin) originalAdmin = { ...currentUserData, uid: auth.currentUser.uid };
             db.ref('users/' + uid).once('value').then(snap => {
@@ -646,6 +632,7 @@
                 toast(`Режим просмотра: ${currentUserData.name}`);
             });
         }
+
         function exitImpersonate() {
             if (originalAdmin) {
                 currentUserData = originalAdmin;
@@ -655,65 +642,7 @@
             }
         }
 
-        // ====================== ГЕНЕРАЦИЯ ДЕМО-ДАННЫХ ======================
-        function generateDemoData() {
-            const school = "BINOM School";
-            const city = "Астана";
-            const classDemo = '7 "А"';
-            const teacher1Id = 'demo-teacher-1';
-            const teacher2Id = 'demo-teacher-2';
-            const students = [
-                { id: 'demo-student-1', name: 'Ахметов Данияр' },
-                { id: 'demo-student-2', name: 'Серикова Айжан' },
-                { id: 'demo-student-3', name: 'Маратов Ерлан' },
-                { id: 'demo-student-4', name: 'Касымова Дана' },
-                { id: 'demo-student-5', name: 'Турсынбек Алия' }
-            ];
-            const subjects = ['Математика', 'Русский язык'];
-            
-            const updates = {};
-            // Учителя
-            updates[`users/${teacher1Id}`] = { name:'Учитель Математики', role:'teacher', school, city, status:'approved', subjects:['Математика'] };
-            updates[`users/${teacher2Id}`] = { name:'Учитель Русского', role:'teacher', school, city, status:'approved', subjects:['Русский язык'] };
-            // Ученики
-            students.forEach(s => {
-                updates[`users/${s.id}`] = { name:s.name, role:'student', school, city, uClass:classDemo, status:'approved' };
-            });
-            // Журнал: несколько дней
-            const dates = ['2026-05-10', '2026-05-11', '2026-05-12'];
-            dates.forEach(date => {
-                subjects.forEach(subj => {
-                    students.forEach((s, idx) => {
-                        const att = idx % 2 === 0 ? 'Б' : 'Н';
-                        const grade = att === 'Б' ? Math.floor(Math.random()*5)+5 : '';
-                        updates[`journal/${school}/${classDemo}/${subj}/${date}/${s.id}`] = { att, grade, _type:'Урок' };
-                    });
-                    // тип урока
-                    updates[`journal/${school}/${classDemo}/${subj}/${date}/_type`] = 'Урок';
-                });
-            });
-            // Задания с ответами
-            const taskId1 = 'demo-task-1';
-            const taskId2 = 'demo-task-2';
-            updates[`tasks/${school}/${classDemo}/Математика/${taskId1}`] = { title:'ДЗ: Сложение дробей', desc:'Решить №123, 124', date:'10.05.2026', timestamp: firebase.database.ServerValue.TIMESTAMP };
-            updates[`tasks/${school}/${classDemo}/Русский язык/${taskId2}`] = { title:'Сочинение "Моя Родина"', desc:'Объём 1 стр.', date:'11.05.2026', timestamp: firebase.database.ServerValue.TIMESTAMP };
-            // Ответы учеников
-            students.slice(0,2).forEach(s => {
-                updates[`homeworks/${school}/${classDemo}/Математика/${taskId1}/${s.id}`] = { studentName:s.name, answer:'Ответ на задание по математике', timestamp: firebase.database.ServerValue.TIMESTAMP };
-            });
-            students.slice(2,4).forEach(s => {
-                updates[`homeworks/${school}/${classDemo}/Русский язык/${taskId2}/${s.id}`] = { studentName:s.name, answer:'Сочинение о Родине', timestamp: firebase.database.ServerValue.TIMESTAMP };
-            });
-            
-            db.ref().update(updates).then(() => {
-                logAction('ГЕНЕРАЦИЯ', 'Созданы демо-данные');
-                toast('Демо-данные созданы!');
-                // перезагрузить заявки
-                loadAdminRequests();
-            });
-        }
-
-        // ====================== УЧИТЕЛЬ: ЖУРНАЛ ======================
+        // ========== УЧИТЕЛЬ: ЖУРНАЛ ==========
         function loadJournal() {
             const subj = document.getElementById('t-my-subject').value;
             const cls = document.getElementById('t-class').value;
@@ -727,11 +656,14 @@
                     const jData = jSnap.val() || {};
                     tbody.innerHTML = '';
                     for (let uid in users) {
-                        if (users[uid].school === school && users[uid].uClass === cls && users[uid].role === 'student' && users[uid].status === 'approved') {
-                            const rec = jData[uid] || { att:'Б', grade:'' };
-                            tbody.innerHTML += `<tr data-uid="${uid}">
+                        if (users[uid].school === school && users[uid].uClass === cls &&
+                            users[uid].role === 'student' && users[uid].status === 'approved') {
+                            const rec = jData[uid] || { att: 'Б', grade: '' };
+                            tbody.innerHTML += `<tr data-uid="${uid}" data-name="${users[uid].name}">
                                 <td>${users[uid].name}</td>
-                                <td><button class="btn ${rec.att==='Б'?'btn-success':'btn-danger'}" onclick="this.textContent=this.textContent==='Б'?'Н':'Б'; this.className='btn '+(this.textContent==='Б'?'btn-success':'btn-danger')">${rec.att}</button></td>
+                                <td><button class="btn ${rec.att === 'Б' ? 'btn-success' : 'btn-danger'}"
+                                    onclick="this.textContent=this.textContent==='Б'?'Н':'Б';
+                                    this.className='btn '+(this.textContent==='Б'?'btn-success':'btn-danger')">${rec.att}</button></td>
                                 <td><input type="number" class="sys-input" style="width:80px" value="${rec.grade}" min="1" max="10"></td>
                             </tr>`;
                         }
@@ -740,6 +672,14 @@
                 });
             });
         }
+
+        function filterJournal() {
+            const search = document.getElementById('journal-search').value.toLowerCase();
+            document.querySelectorAll('#t-journal-body tr[data-name]').forEach(row => {
+                row.style.display = row.dataset.name.toLowerCase().includes(search) ? '' : 'none';
+            });
+        }
+
         function saveJournal() {
             const subj = document.getElementById('t-my-subject').value;
             const cls = document.getElementById('t-class').value;
@@ -758,13 +698,13 @@
                 .then(() => { logAction('СОХРАНЕНИЕ ЖУРНАЛА', `${cls} ${subj}`); toast('Сохранено'); });
         }
 
-        // ====================== УЧИТЕЛЬ: ЗАДАНИЯ ======================
+        // ========== УЧИТЕЛЬ: ЗАДАНИЯ ==========
         function createTask() {
             const subj = document.getElementById('task-subject').value;
             const cls = document.getElementById('task-class').value;
             const title = document.getElementById('task-title').value.trim();
             const desc = document.getElementById('task-desc').value.trim();
-            if (!subj||!cls||!title) return toast('Заполните данные');
+            if (!subj || !cls || !title) return toast('Заполните данные');
             db.ref(`tasks/${currentUserData.school}/${cls}/${subj}`).push({
                 title, desc, date: new Date().toLocaleDateString('ru-RU'),
                 timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -775,11 +715,12 @@
                 loadTeacherTasks();
             });
         }
+
         function loadTeacherTasks() {
             const subj = document.getElementById('task-subject').value;
             const cls = document.getElementById('task-class').value;
             const school = currentUserData.school;
-            if (!subj||!cls) return;
+            if (!subj || !cls) return;
             db.ref(`tasks/${school}/${cls}/${subj}`).once('value').then(tSnap => {
                 const tasks = tSnap.val() || {};
                 const list = document.getElementById('teacher-tasks-list');
@@ -792,7 +733,7 @@
                         const hw = hwSnap.val() || {};
                         const hwDiv = document.getElementById(`hw-${tid}`);
                         if (!hwDiv) return;
-                        hwDiv.innerHTML = Object.values(hw).map(a => 
+                        hwDiv.innerHTML = Object.values(hw).map(a =>
                             `<div style="background:#f8fafc;padding:10px;margin:5px 0;border-radius:8px">
                                 <b>${a.studentName}</b><br>${a.answer}</div>`).join('') || 'Нет ответов';
                     });
@@ -801,7 +742,75 @@
             });
         }
 
-        // ====================== УЧЕНИК: ДНЕВНИК ======================
+        // ========== УЧИТЕЛЬ: АНАЛИТИКА ==========
+        function loadAnalytics() {
+            const cls = document.getElementById('anal-class').value;
+            const subj = document.getElementById('anal-subject').value;
+            const school = currentUserData.school;
+            if (!cls || !subj) return;
+            Promise.all([
+                db.ref('users').once('value'),
+                db.ref(`journal/${school}/${cls}/${subj}`).once('value')
+            ]).then(([usersSnap, journalSnap]) => {
+                const users = usersSnap.val() || {};
+                const allLessons = journalSnap.val() || {};
+                const studentStats = {};
+                // Собираем учеников класса
+                for (let uid in users) {
+                    if (users[uid].school === school && users[uid].uClass === cls &&
+                        users[uid].role === 'student' && users[uid].status === 'approved') {
+                        studentStats[uid] = { name: users[uid].name, lessons: 0, attended: 0, grades: [], sum: 0 };
+                    }
+                }
+                // Обрабатываем журнал
+                for (let date in allLessons) {
+                    const day = allLessons[date];
+                    for (let uid in day) {
+                        if (uid === '_type') continue;
+                        if (studentStats[uid]) {
+                            studentStats[uid].lessons++;
+                            if (day[uid].att === 'Б') {
+                                studentStats[uid].attended++;
+                                if (day[uid].grade && !isNaN(day[uid].grade)) {
+                                    studentStats[uid].grades.push(Number(day[uid].grade));
+                                    studentStats[uid].sum += Number(day[uid].grade);
+                                }
+                            }
+                        }
+                    }
+                }
+                // Таблица
+                const tableDiv = document.getElementById('analytics-table');
+                tableDiv.innerHTML = `<table><thead><tr><th>Ученик</th><th>Посещаемость</th><th>Средний балл</th></tr></thead><tbody>` +
+                    Object.values(studentStats).map(s => {
+                        const percent = s.lessons ? Math.round((s.attended / s.lessons) * 100) : 100;
+                        const avg = s.grades.length ? (s.sum / s.grades.length).toFixed(2) : '-';
+                        return `<tr><td>${s.name}</td><td><span class="badge ${percent >= 90 ? 'badge-success' : (percent >= 75 ? 'badge-info' : 'badge-warning')}">${percent}%</span></td><td>${avg}</td></tr>`;
+                    }).join('') + `</tbody></table>`;
+                // График
+                const names = Object.values(studentStats).map(s => s.name);
+                const percents = Object.values(studentStats).map(s =>
+                    s.lessons ? Math.round((s.attended / s.lessons) * 100) : 100
+                );
+                if (attendanceChart) attendanceChart.destroy();
+                const ctx = document.getElementById('attendanceChart').getContext('2d');
+                attendanceChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: names,
+                        datasets: [{
+                            label: 'Посещаемость (%)',
+                            data: percents,
+                            backgroundColor: '#1F4E8C',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: { responsive: true, scales: { y: { max: 100 } } }
+                });
+            });
+        }
+
+        // ========== УЧЕНИК: ДНЕВНИК ==========
         function loadStudentGrades() {
             const school = currentUserData.school;
             const cls = currentUserData.uClass;
@@ -816,9 +825,9 @@
                             const r = data[subj][date][uid];
                             tbody.innerHTML += `<tr>
                                 <td>${subj}</td><td>${date}</td>
-                                <td>${data[subj][date]._type||'Урок'}</td>
-                                <td><span class="badge ${r.att==='Б'?'badge-success':'badge-warning'}">${r.att}</span></td>
-                                <td>${r.grade||'-'}</td></tr>`;
+                                <td>${data[subj][date]._type || 'Урок'}</td>
+                                <td><span class="badge ${r.att === 'Б' ? 'badge-success' : 'badge-warning'}">${r.att}</span></td>
+                                <td>${r.grade || '-'}</td></tr>`;
                         }
                     }
                 }
@@ -826,7 +835,7 @@
             });
         }
 
-        // ====================== УЧЕНИК: ЗАДАНИЯ ======================
+        // ========== УЧЕНИК: ЗАДАНИЯ ==========
         function loadStudentTasks() {
             const school = currentUserData.school;
             const cls = currentUserData.uClass;
@@ -848,6 +857,7 @@
                 if (!list.innerHTML) list.innerHTML = '<p>Нет заданий</p>';
             });
         }
+
         function submitHomework(taskId, subject) {
             const ans = document.getElementById(`ans-${taskId}`).value.trim();
             if (!ans) return toast('Введите ответ');
@@ -861,19 +871,19 @@
             }).then(() => toast('Ответ отправлен!'));
         }
 
-        // ====================== ЛОГИ ======================
+        // ========== ЛОГИ ==========
         function loadAdminLogs() {
             db.ref('logs').limitToLast(50).on('value', snap => {
                 const logs = snap.val() || {};
                 const container = document.getElementById('logs-container');
-                container.innerHTML = Object.entries(logs).reverse().map(([k,l])=> 
+                container.innerHTML = Object.entries(logs).reverse().map(([k, l]) =>
                     `<div class="card" style="padding:10px;margin:5px 0">
                         <b>${new Date(l.timestamp).toLocaleString('ru-RU')}</b> — ${l.action}<br>
                         <small>${l.user}: ${l.details}</small></div>`).join('');
             });
         }
 
-        // Обработчики навигации
+        // Навигация
         document.addEventListener('click', e => {
             const nav = e.target.closest('.nav-item');
             if (nav && nav.dataset.tab) switchTab(nav.dataset.tab);
