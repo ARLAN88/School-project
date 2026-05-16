@@ -27,8 +27,8 @@
             --success: #059669;
             --danger: #DC2626;
             --warning: #F59E0B;
-            --radius: 12px;
-            --shadow: 0 4px 20px rgba(10,46,92,0.06);
+            --radius: 14px;
+            --shadow: 0 6px 24px rgba(10,46,92,0.08);
             --transition: 0.25s ease;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -40,6 +40,66 @@
         }
         .animate-fade { animation: fadeSlideUp 0.4s ease forwards; }
 
+        /* Фон с гербом */
+        .full-screen-modal {
+            background: linear-gradient(rgba(10, 46, 92, 0.7), rgba(10, 46, 92, 0.7)),
+                        url('https://media.discordapp.net/attachments/1494611247453175808/1505192174910963773/logo_mon_rk.png?ex=6a09baf3&is=6a086973&hm=09e7dd0600ae75e50371c0a41ae3de29531d4563f11b525215fa227a84d99bb7&=&format=webp&quality=lossless')
+                        center / cover no-repeat;
+            position: fixed; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
+        }
+        .login-box {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            padding: 48px 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            animation: fadeSlideUp 0.5s ease;
+            border: 2px solid rgba(197, 164, 73, 0.3);
+        }
+        .login-box h1 {
+            color: var(--kz-blue);
+            margin-bottom: 1rem;
+        }
+        .login-box input, .login-box select, .login-box textarea {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            outline: none;
+            font-size: 1rem;
+            transition: 0.3s;
+            background: #fff;
+        }
+        .login-box input:focus, .login-box select:focus {
+            border-color: var(--kz-gold);
+            box-shadow: 0 0 0 3px rgba(197, 164, 73, 0.2);
+        }
+        .btn-go {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #0A2E5C, #1F4E8C);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+            box-shadow: 0 4px 12px rgba(10,46,92,0.3);
+        }
+        .btn-go:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(10,46,92,0.4);
+        }
+        .hidden { display: none !important; }
+
         /* Sidebar */
         aside {
             width: 280px;
@@ -47,12 +107,12 @@
             color: white;
             display: flex;
             flex-direction: column;
-            box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
             z-index: 10;
         }
         .logo-box {
             padding: 32px 24px 24px;
-            border-bottom: 1px solid rgba(255,255,255,0.15);
+            border-bottom: 2px solid rgba(197, 164, 73, 0.4);
             text-align: center;
             font-size: 1.3rem;
             font-weight: 700;
@@ -82,7 +142,7 @@
         .user-footer {
             margin-top: auto;
             padding: 20px;
-            border-top: 1px solid rgba(255,255,255,0.15);
+            border-top: 2px solid rgba(197, 164, 73, 0.4);
             background: rgba(0,0,0,0.2);
         }
         #user-name { font-weight: 600; display: block; margin-bottom: 4px; }
@@ -92,7 +152,8 @@
         header {
             background: white; padding: 16px 40px; display: flex;
             justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border-bottom: 2px solid var(--kz-gold);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
         }
         .school-tag {
             background: linear-gradient(135deg, #0A2E5C, #1F4E8C);
@@ -106,6 +167,7 @@
             box-shadow: var(--shadow); margin-bottom: 24px; padding: 24px;
             transition: var(--transition); animation: fadeSlideUp 0.4s ease;
         }
+        .card:hover { border-color: var(--kz-gold); }
 
         .btn {
             padding: 10px 20px; border-radius: 8px; font-weight: 600;
@@ -125,9 +187,11 @@
             outline: none; background: #fff; font-size: 0.95rem;
             transition: var(--transition); min-width: 150px;
         }
+        .sys-select:focus, .sys-input:focus { border-color: var(--kz-gold); box-shadow: 0 0 0 3px rgba(197, 164, 73, 0.2); }
+
         .table-responsive { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; background: white; }
-        th { text-align: left; padding: 14px; color: var(--kz-blue); font-size: 0.75rem; text-transform: uppercase; border-bottom: 2px solid var(--kz-light-blue); background: #F8FAFD; }
+        th { text-align: left; padding: 14px; color: var(--kz-blue); font-size: 0.75rem; text-transform: uppercase; border-bottom: 2px solid var(--kz-gold); background: #F8FAFD; }
         td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
         tr:hover td { background: #F4F9FF; }
 
@@ -138,27 +202,27 @@
 
         .chart-container { position: relative; height: 300px; width: 100%; margin-top: 20px; }
 
-        .full-screen-modal {
-            position: fixed; inset: 0;
-            background: radial-gradient(circle at 30% 30%, #1F4E8C, #0A2E5C);
-            display: flex; align-items: center; justify-content: center; z-index: 1000;
+        /* Кнопка генерации демо */
+        .demo-btn { background: var(--kz-gold); color: #0A2E5C; font-weight: 700; }
+        .demo-btn:hover { background: #b8942e; transform: scale(1.02); }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center; z-index: 2000;
         }
-        .login-box {
-            background: white; padding: 48px 40px; border-radius: 24px;
-            width: 100%; max-width: 500px; text-align: center;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.3); animation: fadeSlideUp 0.5s ease;
+        .modal-dialog {
+            background: white; padding: 24px; border-radius: 16px;
+            width: 90%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
-        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-
-    <!-- Экраны авторизации, регистрации, ожидания (как раньше) -->
+    <!-- Экраны входа / регистрации / ожидания -->
     <div id="scr-auth" class="full-screen-modal hidden">
         <div class="login-box">
-            <h1 style="color:var(--kz-blue);">🇰🇿 EduSystem</h1>
+            <h1>🇰🇿 EduSystem</h1>
             <p>Единая образовательная платформа</p>
-            <button class="btn btn-primary" style="width:100%; padding:16px;" onclick="authAction()">Войти через Google</button>
+            <button class="btn-go" onclick="authAction()">Войти через Google</button>
         </div>
     </div>
 
@@ -173,13 +237,13 @@
             </div>
             <select id="reg-role" class="sys-select" onchange="toggleRegFields()"><option value="student">👨‍🎓 Ученик</option><option value="teacher">👨‍🏫 Учитель</option></select>
             <select id="reg-class" class="sys-select" style="margin-top:12px;"><option value="">📚 Класс...</option></select>
-            <button class="btn btn-primary" style="width:100%; margin-top:15px;" onclick="submitReg()">🚀 Отправить заявку</button>
+            <button class="btn-go" onclick="submitReg()">🚀 Отправить заявку</button>
         </div>
     </div>
 
     <div id="scr-wait" class="full-screen-modal hidden">
         <div class="login-box"><h2>⏳ Ожидание доступа</h2><p>Ваша заявка отправлена администратору.</p>
-            <button class="btn btn-outline" style="width:100%; margin-top:20px; background:#0A2E5C; color:white;" onclick="exitApp()">Выйти</button>
+            <button class="btn-outline" style="width:100%; margin-top:20px; background:#0A2E5C; color:white; border-radius:12px;" onclick="exitApp()">Выйти</button>
         </div>
     </div>
 
@@ -215,24 +279,22 @@
                 <div class="school-tag" id="school-tag">EduSystem</div>
             </header>
             <div class="content-area">
-                <!-- АДМИН: Заявки -->
+                <!-- АДМИН -->
                 <div id="tab-admin-req" class="tab-content hidden animate-fade">
                     <div class="card">
                         <h3>Ожидают подтверждения</h3>
-                        <button class="btn btn-primary" onclick="generateDemoData()" style="margin:10px 0;">⚡ Сгенерировать демо-данные</button>
+                        <button class="btn demo-btn" onclick="openDemoModal()" style="margin:10px 0;">⚡ Сгенерировать демо-данные</button>
                         <div class="table-responsive"><table><thead><tr><th>Пользователь</th><th>Город/Школа</th><th>Роль/Класс</th><th>Действие</th></tr></thead><tbody id="admin-req-body"></tbody></table></div>
                     </div>
                 </div>
-                <!-- АДМИН: Пользователи -->
                 <div id="tab-users" class="tab-content hidden animate-fade">
                     <div class="card"><h3>Все пользователи</h3><div class="table-responsive"><table><thead><tr><th>ФИО</th><th>Роль</th><th>Класс/Предметы</th><th>Школа</th><th>Действия</th></tr></thead><tbody id="users-body"></tbody></table></div></div>
                 </div>
-                <!-- АДМИН: Логи -->
                 <div id="tab-admin-logs" class="tab-content hidden animate-fade">
                     <div class="card"><h3>Системный журнал</h3><div id="logs-container"></div></div>
                 </div>
 
-                <!-- УЧИТЕЛЬ: Журнал -->
+                <!-- УЧИТЕЛЬ -->
                 <div id="tab-teacher-journal" class="tab-content hidden animate-fade">
                     <div class="card">
                         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
@@ -246,8 +308,6 @@
                         <div class="table-responsive"><table><thead><tr><th>ФИО</th><th>Посещение</th><th>Балл</th></tr></thead><tbody id="t-journal-body"></tbody></table></div>
                     </div>
                 </div>
-
-                <!-- УЧИТЕЛЬ: Задания -->
                 <div id="tab-teacher-tasks" class="tab-content hidden animate-fade">
                     <div class="card">
                         <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
@@ -261,8 +321,6 @@
                         <div id="teacher-tasks-list"></div>
                     </div>
                 </div>
-
-                <!-- УЧИТЕЛЬ: Аналитика -->
                 <div id="tab-teacher-analytics" class="tab-content hidden animate-fade">
                     <div class="card">
                         <h3>Анализ успеваемости и посещаемости</h3>
@@ -275,12 +333,10 @@
                     </div>
                 </div>
 
-                <!-- УЧЕНИК: Дневник -->
+                <!-- УЧЕНИК -->
                 <div id="tab-student-grades" class="tab-content hidden animate-fade">
                     <div class="card"><h3>Моя успеваемость</h3><div class="table-responsive"><table><thead><tr><th>Предмет</th><th>Дата</th><th>Тип</th><th>Явка</th><th>Балл</th></tr></thead><tbody id="s-journal-body"></tbody></table></div></div>
                 </div>
-
-                <!-- УЧЕНИК: Задания -->
                 <div id="tab-student-tasks" class="tab-content hidden animate-fade">
                     <div class="card"><h3>Задания от учителей</h3><div id="student-tasks-list"></div></div>
                 </div>
@@ -312,7 +368,6 @@
             "Алматы": ["РФМШ","Гимназия №159","Лицей №134","Школа №105"]
         };
 
-        // Учебный план: какие предметы в каких классах
         const SUBJECTS_BY_GRADE = {
             primary: ["Обучение грамоте", "Математика", "Познание мира", "ИЗО", "Музыка", "Физкультура"],
             middle: ["Алгебра", "Геометрия", "Русский язык", "Литература", "История Казахстана", "Биология", "География", "Информатика", "Физика", "Химия", "Английский язык", "Физкультура"],
@@ -326,16 +381,14 @@
             return [];
         }
 
-        // Фильтрация предметов учителя по классу
         function filterTeacherSubjects(teacherSubjects, classValue) {
             if (!classValue || !teacherSubjects) return teacherSubjects || [];
             const grade = parseInt(classValue);
             const allowed = getSubjectsForGrade(grade);
-            if (allowed.length === 0) return teacherSubjects; // если не определили, показываем все его
+            if (allowed.length === 0) return teacherSubjects;
             return teacherSubjects.filter(s => allowed.includes(s));
         }
 
-        // Обновление селекта предметов с учетом класса
         function updateSubjectSelect(selectId, teacherSubjects, classValue) {
             const sel = document.getElementById(selectId);
             if (!sel) return;
@@ -346,7 +399,6 @@
                 sel.add(new Option("Нет доступных предметов", ""));
             } else {
                 filtered.forEach(s => sel.add(new Option(s, s)));
-                // попытаться сохранить выбранное значение, если оно есть в новом списке
                 if (filtered.includes(currentVal)) sel.value = currentVal;
             }
         }
@@ -356,10 +408,9 @@
         let attendanceChart = null;
         document.getElementById('t-date').valueAsDate = new Date();
 
-        // ========== УТИЛИТЫ ==========
         function toast(msg) {
             const t = document.createElement('div');
-            t.style.cssText = 'position:fixed;bottom:30px;right:30px;background:#0A2E5C;color:white;padding:14px 24px;border-radius:8px;z-index:9999;animation:slideInRight 0.3s ease';
+            t.style.cssText = 'position:fixed;bottom:30px;right:30px;background:#0A2E5C;color:white;padding:14px 24px;border-radius:8px;z-index:9999;';
             t.textContent = msg;
             document.body.appendChild(t);
             setTimeout(() => t.remove(), 3000);
@@ -368,7 +419,6 @@
             db.ref('logs').push({ timestamp: firebase.database.ServerValue.TIMESTAMP, user: currentUserData?.name || 'System', action, details });
         }
 
-        // ========== ИНИЦИАЛИЗАЦИЯ ==========
         function initSelectors() {
             const citySel = document.getElementById('reg-city');
             citySel.innerHTML = '<option value="">🌍 Город...</option>';
@@ -390,7 +440,6 @@
             document.getElementById('reg-class').style.display = document.getElementById('reg-role').value === 'student' ? 'block' : 'none';
         }
 
-        // ========== АВТОРИЗАЦИЯ ==========
         auth.onAuthStateChanged(user => {
             if (user) {
                 if (user.email === 'ko-23-151@turan-edu.kz' || user.email === 'admin@admin.com') {
@@ -407,7 +456,7 @@
             } else { showScreen('scr-auth'); }
         });
 
-        function authAction() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+        function authAction() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(() => {}); }
         function exitApp() { auth.signOut().then(() => location.reload()); }
 
         function submitReg() {
@@ -428,7 +477,6 @@
             document.getElementById(id).classList.remove('hidden');
         }
 
-        // ========== РЕНДЕР ИНТЕРФЕЙСА ==========
         function renderAppUI() {
             showScreen('scr-app');
             document.getElementById('user-name').textContent = currentUserData.name;
@@ -443,8 +491,6 @@
                 switchTab('tab-admin-req');
             } else if (role === 'teacher') {
                 document.getElementById('menu-teacher').classList.remove('hidden');
-                // Заполняем селекты классов (уже заполнены, просто обновим предметы при первой загрузке)
-                // Инициализируем предметы с учетом выбранного класса (по умолчанию класс не выбран)
                 onTeacherClassChange();
                 onTaskClassChange();
                 onAnalyticsClassChange();
@@ -473,7 +519,6 @@
             if (tabId === 'tab-student-tasks') loadStudentTasks();
         }
 
-        // Обработчики смены класса для учителя
         function onTeacherClassChange() {
             const cls = document.getElementById('t-class').value;
             updateSubjectSelect('t-my-subject', currentUserData.subjects || [], cls);
@@ -490,18 +535,13 @@
             loadAnalytics();
         }
 
-        // ========== АДМИН: ЗАЯВКИ ==========
         function loadAdminRequests() {
             db.ref('users').on('value', snap => {
                 const tbody = document.getElementById('admin-req-body');
                 tbody.innerHTML = '';
                 const users = snap.val() || {};
-                for (let uid in users) {
-                    if (users[uid].status === 'pending') {
-                        tbody.innerHTML += `<tr><td>${users[uid].name}<br><small>${users[uid].email}</small></td>
-                        <td>${users[uid].city}/${users[uid].school}</td><td>${users[uid].role} ${users[uid].uClass||''}</td>
-                        <td><button class="btn btn-success" onclick="approveUser('${uid}')">Одобрить</button></td></tr>`;
-                    }
+                for (let uid in users) if (users[uid].status === 'pending') {
+                    tbody.innerHTML += `<tr><td>${users[uid].name}<br><small>${users[uid].email}</small></td><td>${users[uid].city}/${users[uid].school}</td><td>${users[uid].role} ${users[uid].uClass||''}</td><td><button class="btn btn-success" onclick="approveUser('${uid}')">Одобрить</button></td></tr>`;
                 }
                 if (!tbody.innerHTML) tbody.innerHTML = '<tr><td colspan="4">Нет заявок</td></tr>';
             });
@@ -511,27 +551,21 @@
             db.ref('users/' + uid).once('value').then(snap => {
                 const user = snap.val();
                 if (user.role === 'teacher') {
-                    const subjects = prompt('Введите предметы через запятую:', 'Математика, Физика');
+                    const subjects = prompt('Введите предметы через запятую:', 'Алгебра, Геометрия');
                     if (!subjects) return;
                     db.ref('users/' + uid).update({ status: 'approved', subjects: subjects.split(',').map(s => s.trim()) });
                 } else db.ref('users/' + uid).update({ status: 'approved' });
             });
         }
 
-        // ========== АДМИН: ПОЛЬЗОВАТЕЛИ ==========
         function loadUsers() {
             db.ref('users').on('value', snap => {
                 const tbody = document.getElementById('users-body');
                 tbody.innerHTML = '';
                 const users = snap.val() || {};
-                for (let uid in users) {
-                    if (users[uid].status === 'approved') {
-                        const u = users[uid];
-                        tbody.innerHTML += `<tr><td>${u.name}</td><td>${u.role}</td>
-                        <td>${u.role==='student' ? u.uClass : (u.subjects||[]).join(', ')}</td><td>${u.school}</td>
-                        <td><button class="btn" onclick="editUser('${uid}')">✏️</button>
-                        <button class="btn btn-primary" onclick="impersonate('${uid}')">👁️ Войти как</button></td></tr>`;
-                    }
+                for (let uid in users) if (users[uid].status === 'approved') {
+                    const u = users[uid];
+                    tbody.innerHTML += `<tr><td>${u.name}</td><td>${u.role}</td><td>${u.role==='student'?u.uClass:(u.subjects||[]).join(', ')}</td><td>${u.school}</td><td><button class="btn" onclick="editUser('${uid}')">✏️</button><button class="btn btn-primary" onclick="impersonate('${uid}')">👁️ Войти как</button></td></tr>`;
                 }
                 if (!tbody.innerHTML) tbody.innerHTML = '<tr><td colspan="5">Нет одобренных пользователей</td></tr>';
             });
@@ -559,18 +593,43 @@
                 toast(`Режим просмотра: ${currentUserData.name}`);
             });
         }
-        function exitImpersonate() {
-            if (originalAdmin) { currentUserData = originalAdmin; originalAdmin = null; renderAppUI(); }
+        function exitImpersonate() { if (originalAdmin) { currentUserData = originalAdmin; originalAdmin = null; renderAppUI(); } }
+
+        // ========== ГЕНЕРАЦИЯ ДЕМО-ДАННЫХ С ВЫБОРОМ КЛАССОВ ==========
+        function openDemoModal() {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal-dialog">
+                    <h3>⚡ Генерация демо-данных</h3>
+                    <p>Введите три класса (например, 7 "А", 7 "Б", 7 "В")</p>
+                    <input type="text" id="demo-class1" class="sys-input" value='7 "А"' placeholder="Класс 1">
+                    <input type="text" id="demo-class2" class="sys-input" value='7 "Б"' placeholder="Класс 2">
+                    <input type="text" id="demo-class3" class="sys-input" value='7 "В"' placeholder="Класс 3">
+                    <div style="margin-top:20px; display:flex; gap:10px;">
+                        <button class="btn btn-primary" id="confirm-demo">Создать</button>
+                        <button class="btn btn-outline" style="color:black; border-color:gray;" id="cancel-demo">Отмена</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            document.getElementById('confirm-demo').addEventListener('click', () => {
+                const c1 = document.getElementById('demo-class1').value.trim();
+                const c2 = document.getElementById('demo-class2').value.trim();
+                const c3 = document.getElementById('demo-class3').value.trim();
+                if (!c1 || !c2 || !c3) return alert('Заполните все три класса');
+                generateDemoData([c1, c2, c3]);
+                overlay.remove();
+            });
+            document.getElementById('cancel-demo').addEventListener('click', () => overlay.remove());
         }
 
-        // ========== ГЕНЕРАЦИЯ ДЕМО-ДАННЫХ ==========
-        function generateDemoData() {
+        function generateDemoData(classes) {
             const school = "BINOM School";
             const city = "Астана";
-            const classes = ['7 "А"', '7 "Б"', '7 "В"'];
             const teacherNames = ["Сериков А.М.", "Ахметова Г.Б.", "Иванова Е.В.", "Касымов Д.С.", "Турсынбек Н.К."];
             const teacherSubjects = [
-                ["Математика","Алгебра","Геометрия"],
+                ["Алгебра","Геометрия"],
                 ["Русский язык","Литература"],
                 ["История Казахстана","География"],
                 ["Физика","Информатика"],
@@ -582,32 +641,23 @@
                 "Оспанова Камилла","Нурланов Амир","Ержанова Адель","Каримов Ильяс","Сагиева Дарина"
             ];
             const updates = {};
-            const teacherIds = [];
             for (let i = 0; i < 5; i++) {
                 const tid = `demo-teacher-${i+1}`;
-                teacherIds.push(tid);
                 updates[`users/${tid}`] = {
-                    name: teacherNames[i],
-                    role: 'teacher',
-                    school, city,
-                    status: 'approved',
-                    subjects: teacherSubjects[i]
+                    name: teacherNames[i], role: 'teacher', school, city,
+                    status: 'approved', subjects: teacherSubjects[i]
                 };
             }
             for (let i = 0; i < 15; i++) {
                 const sid = `demo-student-${i+1}`;
                 const cls = classes[Math.floor(i/5)];
                 updates[`users/${sid}`] = {
-                    name: studentNames[i],
-                    role: 'student',
-                    school, city,
-                    uClass: cls,
-                    status: 'approved'
+                    name: studentNames[i], role: 'student', school, city,
+                    uClass: cls, status: 'approved'
                 };
             }
-            // Журнал только для средней школы (7 класс)
             const dates = ['2026-05-10','2026-05-11','2026-05-12'];
-            const subjectsForJournal = ["Математика","Русский язык","Физика"]; // это предметы средней школы, фильтр пропустит
+            const subjectsForJournal = ["Алгебра","Русский язык","Физика"];
             classes.forEach(cls => {
                 subjectsForJournal.forEach(subj => {
                     dates.forEach(date => {
@@ -625,25 +675,23 @@
                     });
                 });
             });
-            // Задания с вложениями
             const task1Id = 'demo-task-1';
             const task2Id = 'demo-task-2';
-            updates[`tasks/${school}/7 "А"/Математика/${task1Id}`] = {
+            updates[`tasks/${school}/${classes[0]}/Алгебра/${task1Id}`] = {
                 title: 'ДЗ: Сложение дробей', desc: 'Решить №123, 124',
                 attachmentUrl: 'https://drive.google.com/file/d/example',
                 date: '10.05.2026', timestamp: firebase.database.ServerValue.TIMESTAMP
             };
-            updates[`tasks/${school}/7 "Б"/Русский язык/${task2Id}`] = {
+            updates[`tasks/${school}/${classes[1]}/Русский язык/${task2Id}`] = {
                 title: 'Сочинение "Моя Родина"', desc: 'Объём 1 стр.',
                 attachmentUrl: 'https://docs.google.com/document/d/example',
                 date: '11.05.2026', timestamp: firebase.database.ServerValue.TIMESTAMP
             };
             for (let i = 0; i < 5; i++) {
                 const sid = `demo-student-${i+1}`;
-                updates[`homeworks/${school}/7 "А"/Математика/${task1Id}/${sid}`] = {
-                    studentName: studentNames[i],
-                    answerText: 'Решение уравнения...', attachmentUrl: '',
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                updates[`homeworks/${school}/${classes[0]}/Алгебра/${task1Id}/${sid}`] = {
+                    studentName: studentNames[i], answerText: 'Решение уравнения...',
+                    attachmentUrl: '', timestamp: firebase.database.ServerValue.TIMESTAMP
                 };
             }
             db.ref().update(updates).then(() => {
@@ -653,7 +701,6 @@
             });
         }
 
-        // ========== УЧИТЕЛЬ: ЖУРНАЛ ==========
         function loadJournal() {
             const subj = document.getElementById('t-my-subject').value;
             const cls = document.getElementById('t-class').value;
@@ -667,7 +714,8 @@
                     const jData = jSnap.val() || {};
                     tbody.innerHTML = '';
                     for (let uid in users) {
-                        if (users[uid].school === school && users[uid].uClass === cls && users[uid].role === 'student' && users[uid].status === 'approved') {
+                        if (users[uid].school === school && users[uid].uClass === cls &&
+                            users[uid].role === 'student' && users[uid].status === 'approved') {
                             const rec = jData[uid] || { att: 'Б', grade: '' };
                             tbody.innerHTML += `<tr data-uid="${uid}" data-name="${users[uid].name}">
                                 <td>${users[uid].name}</td>
@@ -712,7 +760,6 @@
             });
         }
 
-        // ========== УЧИТЕЛЬ: ЗАДАНИЯ ==========
         function createTask() {
             const subj = document.getElementById('task-subject').value;
             const cls = document.getElementById('task-class').value;
@@ -760,62 +807,41 @@
             });
         }
 
-        // ========== УЧИТЕЛЬ: АНАЛИТИКА ==========
         function loadAnalytics() {
             const cls = document.getElementById('anal-class').value;
             const subj = document.getElementById('anal-subject').value;
             const school = currentUserData.school;
             if (!cls || !subj) return;
-            Promise.all([
-                db.ref('users').once('value'),
-                db.ref(`journal/${school}/${cls}/${subj}`).once('value')
-            ]).then(([usersSnap, journalSnap]) => {
-                const users = usersSnap.val() || {};
-                const allLessons = journalSnap.val() || {};
-                const stats = {};
-                for (let uid in users) {
-                    if (users[uid].school === school && users[uid].uClass === cls && users[uid].role === 'student' && users[uid].status === 'approved') {
+            Promise.all([db.ref('users').once('value'), db.ref(`journal/${school}/${cls}/${subj}`).once('value')])
+                .then(([usersSnap, journalSnap]) => {
+                    const users = usersSnap.val() || {};
+                    const allLessons = journalSnap.val() || {};
+                    const stats = {};
+                    for (let uid in users) if (users[uid].school === school && users[uid].uClass === cls && users[uid].role === 'student' && users[uid].status === 'approved')
                         stats[uid] = { name: users[uid].name, lessons: 0, attended: 0, grades: [] };
-                    }
-                }
-                for (let date in allLessons) {
-                    const day = allLessons[date];
-                    for (let uid in day) {
+                    for (let date in allLessons) for (let uid in allLessons[date]) {
                         if (uid === '_type') continue;
                         if (stats[uid]) {
                             stats[uid].lessons++;
-                            if (day[uid].att === 'Б' || day[uid].att === 'У') stats[uid].attended++;
-                            if (day[uid].grade && !isNaN(day[uid].grade)) stats[uid].grades.push(Number(day[uid].grade));
+                            if (allLessons[date][uid].att === 'Б' || allLessons[date][uid].att === 'У') stats[uid].attended++;
+                            if (allLessons[date][uid].grade && !isNaN(allLessons[date][uid].grade)) stats[uid].grades.push(Number(allLessons[date][uid].grade));
                         }
                     }
-                }
-                const students = Object.values(stats);
-                const names = students.map(s => s.name);
-                const percents = students.map(s => s.lessons ? Math.round((s.attended / s.lessons) * 100) : 100);
-                const avgs = students.map(s => s.grades.length ? (s.grades.reduce((a,b)=>a+b,0)/s.grades.length).toFixed(2) : '-');
-
-                document.getElementById('analytics-table').innerHTML = `<table><thead><tr><th>Ученик</th><th>Посещаемость</th><th>Средний балл</th></tr></thead><tbody>` +
-                    students.map((s,i) => `<tr><td>${s.name}</td><td><span class="badge ${percents[i]>=90?'badge-success':(percents[i]>=75?'badge-warning':'badge-danger')}">${percents[i]}%</span></td><td>${avgs[i]}</td></tr>`).join('') + '</tbody></table>';
-
-                if (attendanceChart) attendanceChart.destroy();
-                const ctx = document.getElementById('attendanceChart').getContext('2d');
-                attendanceChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: names,
-                        datasets: [{
-                            label: 'Посещаемость (%)',
-                            data: percents,
-                            backgroundColor: '#1F4E8C',
-                            borderRadius: 6
-                        }]
-                    },
-                    options: { responsive: true, scales: { y: { max: 100 } } }
+                    const students = Object.values(stats);
+                    const names = students.map(s => s.name);
+                    const percents = students.map(s => s.lessons ? Math.round((s.attended / s.lessons) * 100) : 100);
+                    const avgs = students.map(s => s.grades.length ? (s.grades.reduce((a,b)=>a+b,0)/s.grades.length).toFixed(2) : '-');
+                    document.getElementById('analytics-table').innerHTML = `<table><thead><tr><th>Ученик</th><th>Посещаемость</th><th>Средний балл</th></tr></thead><tbody>` +
+                        students.map((s,i) => `<tr><td>${s.name}</td><td><span class="badge ${percents[i]>=90?'badge-success':(percents[i]>=75?'badge-warning':'badge-danger')}">${percents[i]}%</span></td><td>${avgs[i]}</td></tr>`).join('') + '</tbody></table>';
+                    if (attendanceChart) attendanceChart.destroy();
+                    attendanceChart = new Chart(document.getElementById('attendanceChart'), {
+                        type: 'bar',
+                        data: { labels: names, datasets: [{ label: 'Посещаемость (%)', data: percents, backgroundColor: '#1F4E8C', borderRadius: 6 }] },
+                        options: { responsive: true, scales: { y: { max: 100 } } }
+                    });
                 });
-            });
         }
 
-        // ========== УЧЕНИК: ДНЕВНИК ==========
         function loadStudentGrades() {
             const school = currentUserData.school;
             const cls = currentUserData.uClass;
@@ -824,41 +850,27 @@
                 const data = snap.val() || {};
                 const tbody = document.getElementById('s-journal-body');
                 tbody.innerHTML = '';
-                for (let subj in data) {
-                    for (let date in data[subj]) {
-                        if (data[subj][date][uid]) {
-                            const r = data[subj][date][uid];
-                            tbody.innerHTML += `<tr>
-                                <td>${subj}</td><td>${date}</td><td>${data[subj][date]._type||'ФО'}</td>
-                                <td><span class="badge ${r.att==='Б'?'badge-success':(r.att==='У'?'badge-warning':'badge-danger')}">${r.att}</span></td>
-                                <td>${r.grade||'-'}</td></tr>`;
-                        }
-                    }
+                for (let subj in data) for (let date in data[subj]) if (data[subj][date][uid]) {
+                    const r = data[subj][date][uid];
+                    tbody.innerHTML += `<tr><td>${subj}</td><td>${date}</td><td>${data[subj][date]._type||'ФО'}</td><td><span class="badge ${r.att==='Б'?'badge-success':(r.att==='У'?'badge-warning':'badge-danger')}">${r.att}</span></td><td>${r.grade||'-'}</td></tr>`;
                 }
                 if (!tbody.innerHTML) tbody.innerHTML = '<tr><td colspan="5">Нет оценок</td></tr>';
             });
         }
 
-        // ========== УЧЕНИК: ЗАДАНИЯ ==========
         function loadStudentTasks() {
             const school = currentUserData.school;
             const cls = currentUserData.uClass;
-            const uid = currentUserData.uid;
             db.ref(`tasks/${school}/${cls}`).once('value').then(snap => {
                 const data = snap.val() || {};
                 const list = document.getElementById('student-tasks-list');
                 list.innerHTML = '';
-                for (let subj in data) {
-                    for (let tid in data[subj]) {
-                        const t = data[subj][tid];
-                        let attachmentHtml = t.attachmentUrl ? `<div>📎 <a href="${t.attachmentUrl}" target="_blank">Скачать/посмотреть</a></div>` : '';
-                        list.innerHTML += `<div class="card">
-                            <h4>${subj}: ${t.title}</h4><p>${t.desc}</p>${attachmentHtml}
-                            <textarea id="ans-text-${tid}" class="sys-input" rows="2" placeholder="Ваш ответ (текст)"></textarea>
-                            <input type="text" id="ans-link-${tid}" class="sys-input" placeholder="Ссылка на ваш файл/диск (необязательно)" style="margin:5px 0;">
-                            <button class="btn btn-primary" onclick="submitHomework('${tid}','${subj}')">📤 Отправить</button>
-                        </div>`;
-                    }
+                for (let subj in data) for (let tid in data[subj]) {
+                    const t = data[subj][tid];
+                    list.innerHTML += `<div class="card"><h4>${subj}: ${t.title}</h4><p>${t.desc}</p>${t.attachmentUrl?`<div>📎 <a href="${t.attachmentUrl}" target="_blank">Скачать/посмотреть</a></div>`:''}
+                        <textarea id="ans-text-${tid}" class="sys-input" rows="2" placeholder="Ваш ответ (текст)"></textarea>
+                        <input type="text" id="ans-link-${tid}" class="sys-input" placeholder="Ссылка на ваш файл/диск (необязательно)" style="margin:5px 0;">
+                        <button class="btn btn-primary" onclick="submitHomework('${tid}','${subj}')">📤 Отправить</button></div>`;
                 }
                 if (!list.innerHTML) list.innerHTML = '<p>Нет заданий</p>';
             });
@@ -867,18 +879,13 @@
             const text = document.getElementById(`ans-text-${taskId}`).value.trim();
             const link = document.getElementById(`ans-link-${taskId}`).value.trim();
             if (!text && !link) return toast('Напишите ответ или прикрепите ссылку');
-            const school = currentUserData.school;
-            const cls = currentUserData.uClass;
-            const uid = currentUserData.uid;
+            const school = currentUserData.school, cls = currentUserData.uClass, uid = currentUserData.uid;
             db.ref(`homeworks/${school}/${cls}/${subject}/${taskId}/${uid}`).set({
-                studentName: currentUserData.name,
-                answerText: text,
-                attachmentUrl: link,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
+                studentName: currentUserData.name, answerText: text,
+                attachmentUrl: link, timestamp: firebase.database.ServerValue.TIMESTAMP
             }).then(() => toast('Ответ отправлен!'));
         }
 
-        // ========== ЛОГИ ==========
         function loadAdminLogs() {
             db.ref('logs').limitToLast(50).on('value', snap => {
                 const logs = snap.val() || {};
