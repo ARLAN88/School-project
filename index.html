@@ -10,18 +10,15 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
-    <!-- Chart.js для аналитики -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-    <!-- Шрифты -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <style>
         :root {
             --kz-blue: #0A2E5C;
             --kz-gold: #C5A449;
             --kz-light-blue: #E6EEF5;
-            --kz-accent: #1F4E8C;
             --bg: #F4F7FB;
             --card: #FFFFFF;
             --border: #DCE3EB;
@@ -29,13 +26,12 @@
             --text-light: #64748B;
             --success: #059669;
             --danger: #DC2626;
+            --warning: #F59E0B;
             --radius: 12px;
-            --shadow: 0 4px 20px rgba(10, 46, 92, 0.06);
+            --shadow: 0 4px 20px rgba(10,46,92,0.06);
             --transition: 0.25s ease;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-
         body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
 
         @keyframes fadeSlideUp {
@@ -44,7 +40,7 @@
         }
         .animate-fade { animation: fadeSlideUp 0.4s ease forwards; }
 
-        /* ===== SIDEBAR ===== */
+        /* Sidebar */
         aside {
             width: 280px;
             background: linear-gradient(180deg, #0A2E5C 0%, #123E6B 100%);
@@ -79,7 +75,6 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 0.95rem;
         }
         .nav-item:hover { background: rgba(255,255,255,0.08); color: white; border-left-color: var(--kz-gold); }
         .nav-item.active { background: rgba(255,255,255,0.12); color: white; border-left-color: var(--kz-gold); font-weight: 600; }
@@ -93,13 +88,11 @@
         #user-name { font-weight: 600; display: block; margin-bottom: 4px; }
         #user-role { font-size: 0.8rem; color: var(--kz-gold); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* ===== MAIN ===== */
         main {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            background: var(--bg);
         }
         header {
             background: white;
@@ -147,6 +140,7 @@
         .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(10,46,92,0.4); }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: #fee2e2; color: var(--danger); }
+        .btn-warning { background: #fef3c7; color: #92400e; }
         .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.4); color: white; }
         .btn-outline:hover { background: rgba(255,255,255,0.1); }
 
@@ -160,19 +154,16 @@
             transition: var(--transition);
             min-width: 150px;
         }
-        .sys-select:focus, .sys-input:focus { border-color: var(--kz-accent); box-shadow: 0 0 0 3px rgba(31,78,140,0.1); }
-
         .table-responsive { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; background: white; }
-        th { text-align: left; padding: 16px; color: var(--kz-blue); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 2px solid var(--kz-light-blue); background: #F8FAFD; font-weight: 700; }
-        td { padding: 14px 16px; border-bottom: 1px solid var(--border); }
-        tr:last-child td { border-bottom: none; }
+        th { text-align: left; padding: 14px; color: var(--kz-blue); font-size: 0.75rem; text-transform: uppercase; border-bottom: 2px solid var(--kz-light-blue); background: #F8FAFD; }
+        td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
         tr:hover td { background: #F4F9FF; }
 
         .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-block; }
         .badge-success { background: #DCFCE7; color: #166534; }
-        .badge-warning { background: #FFF3CD; color: #856404; }
-        .badge-info { background: #E0F2FE; color: #075985; }
+        .badge-danger { background: #FEE2E2; color: #991B1B; }
+        .badge-warning { background: #FEF3C7; color: #92400E; }
 
         .chart-container { position: relative; height: 300px; width: 100%; margin-top: 20px; }
 
@@ -183,14 +174,9 @@
             z-index: 1000;
         }
         .login-box {
-            background: white;
-            padding: 48px 40px;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
-            animation: fadeSlideUp 0.5s ease;
+            background: white; padding: 48px 40px; border-radius: 24px;
+            width: 100%; max-width: 500px; text-align: center;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3); animation: fadeSlideUp 0.5s ease;
         }
         .hidden { display: none !important; }
     </style>
@@ -208,35 +194,23 @@
 
     <!-- Экран регистрации -->
     <div id="scr-reg" class="full-screen-modal hidden">
-        <div class="login-box" style="max-width: 600px;">
+        <div class="login-box" style="max-width:600px;">
             <h3>Создание профиля</h3>
-            <p style="color:var(--text-light); margin-bottom:20px;">Заполните данные для модерации</p>
+            <p>Заполните данные для модерации</p>
             <input type="text" id="reg-name" class="sys-input" placeholder="ФИО полностью">
-            <div style="display:flex; gap:10px; margin-bottom:12px;">
-                <select id="reg-city" class="sys-select" onchange="updateSchools()">
-                    <option value="">🌍 Город...</option>
-                </select>
-                <select id="reg-school" class="sys-select">
-                    <option value="">🏫 Сначала выберите город</option>
-                </select>
+            <div style="display:flex; gap:10px; margin:12px 0;">
+                <select id="reg-city" class="sys-select" onchange="updateSchools()"><option value="">🌍 Город...</option></select>
+                <select id="reg-school" class="sys-select"><option value="">🏫 Школа...</option></select>
             </div>
-            <select id="reg-role" class="sys-select" onchange="toggleRegFields()">
-                <option value="student">👨‍🎓 Ученик</option>
-                <option value="teacher">👨‍🏫 Учитель</option>
-            </select>
-            <select id="reg-class" class="sys-select" style="margin-top:12px;">
-                <option value="">📚 Выберите класс...</option>
-            </select>
+            <select id="reg-role" class="sys-select" onchange="toggleRegFields()"><option value="student">👨‍🎓 Ученик</option><option value="teacher">👨‍🏫 Учитель</option></select>
+            <select id="reg-class" class="sys-select" style="margin-top:12px;"><option value="">📚 Класс...</option></select>
             <button class="btn btn-primary" style="width:100%; margin-top:15px;" onclick="submitReg()">🚀 Отправить заявку</button>
         </div>
     </div>
 
     <!-- Ожидание -->
     <div id="scr-wait" class="full-screen-modal hidden">
-        <div class="login-box">
-            <div style="font-size:3rem;">⏳</div>
-            <h2>Ожидание доступа</h2>
-            <p>Ваша заявка отправлена администратору.</p>
+        <div class="login-box"><h2>⏳ Ожидание доступа</h2><p>Ваша заявка отправлена администратору.</p>
             <button class="btn btn-outline" style="width:100%; margin-top:20px; background:#0A2E5C; color:white;" onclick="exitApp()">Выйти</button>
         </div>
     </div>
@@ -273,61 +247,59 @@
                 <div class="school-tag" id="school-tag">EduSystem</div>
             </header>
             <div class="content-area">
-                <!-- Админ: Заявки -->
+                <!-- АДМИН: ЗАЯВКИ -->
                 <div id="tab-admin-req" class="tab-content hidden animate-fade">
                     <div class="card">
                         <h3>Ожидают подтверждения</h3>
-                        <div class="table-responsive"><table><thead><tr><th>Пользователь</th><th>Город / Школа</th><th>Роль / Класс</th><th>Действие</th></tr></thead>
-                        <tbody id="admin-req-body"></tbody></table></div>
+                        <button class="btn btn-primary" onclick="generateDemoData()" style="margin:10px 0;">⚡ Сгенерировать демо-данные (15 учеников, 5 учителей, 3 класса)</button>
+                        <div class="table-responsive"><table><thead><tr><th>Пользователь</th><th>Город/Школа</th><th>Роль/Класс</th><th>Действие</th></tr></thead><tbody id="admin-req-body"></tbody></table></div>
                     </div>
                 </div>
-                <!-- Админ: Пользователи -->
+
+                <!-- АДМИН: ПОЛЬЗОВАТЕЛИ -->
                 <div id="tab-users" class="tab-content hidden animate-fade">
-                    <div class="card">
-                        <h3>Все пользователи</h3>
-                        <div class="table-responsive"><table><thead><tr><th>ФИО</th><th>Роль</th><th>Класс / Предметы</th><th>Школа</th><th>Действия</th></tr></thead>
-                        <tbody id="users-body"></tbody></table></div>
-                    </div>
+                    <div class="card"><h3>Все пользователи</h3><div class="table-responsive"><table><thead><tr><th>ФИО</th><th>Роль</th><th>Класс/Предметы</th><th>Школа</th><th>Действия</th></tr></thead><tbody id="users-body"></tbody></table></div></div>
                 </div>
-                <!-- Админ: Логи -->
+
+                <!-- АДМИН: ЛОГИ -->
                 <div id="tab-admin-logs" class="tab-content hidden animate-fade">
                     <div class="card"><h3>Системный журнал</h3><div id="logs-container"></div></div>
                 </div>
 
-                <!-- Учитель: Журнал -->
+                <!-- УЧИТЕЛЬ: ЖУРНАЛ -->
                 <div id="tab-teacher-journal" class="tab-content hidden animate-fade">
                     <div class="card">
                         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
                             <select id="t-my-subject" class="sys-select" onchange="loadJournal()"></select>
                             <select id="t-class" class="sys-select" onchange="loadJournal()"></select>
                             <input type="date" id="t-date" class="sys-input" onchange="loadJournal()">
-                            <select id="t-type" class="sys-select"><option value="Урок">Урок</option><option value="СОР">СОР</option><option value="СОЧ">СОЧ</option></select>
+                            <select id="t-type" class="sys-select"><option value="ФО">ФО</option><option value="СОР">СОР</option><option value="СОЧ">СОЧ</option></select>
                             <input type="text" id="journal-search" class="sys-input" placeholder="🔍 Поиск ученика..." oninput="filterJournal()">
                             <button class="btn btn-primary" onclick="saveJournal()">💾 Сохранить</button>
                         </div>
-                        <div class="table-responsive"><table><thead><tr><th>ФИО</th><th>Явка</th><th>Оценка</th></tr></thead>
-                        <tbody id="t-journal-body"></tbody></table></div>
+                        <div class="table-responsive"><table><thead><tr><th>ФИО</th><th>Посещение</th><th>Балл</th></tr></thead><tbody id="t-journal-body"></tbody></table></div>
                     </div>
                 </div>
 
-                <!-- Учитель: Задания -->
+                <!-- УЧИТЕЛЬ: ЗАДАНИЯ -->
                 <div id="tab-teacher-tasks" class="tab-content hidden animate-fade">
                     <div class="card">
-                        <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
                             <select id="task-subject" class="sys-select"></select>
                             <select id="task-class" class="sys-select"></select>
-                            <input type="text" id="task-title" class="sys-input" placeholder="Тема задания">
+                            <input type="text" id="task-title" class="sys-input" placeholder="Тема">
                             <textarea id="task-desc" class="sys-input" rows="2" placeholder="Описание"></textarea>
+                            <input type="text" id="task-link" class="sys-input" placeholder="🔗 Ссылка или файл (drive/doc)">
                             <button class="btn btn-primary" onclick="createTask()">+ Выдать</button>
                         </div>
                         <div id="teacher-tasks-list"></div>
                     </div>
                 </div>
 
-                <!-- Учитель: Аналитика -->
+                <!-- УЧИТЕЛЬ: АНАЛИТИКА -->
                 <div id="tab-teacher-analytics" class="tab-content hidden animate-fade">
                     <div class="card">
-                        <h3>Анализ посещаемости и успеваемости</h3>
+                        <h3>Анализ успеваемости и посещаемости</h3>
                         <div style="display:flex; gap:10px; margin-bottom:20px;">
                             <select id="anal-class" class="sys-select" onchange="loadAnalytics()"></select>
                             <select id="anal-subject" class="sys-select" onchange="loadAnalytics()"></select>
@@ -337,16 +309,12 @@
                     </div>
                 </div>
 
-                <!-- Ученик: Дневник -->
+                <!-- УЧЕНИК: ДНЕВНИК -->
                 <div id="tab-student-grades" class="tab-content hidden animate-fade">
-                    <div class="card">
-                        <h3>Моя успеваемость</h3>
-                        <div class="table-responsive"><table><thead><tr><th>Предмет</th><th>Дата</th><th>Тип</th><th>Явка</th><th>Оценка</th></tr></thead>
-                        <tbody id="s-journal-body"></tbody></table></div>
-                    </div>
+                    <div class="card"><h3>Моя успеваемость</h3><div class="table-responsive"><table><thead><tr><th>Предмет</th><th>Дата</th><th>Тип</th><th>Явка</th><th>Балл</th></tr></thead><tbody id="s-journal-body"></tbody></table></div></div>
                 </div>
 
-                <!-- Ученик: Задания -->
+                <!-- УЧЕНИК: ЗАДАНИЯ -->
                 <div id="tab-student-tasks" class="tab-content hidden animate-fade">
                     <div class="card"><h3>Задания от учителей</h3><div id="student-tasks-list"></div></div>
                 </div>
@@ -371,32 +339,19 @@
 
         // ========== ДАННЫЕ ==========
         const ALL_CLASSES = [];
-        for (let i = 1; i <= 11; i++) {
-            ['А', 'Б', 'В', 'Г', 'Д'].forEach(l => ALL_CLASSES.push(`${i} "${l}"`));
-        }
+        for (let i = 1; i <= 11; i++) ['А','Б','В','Г','Д'].forEach(l => ALL_CLASSES.push(`${i} "${l}"`));
 
         const KZ_DATA = {
-            "Астана": [
-                "Школа-лицей №1", "Гимназия №2", "НИШ ФМН", "НИШ ХБН",
-                "БИЛ для одаренных юношей", "Школа-лицей №54", "BINOM School",
-                "Школа-гимназия №3", "Лицей №8"
-            ],
-            "Алматы": [
-                "РФМШ", "Гимназия №159", "Лицей №134", "Школа №105",
-                "КТЛ", "Гимназия №39", "Школа №12", "Лицей №165", "Школа-гимназия №144"
-            ]
+            "Астана": ["Школа-лицей №1","Гимназия №2","НИШ ФМН","BINOM School"],
+            "Алматы": ["РФМШ","Гимназия №159","Лицей №134","Школа №105"]
         };
 
-        const ALL_SUBJECTS = [
-            "Математика", "Алгебра", "Геометрия", "Физика", "Химия", "Биология",
-            "Информатика", "География", "История Казахстана", "Русский язык",
-            "Английский язык", "Физкультура"
-        ];
+        const ALL_SUBJECTS = ["Математика","Алгебра","Геометрия","Физика","Химия","Биология",
+            "Информатика","Русский язык","Английский язык","История Казахстана","Физкультура"];
 
         let currentUserData = null;
         let originalAdmin = null;
         let attendanceChart = null;
-
         document.getElementById('t-date').valueAsDate = new Date();
 
         // ========== УТИЛИТЫ ==========
@@ -407,22 +362,15 @@
             document.body.appendChild(t);
             setTimeout(() => t.remove(), 3000);
         }
-
         function logAction(action, details) {
-            db.ref('logs').push({
-                timestamp: firebase.database.ServerValue.TIMESTAMP,
-                user: currentUserData?.name || 'System',
-                action,
-                details
-            });
+            db.ref('logs').push({ timestamp: firebase.database.ServerValue.TIMESTAMP, user: currentUserData?.name || 'System', action, details });
         }
 
         // ========== ИНИЦИАЛИЗАЦИЯ ==========
         function initSelectors() {
             const citySel = document.getElementById('reg-city');
             citySel.innerHTML = '<option value="">🌍 Город...</option>';
-            Object.keys(KZ_DATA).forEach(city => citySel.add(new Option(city, city)));
-
+            Object.keys(KZ_DATA).forEach(c => citySel.add(new Option(c, c)));
             document.querySelectorAll('#reg-class, #t-class, #task-class, #anal-class').forEach(el => {
                 el.innerHTML = '<option value="">-- Класс --</option>';
                 ALL_CLASSES.forEach(c => el.add(new Option(c, c)));
@@ -434,14 +382,10 @@
             const city = document.getElementById('reg-city').value;
             const schoolSel = document.getElementById('reg-school');
             schoolSel.innerHTML = '<option value="">🏫 Школа...</option>';
-            if (city && KZ_DATA[city]) {
-                KZ_DATA[city].forEach(s => schoolSel.add(new Option(s, s)));
-            }
+            if (city && KZ_DATA[city]) KZ_DATA[city].forEach(s => schoolSel.add(new Option(s, s)));
         }
-
         function toggleRegFields() {
-            document.getElementById('reg-class').style.display =
-                document.getElementById('reg-role').value === 'student' ? 'block' : 'none';
+            document.getElementById('reg-class').style.display = document.getElementById('reg-role').value === 'student' ? 'block' : 'none';
         }
 
         // ========== АВТОРИЗАЦИЯ ==========
@@ -455,19 +399,13 @@
                         const val = snap.val();
                         if (!val) showScreen('scr-reg');
                         else if (val.status === 'pending') showScreen('scr-wait');
-                        else {
-                            currentUserData = val;
-                            currentUserData.uid = user.uid;
-                            renderAppUI();
-                        }
+                        else { currentUserData = val; currentUserData.uid = user.uid; renderAppUI(); }
                     });
                 }
-            } else {
-                showScreen('scr-auth');
-            }
+            } else { showScreen('scr-auth'); }
         });
 
-        function authAction() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(() => {}); }
+        function authAction() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
         function exitApp() { auth.signOut().then(() => location.reload()); }
 
         function submitReg() {
@@ -480,14 +418,11 @@
             db.ref('users/' + auth.currentUser.uid).set({
                 name, role, uClass: role === 'student' ? uClass : '', city, school,
                 status: 'pending', email: auth.currentUser.email
-            }).then(() => {
-                logAction('РЕГИСТРАЦИЯ', `Заявка от ${name}`);
-                showScreen('scr-wait');
-            });
+            }).then(() => { logAction('РЕГИСТРАЦИЯ', `Заявка от ${name}`); showScreen('scr-wait'); });
         }
 
         function showScreen(id) {
-            ['scr-auth', 'scr-reg', 'scr-wait', 'scr-app'].forEach(el => document.getElementById(el).classList.add('hidden'));
+            ['scr-auth','scr-reg','scr-wait','scr-app'].forEach(el => document.getElementById(el).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
 
@@ -495,33 +430,23 @@
         function renderAppUI() {
             showScreen('scr-app');
             document.getElementById('user-name').textContent = currentUserData.name;
-            document.getElementById('user-role').textContent =
-                currentUserData.role === 'admin' ? 'Администратор' : currentUserData.role;
+            document.getElementById('user-role').textContent = currentUserData.role === 'admin' ? 'Администратор' : currentUserData.role;
             document.getElementById('school-tag').textContent = currentUserData.school || 'EduSystem';
             document.getElementById('impersonate-exit').classList.toggle('hidden', !originalAdmin);
-
             document.querySelectorAll('.nav-menu').forEach(m => m.classList.add('hidden'));
+
             const role = currentUserData.role;
             if (role === 'admin') {
                 document.getElementById('menu-admin').classList.remove('hidden');
                 switchTab('tab-admin-req');
             } else if (role === 'teacher') {
                 document.getElementById('menu-teacher').classList.remove('hidden');
-                const subjSel = document.getElementById('t-my-subject');
-                const taskSubjSel = document.getElementById('task-subject');
-                const analSubjSel = document.getElementById('anal-subject');
-                subjSel.innerHTML = ''; taskSubjSel.innerHTML = ''; analSubjSel.innerHTML = '';
-                if (currentUserData.subjects) {
-                    currentUserData.subjects.forEach(s => {
-                        subjSel.add(new Option(s, s));
-                        taskSubjSel.add(new Option(s, s));
-                        analSubjSel.add(new Option(s, s));
-                    });
-                } else {
-                    subjSel.add(new Option("Нет предметов", ""));
-                    taskSubjSel.add(new Option("Нет предметов", ""));
-                    analSubjSel.add(new Option("Нет предметов", ""));
-                }
+                ['t-my-subject','task-subject','anal-subject'].forEach(id => {
+                    const sel = document.getElementById(id);
+                    sel.innerHTML = '';
+                    if (currentUserData.subjects) currentUserData.subjects.forEach(s => sel.add(new Option(s, s)));
+                    else sel.add(new Option("Нет предметов", ""));
+                });
                 switchTab('tab-teacher-journal');
             } else if (role === 'student') {
                 document.getElementById('menu-student').classList.remove('hidden');
@@ -555,12 +480,9 @@
                 const users = snap.val() || {};
                 for (let uid in users) {
                     if (users[uid].status === 'pending') {
-                        tbody.innerHTML += `<tr>
-                            <td>${users[uid].name}<br><small>${users[uid].email}</small></td>
-                            <td>${users[uid].city} / ${users[uid].school}</td>
-                            <td>${users[uid].role} ${users[uid].uClass || ''}</td>
-                            <td><button class="btn btn-success" onclick="approveUser('${uid}')">Одобрить</button></td>
-                        </tr>`;
+                        tbody.innerHTML += `<tr><td>${users[uid].name}<br><small>${users[uid].email}</small></td>
+                        <td>${users[uid].city}/${users[uid].school}</td><td>${users[uid].role} ${users[uid].uClass||''}</td>
+                        <td><button class="btn btn-success" onclick="approveUser('${uid}')">Одобрить</button></td></tr>`;
                     }
                 }
                 if (!tbody.innerHTML) tbody.innerHTML = '<tr><td colspan="4">Нет заявок</td></tr>';
@@ -573,14 +495,8 @@
                 if (user.role === 'teacher') {
                     const subjects = prompt('Введите предметы через запятую:', 'Математика, Физика');
                     if (!subjects) return;
-                    db.ref('users/' + uid).update({
-                        status: 'approved',
-                        subjects: subjects.split(',').map(s => s.trim())
-                    }).then(() => logAction('ОДОБРЕНИЕ', `Учитель ${user.name}`));
-                } else {
-                    db.ref('users/' + uid).update({ status: 'approved' })
-                      .then(() => logAction('ОДОБРЕНИЕ', `Ученик ${user.name}`));
-                }
+                    db.ref('users/' + uid).update({ status: 'approved', subjects: subjects.split(',').map(s => s.trim()) });
+                } else db.ref('users/' + uid).update({ status: 'approved' });
             });
         }
 
@@ -593,16 +509,10 @@
                 for (let uid in users) {
                     if (users[uid].status === 'approved') {
                         const u = users[uid];
-                        tbody.innerHTML += `<tr>
-                            <td>${u.name}</td>
-                            <td>${u.role}</td>
-                            <td>${u.role === 'student' ? u.uClass : (u.subjects || []).join(', ')}</td>
-                            <td>${u.school}</td>
-                            <td>
-                                <button class="btn" onclick="editUser('${uid}')">✏️</button>
-                                <button class="btn btn-primary" onclick="impersonate('${uid}')">👁️ Войти как</button>
-                            </td>
-                        </tr>`;
+                        tbody.innerHTML += `<tr><td>${u.name}</td><td>${u.role}</td>
+                        <td>${u.role==='student' ? u.uClass : (u.subjects||[]).join(', ')}</td><td>${u.school}</td>
+                        <td><button class="btn" onclick="editUser('${uid}')">✏️</button>
+                        <button class="btn btn-primary" onclick="impersonate('${uid}')">👁️ Войти как</button></td></tr>`;
                     }
                 }
                 if (!tbody.innerHTML) tbody.innerHTML = '<tr><td colspan="5">Нет одобренных пользователей</td></tr>';
@@ -613,16 +523,15 @@
             db.ref('users/' + uid).once('value').then(snap => {
                 const user = snap.val();
                 if (user.role === 'student') {
-                    const newClass = prompt('Новый класс (например, 7 "А"):', user.uClass);
+                    const newClass = prompt('Новый класс:', user.uClass);
                     if (newClass) db.ref('users/' + uid).update({ uClass: newClass });
                 } else if (user.role === 'teacher') {
-                    const newSubj = prompt('Предметы через запятую:', (user.subjects || []).join(', '));
-                    if (newSubj) db.ref('users/' + uid).update({ subjects: newSubj.split(',').map(s => s.trim()) });
+                    const newSubj = prompt('Предметы через запятую:', (user.subjects||[]).join(', '));
+                    if (newSubj) db.ref('users/' + uid).update({ subjects: newSubj.split(',').map(s=>s.trim()) });
                 }
             });
         }
 
-        // ========== IMPERSONATE ==========
         function impersonate(uid) {
             if (!originalAdmin) originalAdmin = { ...currentUserData, uid: auth.currentUser.uid };
             db.ref('users/' + uid).once('value').then(snap => {
@@ -632,14 +541,106 @@
                 toast(`Режим просмотра: ${currentUserData.name}`);
             });
         }
-
         function exitImpersonate() {
-            if (originalAdmin) {
-                currentUserData = originalAdmin;
-                originalAdmin = null;
-                renderAppUI();
-                toast('Вы вернулись в режим администратора');
+            if (originalAdmin) { currentUserData = originalAdmin; originalAdmin = null; renderAppUI(); }
+        }
+
+        // ========== ГЕНЕРАЦИЯ ДЕМО-ДАННЫХ (15 учеников, 5 учителей, 3 класса) ==========
+        function generateDemoData() {
+            const school = "BINOM School";
+            const city = "Астана";
+            const classes = ['7 "А"', '7 "Б"', '7 "В"'];
+            const teacherNames = ["Сериков А.М.", "Ахметова Г.Б.", "Иванова Е.В.", "Касымов Д.С.", "Турсынбек Н.К."];
+            const teacherSubjects = [
+                ["Математика","Алгебра","Геометрия"],
+                ["Русский язык","Литература"],
+                ["История Казахстана","География"],
+                ["Физика","Информатика"],
+                ["Химия","Биология"]
+            ];
+            const studentNames = [
+                "Ахметов Данияр","Серикова Айжан","Маратов Ерлан","Касымова Дана","Турсынбек Алия",
+                "Исаев Алихан","Ким Арина","Ли Виктор","Смагулова Айгерим","Жумабаев Бекзат",
+                "Оспанова Камилла","Нурланов Амир","Ержанова Адель","Каримов Ильяс","Сагиева Дарина"
+            ];
+            // Разложим 15 учеников по 5 в каждый класс
+            const updates = {};
+            const teacherIds = [];
+            for (let i = 0; i < 5; i++) {
+                const tid = `demo-teacher-${i+1}`;
+                teacherIds.push(tid);
+                updates[`users/${tid}`] = {
+                    name: teacherNames[i],
+                    role: 'teacher',
+                    school, city,
+                    status: 'approved',
+                    subjects: teacherSubjects[i]
+                };
             }
+            for (let i = 0; i < 15; i++) {
+                const sid = `demo-student-${i+1}`;
+                const cls = classes[Math.floor(i/5)];
+                updates[`users/${sid}`] = {
+                    name: studentNames[i],
+                    role: 'student',
+                    school, city,
+                    uClass: cls,
+                    status: 'approved'
+                };
+            }
+            // Создадим журнал за несколько дней
+            const dates = ['2026-05-10','2026-05-11','2026-05-12'];
+            const subjectsForJournal = ["Математика","Русский язык","Физика"];
+            classes.forEach(cls => {
+                subjectsForJournal.forEach(subj => {
+                    dates.forEach(date => {
+                        const dayUpdates = { _type: 'ФО' };
+                        for (let i = 0; i < 5; i++) {
+                            const sid = `demo-student-${Math.floor(classes.indexOf(cls))*5 + i + 1}`;
+                            const attRand = Math.random();
+                            let att = 'Б';
+                            if (attRand > 0.8) att = 'Н';
+                            else if (attRand > 0.9) att = 'У';
+                            const grade = att === 'Б' ? Math.floor(Math.random()*10)+1 : '';
+                            dayUpdates[sid] = { att, grade };
+                        }
+                        updates[`journal/${school}/${cls}/${subj}/${date}`] = dayUpdates;
+                    });
+                });
+            });
+            // Задания с вложениями
+            const task1Id = 'demo-task-1';
+            const task2Id = 'demo-task-2';
+            updates[`tasks/${school}/7 "А"/Математика/${task1Id}`] = {
+                title: 'ДЗ: Сложение дробей',
+                desc: 'Решить №123, 124',
+                attachmentUrl: 'https://drive.google.com/file/d/example',
+                date: '10.05.2026',
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+            updates[`tasks/${school}/7 "Б"/Русский язык/${task2Id}`] = {
+                title: 'Сочинение "Моя Родина"',
+                desc: 'Объём 1 стр.',
+                attachmentUrl: 'https://docs.google.com/document/d/example',
+                date: '11.05.2026',
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+            // Ответы учеников
+            for (let i = 0; i < 5; i++) {
+                const sid = `demo-student-${i+1}`;
+                updates[`homeworks/${school}/7 "А"/Математика/${task1Id}/${sid}`] = {
+                    studentName: studentNames[i],
+                    answerText: 'Решение уравнения...',
+                    attachmentUrl: '',
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+            }
+
+            db.ref().update(updates).then(() => {
+                toast('Демо-данные созданы!');
+                loadAdminRequests();
+                loadUsers();
+            });
         }
 
         // ========== УЧИТЕЛЬ: ЖУРНАЛ ==========
@@ -656,14 +657,18 @@
                     const jData = jSnap.val() || {};
                     tbody.innerHTML = '';
                     for (let uid in users) {
-                        if (users[uid].school === school && users[uid].uClass === cls &&
-                            users[uid].role === 'student' && users[uid].status === 'approved') {
+                        if (users[uid].school === school && users[uid].uClass === cls && users[uid].role === 'student' && users[uid].status === 'approved') {
                             const rec = jData[uid] || { att: 'Б', grade: '' };
+                            const attBtnClass = rec.att === 'Б' ? 'btn-success' : (rec.att === 'У' ? 'btn-warning' : 'btn-danger');
                             tbody.innerHTML += `<tr data-uid="${uid}" data-name="${users[uid].name}">
                                 <td>${users[uid].name}</td>
-                                <td><button class="btn ${rec.att === 'Б' ? 'btn-success' : 'btn-danger'}"
-                                    onclick="this.textContent=this.textContent==='Б'?'Н':'Б';
-                                    this.className='btn '+(this.textContent==='Б'?'btn-success':'btn-danger')">${rec.att}</button></td>
+                                <td>
+                                    <select class="sys-select att-select" style="width:100px">
+                                        <option value="Б" ${rec.att==='Б'?'selected':''}>Б (присут.)</option>
+                                        <option value="Н" ${rec.att==='Н'?'selected':''}>Н (неуваж.)</option>
+                                        <option value="У" ${rec.att==='У'?'selected':''}>У (уважит.)</option>
+                                    </select>
+                                </td>
                                 <td><input type="number" class="sys-input" style="width:80px" value="${rec.grade}" min="1" max="10"></td>
                             </tr>`;
                         }
@@ -672,14 +677,12 @@
                 });
             });
         }
-
         function filterJournal() {
-            const search = document.getElementById('journal-search').value.toLowerCase();
+            const s = document.getElementById('journal-search').value.toLowerCase();
             document.querySelectorAll('#t-journal-body tr[data-name]').forEach(row => {
-                row.style.display = row.dataset.name.toLowerCase().includes(search) ? '' : 'none';
+                row.style.display = row.dataset.name.toLowerCase().includes(s) ? '' : 'none';
             });
         }
-
         function saveJournal() {
             const subj = document.getElementById('t-my-subject').value;
             const cls = document.getElementById('t-class').value;
@@ -690,12 +693,14 @@
             const updates = { _type: type };
             document.querySelectorAll('#t-journal-body tr[data-uid]').forEach(row => {
                 const uid = row.dataset.uid;
-                const att = row.querySelector('button').textContent;
+                const att = row.querySelector('.att-select').value;
                 const grade = row.querySelector('input').value;
                 updates[uid] = { att, grade };
             });
-            db.ref(`journal/${school}/${cls}/${subj}/${date}`).set(updates)
-                .then(() => { logAction('СОХРАНЕНИЕ ЖУРНАЛА', `${cls} ${subj}`); toast('Сохранено'); });
+            db.ref(`journal/${school}/${cls}/${subj}/${date}`).set(updates).then(() => {
+                toast('Сохранено');
+                logAction('СОХРАНЕНИЕ ЖУРНАЛА', `${cls} ${subj}`);
+            });
         }
 
         // ========== УЧИТЕЛЬ: ЗАДАНИЯ ==========
@@ -704,18 +709,19 @@
             const cls = document.getElementById('task-class').value;
             const title = document.getElementById('task-title').value.trim();
             const desc = document.getElementById('task-desc').value.trim();
-            if (!subj || !cls || !title) return toast('Заполните данные');
+            const link = document.getElementById('task-link').value.trim();
+            if (!subj || !cls || !title) return toast('Заполните обязательные поля');
             db.ref(`tasks/${currentUserData.school}/${cls}/${subj}`).push({
-                title, desc, date: new Date().toLocaleDateString('ru-RU'),
+                title, desc, attachmentUrl: link, date: new Date().toLocaleDateString('ru-RU'),
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             }).then(() => {
                 toast('Задание выдано');
                 document.getElementById('task-title').value = '';
                 document.getElementById('task-desc').value = '';
+                document.getElementById('task-link').value = '';
                 loadTeacherTasks();
             });
         }
-
         function loadTeacherTasks() {
             const subj = document.getElementById('task-subject').value;
             const cls = document.getElementById('task-class').value;
@@ -727,15 +733,18 @@
                 list.innerHTML = '';
                 for (let tid in tasks) {
                     const t = tasks[tid];
-                    list.innerHTML += `<div class="card"><b>${t.title}</b><br><small>${t.date}</small><p>${t.desc}</p>
+                    let attachmentHtml = t.attachmentUrl ? `<div>📎 <a href="${t.attachmentUrl}" target="_blank">Скачать/посмотреть</a></div>` : '';
+                    list.innerHTML += `<div class="card"><b>${t.title}</b><br><small>${t.date}</small><p>${t.desc}</p>${attachmentHtml}
                         <div id="hw-${tid}">Загрузка ответов...</div></div>`;
                     db.ref(`homeworks/${school}/${cls}/${subj}/${tid}`).once('value').then(hwSnap => {
                         const hw = hwSnap.val() || {};
                         const hwDiv = document.getElementById(`hw-${tid}`);
                         if (!hwDiv) return;
-                        hwDiv.innerHTML = Object.values(hw).map(a =>
-                            `<div style="background:#f8fafc;padding:10px;margin:5px 0;border-radius:8px">
-                                <b>${a.studentName}</b><br>${a.answer}</div>`).join('') || 'Нет ответов';
+                        hwDiv.innerHTML = Object.values(hw).map(a => `
+                            <div style="background:#f8fafc;padding:10px;margin:5px 0;border-radius:8px">
+                                <b>${a.studentName}</b><br>${a.answerText}
+                                ${a.attachmentUrl ? `<br><a href="${a.attachmentUrl}" target="_blank">📎 Ответ в файле</a>` : ''}
+                            </div>`).join('') || 'Нет ответов';
                     });
                 }
                 if (!Object.keys(tasks).length) list.innerHTML = '<p>Нет заданий</p>';
@@ -754,44 +763,31 @@
             ]).then(([usersSnap, journalSnap]) => {
                 const users = usersSnap.val() || {};
                 const allLessons = journalSnap.val() || {};
-                const studentStats = {};
-                // Собираем учеников класса
+                const stats = {};
                 for (let uid in users) {
-                    if (users[uid].school === school && users[uid].uClass === cls &&
-                        users[uid].role === 'student' && users[uid].status === 'approved') {
-                        studentStats[uid] = { name: users[uid].name, lessons: 0, attended: 0, grades: [], sum: 0 };
+                    if (users[uid].school === school && users[uid].uClass === cls && users[uid].role === 'student' && users[uid].status === 'approved') {
+                        stats[uid] = { name: users[uid].name, lessons: 0, attended: 0, grades: [] };
                     }
                 }
-                // Обрабатываем журнал
                 for (let date in allLessons) {
                     const day = allLessons[date];
                     for (let uid in day) {
                         if (uid === '_type') continue;
-                        if (studentStats[uid]) {
-                            studentStats[uid].lessons++;
-                            if (day[uid].att === 'Б') {
-                                studentStats[uid].attended++;
-                                if (day[uid].grade && !isNaN(day[uid].grade)) {
-                                    studentStats[uid].grades.push(Number(day[uid].grade));
-                                    studentStats[uid].sum += Number(day[uid].grade);
-                                }
-                            }
+                        if (stats[uid]) {
+                            stats[uid].lessons++;
+                            if (day[uid].att === 'Б' || day[uid].att === 'У') stats[uid].attended++; // уважительный тоже считается присутствием?
+                            if (day[uid].grade && !isNaN(day[uid].grade)) stats[uid].grades.push(Number(day[uid].grade));
                         }
                     }
                 }
-                // Таблица
-                const tableDiv = document.getElementById('analytics-table');
-                tableDiv.innerHTML = `<table><thead><tr><th>Ученик</th><th>Посещаемость</th><th>Средний балл</th></tr></thead><tbody>` +
-                    Object.values(studentStats).map(s => {
-                        const percent = s.lessons ? Math.round((s.attended / s.lessons) * 100) : 100;
-                        const avg = s.grades.length ? (s.sum / s.grades.length).toFixed(2) : '-';
-                        return `<tr><td>${s.name}</td><td><span class="badge ${percent >= 90 ? 'badge-success' : (percent >= 75 ? 'badge-info' : 'badge-warning')}">${percent}%</span></td><td>${avg}</td></tr>`;
-                    }).join('') + `</tbody></table>`;
-                // График
-                const names = Object.values(studentStats).map(s => s.name);
-                const percents = Object.values(studentStats).map(s =>
-                    s.lessons ? Math.round((s.attended / s.lessons) * 100) : 100
-                );
+                const students = Object.values(stats);
+                const names = students.map(s => s.name);
+                const percents = students.map(s => s.lessons ? Math.round((s.attended / s.lessons) * 100) : 100);
+                const avgs = students.map(s => s.grades.length ? (s.grades.reduce((a,b)=>a+b,0)/s.grades.length).toFixed(2) : '-');
+
+                document.getElementById('analytics-table').innerHTML = `<table><thead><tr><th>Ученик</th><th>Посещаемость</th><th>Средний балл</th></tr></thead><tbody>` +
+                    students.map((s,i) => `<tr><td>${s.name}</td><td><span class="badge ${percents[i]>=90?'badge-success':(percents[i]>=75?'badge-warning':'badge-danger')}">${percents[i]}%</span></td><td>${avgs[i]}</td></tr>`).join('') + '</tbody></table>';
+
                 if (attendanceChart) attendanceChart.destroy();
                 const ctx = document.getElementById('attendanceChart').getContext('2d');
                 attendanceChart = new Chart(ctx, {
@@ -824,10 +820,9 @@
                         if (data[subj][date][uid]) {
                             const r = data[subj][date][uid];
                             tbody.innerHTML += `<tr>
-                                <td>${subj}</td><td>${date}</td>
-                                <td>${data[subj][date]._type || 'Урок'}</td>
-                                <td><span class="badge ${r.att === 'Б' ? 'badge-success' : 'badge-warning'}">${r.att}</span></td>
-                                <td>${r.grade || '-'}</td></tr>`;
+                                <td>${subj}</td><td>${date}</td><td>${data[subj][date]._type||'ФО'}</td>
+                                <td><span class="badge ${r.att==='Б'?'badge-success':(r.att==='У'?'badge-warning':'badge-danger')}">${r.att}</span></td>
+                                <td>${r.grade||'-'}</td></tr>`;
                         }
                     }
                 }
@@ -847,26 +842,29 @@
                 for (let subj in data) {
                     for (let tid in data[subj]) {
                         const t = data[subj][tid];
+                        let attachmentHtml = t.attachmentUrl ? `<div>📎 <a href="${t.attachmentUrl}" target="_blank">Скачать/посмотреть</a></div>` : '';
                         list.innerHTML += `<div class="card">
-                            <h4>${subj}: ${t.title}</h4><p>${t.desc}</p>
-                            <textarea id="ans-${tid}" class="sys-input" rows="2" placeholder="Ваш ответ"></textarea>
-                            <button class="btn btn-primary" onclick="submitHomework('${tid}','${subj}')">Отправить</button>
+                            <h4>${subj}: ${t.title}</h4><p>${t.desc}</p>${attachmentHtml}
+                            <textarea id="ans-text-${tid}" class="sys-input" rows="2" placeholder="Ваш ответ (текст)"></textarea>
+                            <input type="text" id="ans-link-${tid}" class="sys-input" placeholder="Ссылка на ваш файл/диск (необязательно)" style="margin:5px 0;">
+                            <button class="btn btn-primary" onclick="submitHomework('${tid}','${subj}')">📤 Отправить</button>
                         </div>`;
                     }
                 }
                 if (!list.innerHTML) list.innerHTML = '<p>Нет заданий</p>';
             });
         }
-
         function submitHomework(taskId, subject) {
-            const ans = document.getElementById(`ans-${taskId}`).value.trim();
-            if (!ans) return toast('Введите ответ');
+            const text = document.getElementById(`ans-text-${taskId}`).value.trim();
+            const link = document.getElementById(`ans-link-${taskId}`).value.trim();
+            if (!text && !link) return toast('Напишите ответ или прикрепите ссылку');
             const school = currentUserData.school;
             const cls = currentUserData.uClass;
             const uid = currentUserData.uid;
             db.ref(`homeworks/${school}/${cls}/${subject}/${taskId}/${uid}`).set({
                 studentName: currentUserData.name,
-                answer: ans,
+                answerText: text,
+                attachmentUrl: link,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             }).then(() => toast('Ответ отправлен!'));
         }
@@ -875,15 +873,13 @@
         function loadAdminLogs() {
             db.ref('logs').limitToLast(50).on('value', snap => {
                 const logs = snap.val() || {};
-                const container = document.getElementById('logs-container');
-                container.innerHTML = Object.entries(logs).reverse().map(([k, l]) =>
-                    `<div class="card" style="padding:10px;margin:5px 0">
+                document.getElementById('logs-container').innerHTML = Object.entries(logs).reverse().map(([k,l]) => `
+                    <div class="card" style="padding:10px;margin:5px 0">
                         <b>${new Date(l.timestamp).toLocaleString('ru-RU')}</b> — ${l.action}<br>
                         <small>${l.user}: ${l.details}</small></div>`).join('');
             });
         }
 
-        // Навигация
         document.addEventListener('click', e => {
             const nav = e.target.closest('.nav-item');
             if (nav && nav.dataset.tab) switchTab(nav.dataset.tab);
