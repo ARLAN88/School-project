@@ -88,53 +88,29 @@
         #user-name { font-weight: 600; display: block; margin-bottom: 4px; }
         #user-role { font-size: 0.8rem; color: var(--kz-gold); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
+        main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
         header {
-            background: white;
-            padding: 16px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            background: white; padding: 16px 40px; display: flex;
+            justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.03);
         }
         .school-tag {
             background: linear-gradient(135deg, #0A2E5C, #1F4E8C);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            color: white; padding: 8px 20px; border-radius: 30px;
+            font-size: 0.85rem; font-weight: 600;
         }
         .content-area { padding: 40px; max-width: 1400px; margin: 0 auto; width: 100%; }
 
         .card {
-            background: white;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            margin-bottom: 24px;
-            padding: 24px;
-            transition: var(--transition);
-            animation: fadeSlideUp 0.4s ease;
+            background: white; border-radius: var(--radius); border: 1px solid var(--border);
+            box-shadow: var(--shadow); margin-bottom: 24px; padding: 24px;
+            transition: var(--transition); animation: fadeSlideUp 0.4s ease;
         }
 
         .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            font-size: 0.9rem;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            padding: 10px 20px; border-radius: 8px; font-weight: 600;
+            cursor: pointer; border: none; font-size: 0.9rem;
+            transition: var(--transition); display: inline-flex; align-items: center; gap: 8px;
         }
         .btn-primary { background: linear-gradient(135deg, #0A2E5C, #1F4E8C); color: white; box-shadow: 0 4px 12px rgba(10,46,92,0.3); }
         .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(10,46,92,0.4); }
@@ -145,14 +121,9 @@
         .btn-outline:hover { background: rgba(255,255,255,0.1); }
 
         .sys-select, .sys-input {
-            padding: 10px 14px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            outline: none;
-            background: #fff;
-            font-size: 0.95rem;
-            transition: var(--transition);
-            min-width: 150px;
+            padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border);
+            outline: none; background: #fff; font-size: 0.95rem;
+            transition: var(--transition); min-width: 150px;
         }
         .table-responsive { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; background: white; }
@@ -170,8 +141,7 @@
         .full-screen-modal {
             position: fixed; inset: 0;
             background: radial-gradient(circle at 30% 30%, #1F4E8C, #0A2E5C);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 1000;
+            display: flex; align-items: center; justify-content: center; z-index: 1000;
         }
         .login-box {
             background: white; padding: 48px 40px; border-radius: 24px;
@@ -183,7 +153,7 @@
 </head>
 <body>
 
-    <!-- Экран входа -->
+    <!-- Экраны авторизации, регистрации, ожидания (как раньше) -->
     <div id="scr-auth" class="full-screen-modal hidden">
         <div class="login-box">
             <h1 style="color:var(--kz-blue);">🇰🇿 EduSystem</h1>
@@ -192,7 +162,6 @@
         </div>
     </div>
 
-    <!-- Экран регистрации -->
     <div id="scr-reg" class="full-screen-modal hidden">
         <div class="login-box" style="max-width:600px;">
             <h3>Создание профиля</h3>
@@ -208,7 +177,6 @@
         </div>
     </div>
 
-    <!-- Ожидание -->
     <div id="scr-wait" class="full-screen-modal hidden">
         <div class="login-box"><h2>⏳ Ожидание доступа</h2><p>Ваша заявка отправлена администратору.</p>
             <button class="btn btn-outline" style="width:100%; margin-top:20px; background:#0A2E5C; color:white;" onclick="exitApp()">Выйти</button>
@@ -247,31 +215,29 @@
                 <div class="school-tag" id="school-tag">EduSystem</div>
             </header>
             <div class="content-area">
-                <!-- АДМИН: ЗАЯВКИ -->
+                <!-- АДМИН: Заявки -->
                 <div id="tab-admin-req" class="tab-content hidden animate-fade">
                     <div class="card">
                         <h3>Ожидают подтверждения</h3>
-                        <button class="btn btn-primary" onclick="generateDemoData()" style="margin:10px 0;">⚡ Сгенерировать демо-данные (15 учеников, 5 учителей, 3 класса)</button>
+                        <button class="btn btn-primary" onclick="generateDemoData()" style="margin:10px 0;">⚡ Сгенерировать демо-данные</button>
                         <div class="table-responsive"><table><thead><tr><th>Пользователь</th><th>Город/Школа</th><th>Роль/Класс</th><th>Действие</th></tr></thead><tbody id="admin-req-body"></tbody></table></div>
                     </div>
                 </div>
-
-                <!-- АДМИН: ПОЛЬЗОВАТЕЛИ -->
+                <!-- АДМИН: Пользователи -->
                 <div id="tab-users" class="tab-content hidden animate-fade">
                     <div class="card"><h3>Все пользователи</h3><div class="table-responsive"><table><thead><tr><th>ФИО</th><th>Роль</th><th>Класс/Предметы</th><th>Школа</th><th>Действия</th></tr></thead><tbody id="users-body"></tbody></table></div></div>
                 </div>
-
-                <!-- АДМИН: ЛОГИ -->
+                <!-- АДМИН: Логи -->
                 <div id="tab-admin-logs" class="tab-content hidden animate-fade">
                     <div class="card"><h3>Системный журнал</h3><div id="logs-container"></div></div>
                 </div>
 
-                <!-- УЧИТЕЛЬ: ЖУРНАЛ -->
+                <!-- УЧИТЕЛЬ: Журнал -->
                 <div id="tab-teacher-journal" class="tab-content hidden animate-fade">
                     <div class="card">
                         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
                             <select id="t-my-subject" class="sys-select" onchange="loadJournal()"></select>
-                            <select id="t-class" class="sys-select" onchange="loadJournal()"></select>
+                            <select id="t-class" class="sys-select" onchange="onTeacherClassChange()"></select>
                             <input type="date" id="t-date" class="sys-input" onchange="loadJournal()">
                             <select id="t-type" class="sys-select"><option value="ФО">ФО</option><option value="СОР">СОР</option><option value="СОЧ">СОЧ</option></select>
                             <input type="text" id="journal-search" class="sys-input" placeholder="🔍 Поиск ученика..." oninput="filterJournal()">
@@ -281,27 +247,27 @@
                     </div>
                 </div>
 
-                <!-- УЧИТЕЛЬ: ЗАДАНИЯ -->
+                <!-- УЧИТЕЛЬ: Задания -->
                 <div id="tab-teacher-tasks" class="tab-content hidden animate-fade">
                     <div class="card">
                         <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
                             <select id="task-subject" class="sys-select"></select>
-                            <select id="task-class" class="sys-select"></select>
+                            <select id="task-class" class="sys-select" onchange="onTaskClassChange()"></select>
                             <input type="text" id="task-title" class="sys-input" placeholder="Тема">
                             <textarea id="task-desc" class="sys-input" rows="2" placeholder="Описание"></textarea>
-                            <input type="text" id="task-link" class="sys-input" placeholder="🔗 Ссылка или файл (drive/doc)">
+                            <input type="text" id="task-link" class="sys-input" placeholder="🔗 Ссылка или файл">
                             <button class="btn btn-primary" onclick="createTask()">+ Выдать</button>
                         </div>
                         <div id="teacher-tasks-list"></div>
                     </div>
                 </div>
 
-                <!-- УЧИТЕЛЬ: АНАЛИТИКА -->
+                <!-- УЧИТЕЛЬ: Аналитика -->
                 <div id="tab-teacher-analytics" class="tab-content hidden animate-fade">
                     <div class="card">
                         <h3>Анализ успеваемости и посещаемости</h3>
                         <div style="display:flex; gap:10px; margin-bottom:20px;">
-                            <select id="anal-class" class="sys-select" onchange="loadAnalytics()"></select>
+                            <select id="anal-class" class="sys-select" onchange="onAnalyticsClassChange()"></select>
                             <select id="anal-subject" class="sys-select" onchange="loadAnalytics()"></select>
                         </div>
                         <div id="analytics-table"></div>
@@ -309,12 +275,12 @@
                     </div>
                 </div>
 
-                <!-- УЧЕНИК: ДНЕВНИК -->
+                <!-- УЧЕНИК: Дневник -->
                 <div id="tab-student-grades" class="tab-content hidden animate-fade">
                     <div class="card"><h3>Моя успеваемость</h3><div class="table-responsive"><table><thead><tr><th>Предмет</th><th>Дата</th><th>Тип</th><th>Явка</th><th>Балл</th></tr></thead><tbody id="s-journal-body"></tbody></table></div></div>
                 </div>
 
-                <!-- УЧЕНИК: ЗАДАНИЯ -->
+                <!-- УЧЕНИК: Задания -->
                 <div id="tab-student-tasks" class="tab-content hidden animate-fade">
                     <div class="card"><h3>Задания от учителей</h3><div id="student-tasks-list"></div></div>
                 </div>
@@ -346,8 +312,44 @@
             "Алматы": ["РФМШ","Гимназия №159","Лицей №134","Школа №105"]
         };
 
-        const ALL_SUBJECTS = ["Математика","Алгебра","Геометрия","Физика","Химия","Биология",
-            "Информатика","Русский язык","Английский язык","История Казахстана","Физкультура"];
+        // Учебный план: какие предметы в каких классах
+        const SUBJECTS_BY_GRADE = {
+            primary: ["Обучение грамоте", "Математика", "Познание мира", "ИЗО", "Музыка", "Физкультура"],
+            middle: ["Алгебра", "Геометрия", "Русский язык", "Литература", "История Казахстана", "Биология", "География", "Информатика", "Физика", "Химия", "Английский язык", "Физкультура"],
+            high: ["Алгебра", "Геометрия", "Русский язык", "Литература", "История Казахстана", "Всемирная история", "Основы права", "Биология", "Физика", "Химия", "Информатика", "Английский язык", "Физкультура"]
+        };
+
+        function getSubjectsForGrade(grade) {
+            if (grade >= 1 && grade <= 4) return SUBJECTS_BY_GRADE.primary;
+            if (grade >= 5 && grade <= 9) return SUBJECTS_BY_GRADE.middle;
+            if (grade >= 10 && grade <= 11) return SUBJECTS_BY_GRADE.high;
+            return [];
+        }
+
+        // Фильтрация предметов учителя по классу
+        function filterTeacherSubjects(teacherSubjects, classValue) {
+            if (!classValue || !teacherSubjects) return teacherSubjects || [];
+            const grade = parseInt(classValue);
+            const allowed = getSubjectsForGrade(grade);
+            if (allowed.length === 0) return teacherSubjects; // если не определили, показываем все его
+            return teacherSubjects.filter(s => allowed.includes(s));
+        }
+
+        // Обновление селекта предметов с учетом класса
+        function updateSubjectSelect(selectId, teacherSubjects, classValue) {
+            const sel = document.getElementById(selectId);
+            if (!sel) return;
+            const filtered = filterTeacherSubjects(teacherSubjects, classValue);
+            const currentVal = sel.value;
+            sel.innerHTML = '';
+            if (filtered.length === 0) {
+                sel.add(new Option("Нет доступных предметов", ""));
+            } else {
+                filtered.forEach(s => sel.add(new Option(s, s)));
+                // попытаться сохранить выбранное значение, если оно есть в новом списке
+                if (filtered.includes(currentVal)) sel.value = currentVal;
+            }
+        }
 
         let currentUserData = null;
         let originalAdmin = null;
@@ -441,12 +443,11 @@
                 switchTab('tab-admin-req');
             } else if (role === 'teacher') {
                 document.getElementById('menu-teacher').classList.remove('hidden');
-                ['t-my-subject','task-subject','anal-subject'].forEach(id => {
-                    const sel = document.getElementById(id);
-                    sel.innerHTML = '';
-                    if (currentUserData.subjects) currentUserData.subjects.forEach(s => sel.add(new Option(s, s)));
-                    else sel.add(new Option("Нет предметов", ""));
-                });
+                // Заполняем селекты классов (уже заполнены, просто обновим предметы при первой загрузке)
+                // Инициализируем предметы с учетом выбранного класса (по умолчанию класс не выбран)
+                onTeacherClassChange();
+                onTaskClassChange();
+                onAnalyticsClassChange();
                 switchTab('tab-teacher-journal');
             } else if (role === 'student') {
                 document.getElementById('menu-student').classList.remove('hidden');
@@ -465,11 +466,28 @@
             if (tabId === 'tab-admin-req') loadAdminRequests();
             if (tabId === 'tab-users') loadUsers();
             if (tabId === 'tab-admin-logs') loadAdminLogs();
-            if (tabId === 'tab-teacher-journal') loadJournal();
-            if (tabId === 'tab-teacher-tasks') loadTeacherTasks();
-            if (tabId === 'tab-teacher-analytics') loadAnalytics();
+            if (tabId === 'tab-teacher-journal') { onTeacherClassChange(); loadJournal(); }
+            if (tabId === 'tab-teacher-tasks') { onTaskClassChange(); loadTeacherTasks(); }
+            if (tabId === 'tab-teacher-analytics') { onAnalyticsClassChange(); loadAnalytics(); }
             if (tabId === 'tab-student-grades') loadStudentGrades();
             if (tabId === 'tab-student-tasks') loadStudentTasks();
+        }
+
+        // Обработчики смены класса для учителя
+        function onTeacherClassChange() {
+            const cls = document.getElementById('t-class').value;
+            updateSubjectSelect('t-my-subject', currentUserData.subjects || [], cls);
+            loadJournal();
+        }
+        function onTaskClassChange() {
+            const cls = document.getElementById('task-class').value;
+            updateSubjectSelect('task-subject', currentUserData.subjects || [], cls);
+            loadTeacherTasks();
+        }
+        function onAnalyticsClassChange() {
+            const cls = document.getElementById('anal-class').value;
+            updateSubjectSelect('anal-subject', currentUserData.subjects || [], cls);
+            loadAnalytics();
         }
 
         // ========== АДМИН: ЗАЯВКИ ==========
@@ -545,7 +563,7 @@
             if (originalAdmin) { currentUserData = originalAdmin; originalAdmin = null; renderAppUI(); }
         }
 
-        // ========== ГЕНЕРАЦИЯ ДЕМО-ДАННЫХ (15 учеников, 5 учителей, 3 класса) ==========
+        // ========== ГЕНЕРАЦИЯ ДЕМО-ДАННЫХ ==========
         function generateDemoData() {
             const school = "BINOM School";
             const city = "Астана";
@@ -563,7 +581,6 @@
                 "Исаев Алихан","Ким Арина","Ли Виктор","Смагулова Айгерим","Жумабаев Бекзат",
                 "Оспанова Камилла","Нурланов Амир","Ержанова Адель","Каримов Ильяс","Сагиева Дарина"
             ];
-            // Разложим 15 учеников по 5 в каждый класс
             const updates = {};
             const teacherIds = [];
             for (let i = 0; i < 5; i++) {
@@ -588,15 +605,15 @@
                     status: 'approved'
                 };
             }
-            // Создадим журнал за несколько дней
+            // Журнал только для средней школы (7 класс)
             const dates = ['2026-05-10','2026-05-11','2026-05-12'];
-            const subjectsForJournal = ["Математика","Русский язык","Физика"];
+            const subjectsForJournal = ["Математика","Русский язык","Физика"]; // это предметы средней школы, фильтр пропустит
             classes.forEach(cls => {
                 subjectsForJournal.forEach(subj => {
                     dates.forEach(date => {
                         const dayUpdates = { _type: 'ФО' };
                         for (let i = 0; i < 5; i++) {
-                            const sid = `demo-student-${Math.floor(classes.indexOf(cls))*5 + i + 1}`;
+                            const sid = `demo-student-${classes.indexOf(cls)*5 + i + 1}`;
                             const attRand = Math.random();
                             let att = 'Б';
                             if (attRand > 0.8) att = 'Н';
@@ -612,30 +629,23 @@
             const task1Id = 'demo-task-1';
             const task2Id = 'demo-task-2';
             updates[`tasks/${school}/7 "А"/Математика/${task1Id}`] = {
-                title: 'ДЗ: Сложение дробей',
-                desc: 'Решить №123, 124',
+                title: 'ДЗ: Сложение дробей', desc: 'Решить №123, 124',
                 attachmentUrl: 'https://drive.google.com/file/d/example',
-                date: '10.05.2026',
-                timestamp: firebase.database.ServerValue.TIMESTAMP
+                date: '10.05.2026', timestamp: firebase.database.ServerValue.TIMESTAMP
             };
             updates[`tasks/${school}/7 "Б"/Русский язык/${task2Id}`] = {
-                title: 'Сочинение "Моя Родина"',
-                desc: 'Объём 1 стр.',
+                title: 'Сочинение "Моя Родина"', desc: 'Объём 1 стр.',
                 attachmentUrl: 'https://docs.google.com/document/d/example',
-                date: '11.05.2026',
-                timestamp: firebase.database.ServerValue.TIMESTAMP
+                date: '11.05.2026', timestamp: firebase.database.ServerValue.TIMESTAMP
             };
-            // Ответы учеников
             for (let i = 0; i < 5; i++) {
                 const sid = `demo-student-${i+1}`;
                 updates[`homeworks/${school}/7 "А"/Математика/${task1Id}/${sid}`] = {
                     studentName: studentNames[i],
-                    answerText: 'Решение уравнения...',
-                    attachmentUrl: '',
+                    answerText: 'Решение уравнения...', attachmentUrl: '',
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 };
             }
-
             db.ref().update(updates).then(() => {
                 toast('Демо-данные созданы!');
                 loadAdminRequests();
@@ -659,7 +669,6 @@
                     for (let uid in users) {
                         if (users[uid].school === school && users[uid].uClass === cls && users[uid].role === 'student' && users[uid].status === 'approved') {
                             const rec = jData[uid] || { att: 'Б', grade: '' };
-                            const attBtnClass = rec.att === 'Б' ? 'btn-success' : (rec.att === 'У' ? 'btn-warning' : 'btn-danger');
                             tbody.innerHTML += `<tr data-uid="${uid}" data-name="${users[uid].name}">
                                 <td>${users[uid].name}</td>
                                 <td>
@@ -775,7 +784,7 @@
                         if (uid === '_type') continue;
                         if (stats[uid]) {
                             stats[uid].lessons++;
-                            if (day[uid].att === 'Б' || day[uid].att === 'У') stats[uid].attended++; // уважительный тоже считается присутствием?
+                            if (day[uid].att === 'Б' || day[uid].att === 'У') stats[uid].attended++;
                             if (day[uid].grade && !isNaN(day[uid].grade)) stats[uid].grades.push(Number(day[uid].grade));
                         }
                     }
